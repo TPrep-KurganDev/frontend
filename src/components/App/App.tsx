@@ -3,6 +3,8 @@ import '../../styles/global.scss';
 
 export default function App() {
   return (
-    <ExamScreen/>
+    <div className="screen">
+      <ExamScreen/>
+    </div>
   );
 }

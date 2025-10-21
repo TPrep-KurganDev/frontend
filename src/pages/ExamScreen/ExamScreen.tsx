@@ -13,9 +13,8 @@ export default function ExamScreen() {
   const title = 'Экзамен по алгему'
 
   return (
-    <div className="screen">
+    <div>
       <Header title={title}/>
-
       <div className={styles.list}>
         {questions.map((q) => (
           <div key={q.id} className={styles.item}>
