@@ -1,0 +1,24 @@
+:local {
+  .header {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin: 0;
+    padding: 20px 10px 10px;
+  }
+
+  .title {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .backButton {
+    color: #3b82f6;
+    font-size: 1.25rem;
+    margin-right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+  }
+}

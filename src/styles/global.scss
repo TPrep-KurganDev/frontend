@@ -1,0 +1,13 @@
+@use "fonts";
+
+body {
+  font-family: 'Tinkoff', sans-serif;
+}
+
+.screen {
+  min-height: 100vh;
+  background: #fff;
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 0 5px;
+}
