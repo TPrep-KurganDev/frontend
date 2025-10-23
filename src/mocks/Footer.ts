@@ -1,11 +1,6 @@
-type Footer = {
-  mistakesCount: number;
-  cardsCount: number;
-  doneCardsCount: number;
-  cardsProgress: boolean[];
-}
+import {FooterCard} from '../types/FooterCard.ts';
 
-export const footer: Footer = {
+export const footer: FooterCard = {
   mistakesCount: 1,
   cardsCount: 12,
   doneCardsCount: 4,

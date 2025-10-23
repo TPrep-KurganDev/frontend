@@ -1,0 +1,48 @@
+:local {
+  .footer {
+    border-radius: 15px;
+    box-shadow: 0 0 29.5px 0 rgba(0, 0, 0, 0.14);
+    padding: 10px;
+  }
+
+  .info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .progressText {
+    font-size: 19px;
+    font-weight: 400;
+    color: rgba(53, 53, 53, 1);
+  }
+
+  .errorsText {
+    font-size: 14px;
+    color: rgba(147, 147, 147, 1);
+  }
+
+  .progressBar {
+    display: flex;
+    gap: 4px;
+  }
+
+  .segment {
+    height: 8px;
+    border-radius: 15px;
+    width: 100%;
+  }
+
+  .segmentCompleted {
+    background-color: #3b82f6;
+  }
+
+  .segmentError {
+    background-color: #ef4444;
+  }
+
+  .segmentPending {
+    background-color: #e5e7eb;
+  }
+}
