@@ -1,0 +1,38 @@
+:local {
+  .card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 35px;
+    box-shadow: 0 0 29.5px 0 rgba(0, 0, 0, 0.14);
+    padding: 30px;
+    cursor: pointer;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  .question,
+  .answer {
+    font-weight: 400;
+    color: rgba(53, 53, 53, 1);
+    width: 100%;
+  }
+
+  .question {
+    font-size: 36px;
+  }
+
+  .answer {
+    font-size: 30px;
+    display: none;
+  }
+
+  .cardFlipped .question {
+    display: none;
+  }
+
+  .cardFlipped .answer {
+    display: block;
+  }
+}
