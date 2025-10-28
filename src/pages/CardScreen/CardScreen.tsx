@@ -18,7 +18,7 @@ export function CardScreen() {
   return (
     <>
       <Header title={titleExam}/>
-      <div className="screenСontent">
+      <div className="screenСontent screenContentCentered">
         <Card
           question={currentQuestion.title}
           answer={currentQuestion.answer}

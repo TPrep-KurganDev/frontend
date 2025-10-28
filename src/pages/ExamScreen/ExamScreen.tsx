@@ -8,7 +8,6 @@ export default function ExamScreen() {
   return (
     <>
       <Header title={titleExam}/>
-      <div className="screenСontent">
         <div className={styles.list}>
           {questions.map((q) => (
             <div key={q.id} className={styles.item}>
@@ -20,7 +19,6 @@ export default function ExamScreen() {
             </div>
           ))}
         </div>
-      </div>
     </>
   );
 }
