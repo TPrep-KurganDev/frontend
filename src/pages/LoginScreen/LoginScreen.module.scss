@@ -5,7 +5,7 @@
     border-radius: 40px;
     margin: 0 10px;
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.14);
-    width: 325px;
+    width: 92%;
   }
 
   .loginForm h2 {
@@ -23,7 +23,7 @@
 
   .formGroup label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-size: 18px;
     padding-left: 10px;
   }
@@ -31,13 +31,13 @@
   .formGroup input {
     width: 90%;
     padding: 12px 16px;
-    border: 1px solid #939393;
-    border-radius: 14px;
-    font-size: 16px;
+    border: 1px solid #909090;
+    border-radius: 16px;
+    font-size: 20px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     display: block;
     margin: auto;
-    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.1);
   }
 
   .formGroup input:focus {
@@ -61,21 +61,5 @@
 
   .forgotPassword:hover {
     text-decoration: underline;
-  }
-
-  .loginButton {
-    width: 200px;
-    padding: 14px;
-    background: linear-gradient(-45deg, #D9EAFF, #EFF6FF);
-    border: none;
-    border-radius: 30px;
-    font-size: 24px;
-    color: black;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-    font-family: "Tinkoff", sans-serif;
-    margin: 0 auto;
-    display: block;
-    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.14);
   }
 }

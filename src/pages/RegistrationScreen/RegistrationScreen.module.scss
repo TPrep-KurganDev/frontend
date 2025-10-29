@@ -1,0 +1,69 @@
+:local {
+  .registrationForm {
+    padding: 20px 30px;
+    background: #fff;
+    border-radius: 0px 0px 40px 40px;
+    margin: 0 10px;
+    box-shadow: 0 13px 10px -7px rgba(0, 0, 0, 0.3);
+    width: 92%;
+  }
+
+  .title {
+    text-align: center;
+    margin-top: 3px;
+    margin-bottom: 24px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  input {
+    color: black;
+    font-family: 'Tinkoff', sans-serif;
+  }
+
+  .input::placeholder {
+    color: #939393; /* Цвет текста плейсхолдера */
+  }
+
+  .gap {
+    margin-bottom: 30px;
+  }
+
+  .gap2 {
+    margin-bottom: 15px;
+  }
+
+  .yellowButton {
+    background: linear-gradient(-45deg, #fee976, #feef9e);
+    width: 70%;
+    border-radius: 28px;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.10);
+  }
+
+  .yellowButton:hover {
+    cursor: pointer;
+  }
+
+  .yellowButtonPadding {
+    margin-bottom: 120px;
+  }
+
+  .yellowButtonP {
+    color: #939393;
+    padding: 0;
+    margin: 0;
+  }
+
+  .yellowButtonTitle {
+    font-size: 25px;
+    padding: 0;
+    margin: 0;
+  }
+}

@@ -1,4 +1,5 @@
 import styles from './LoginScreen.module.scss';
+import {BlueButton} from '../../components/BlueButton/BlueButton.tsx';
 
 export function LoginScreen() {
   return (
@@ -21,7 +22,7 @@ export function LoginScreen() {
             <a href="#" className={styles.forgotPassword}>Забыли пароль?</a>
           </div>
 
-          <button type="submit" className={styles.loginButton}>Войти</button>
+          <BlueButton title="Войти"/>
         </form>
       </div>
     </div>
