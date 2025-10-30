@@ -8,12 +8,13 @@ import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 export default function ExamScreen() {
   return (
     <>
-      <Header title={titleExam}/>
-        <div className={styles.list}>
-          {questions.map((q) => (
-            <CardListEntry question={q.title} answer={q.answer} id={q.id.toString()}/>
-          ))}
-        </div>
+      <Header title={titleExam} imgSrc={'settingsCard.svg'} widthImg="38" heightImg="36" />
+      <div className={styles.list}>
+        {questions.map((q) => (
+          <CardListEntry question={q.title} answer={q.answer} id={q.id.toString()}/>
+        ))}
+        <CardListEntry question={''} answer={''} id={'+'}/>
+      </div>
     </>
   );
 }

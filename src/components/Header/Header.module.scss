@@ -13,12 +13,20 @@
     margin: 0;
   }
 
+  .backButton,
+  .settingsButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
   .backButton {
     color: #3b82f6;
     font-size: 1.25rem;
     margin-right: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
+  }
+
+  .settingsButton {
+    margin-left: auto;
   }
 }

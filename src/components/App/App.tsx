@@ -3,6 +3,7 @@ import '../../styles/global.scss';
 import {CardScreen} from '../../pages/CardScreen/CardScreen.tsx';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {AppRoute} from '../../const.ts';
+import {CardEditScreen} from '../../pages/CardEditScreen/CardEditScreen.tsx';
 
 export default function App() {
   return (
@@ -16,6 +17,10 @@ export default function App() {
           <Route
             path={AppRoute.Card}
             element={<CardScreen/>}
+          />
+          <Route
+            path={'/cardEdit'}
+            element={<CardEditScreen/>}
           />
         </Routes>
       </BrowserRouter>

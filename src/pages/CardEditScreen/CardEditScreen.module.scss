@@ -1,0 +1,23 @@
+:local {
+  .answer,
+  .question {
+    text-align: center;
+
+    border-radius: 18px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border: rgba(147, 147, 147, 1) solid 1px;
+    margin: 25px;
+    font-size: 22px;
+    font-weight: 400;
+    word-break: break-word;
+  }
+  .question {
+    color: #000000;
+  }
+
+  .answer {
+    background-color: #EFF6FF;
+    margin-top: 0;
+  }
+}
