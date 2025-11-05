@@ -1,89 +1,60 @@
-import { http } from './httpClient';
+import axios from 'axios';
 
-// ----------- Types -------------
+const API_URL = 'http://localhost:8000/api';
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  access_token: string;
-  token_type: string; // "bearer"
-}
-
-export interface RefreshResponse {
-  accessToken: string;
-  expiresIn: number;
-  token_type: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  user_name: string;
-}
-
-export interface UserOut {
-  id: number;
-  email: string;
-  user_name: string;
-}
-
-// -------- Token Storage ----------
-
-const tokenStorage = {
-  set(access: string | null) {
-    if (access) localStorage.setItem('accessToken', access);
-    else localStorage.removeItem('accessToken');
+export const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
   },
+});
 
-  get() {
-    return localStorage.getItem('accessToken');
-  },
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) throw new Error('No refresh token');
 
-  clear() {
-    localStorage.removeItem('accessToken');
+        const res = await axios.post(`${API_URL}/auth/refresh`, {
+          refreshToken,
+        });
+
+        localStorage.setItem('accessToken', res.data.accessToken);
+
+        error.config.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
+        return axios(error.config);
+      } catch {
+        console.log('Refresh failed — redirect to login');
+        localStorage.clear();
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
   }
-};
+);
 
-// -------- Auth API -------------
 
-export const authApi = {
+export async function register(data: { email: string; password: string; user_name: string }) {
+  return api.post('/auth/register', data);
+}
 
-  // REGISTRATION
-  async register(payload: RegisterRequest): Promise<UserOut> {
-    const { data } = await http.post<UserOut>('/auth/register', payload);
-    return data;
-  },
+export async function login(data: { email: string; password: string }) {
+  const res = await api.post('/auth/login', data);
 
-  // LOGIN
-  async login(payload: LoginRequest): Promise<LoginResponse> {
-    const { data } = await http.post<LoginResponse>('/auth/login', payload);
+  localStorage.setItem('accessToken', res.data.access_token);
+  localStorage.setItem('tokenType', res.data.token_type);
 
-    // backend returns access_token, not accessToken
-    tokenStorage.set(data.access_token);
+  return res.data;
+}
 
-    return data;
-  },
+export async function getProfile() {
+  const token = localStorage.getItem('accessToken');
 
-  // REFRESH ACCESS TOKEN
-  async refresh(): Promise<RefreshResponse> {
-    const refreshToken = tokenStorage.get();
-    if (!refreshToken) throw new Error('No token to refresh');
-
-    const { data } = await http.post<RefreshResponse>('/auth/refresh', {
-      refreshToken
-    });
-
-    // backend returns accessToken
-    tokenStorage.set(data.accessToken);
-
-    return data;
-  },
-
-  // LOGOUT
-  logout() {
-    tokenStorage.clear();
-  }
-};
+  return api.get('/users/me', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
