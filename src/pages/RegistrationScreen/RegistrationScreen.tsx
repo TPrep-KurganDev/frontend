@@ -2,7 +2,7 @@ import login_styles from '../LoginScreen/LoginScreen.module.scss';
 import styles from './RegistrationScreen.module.scss'
 import {BlueButton} from '../../components/BlueButton/BlueButton.tsx';
 import { useState } from 'react';
-import { register } from '../../api';
+import { register } from '../../api/auth.ts';
 
 export function RegistrationScreen() {
   const [email, setEmail] = useState('');

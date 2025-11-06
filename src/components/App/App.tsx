@@ -31,15 +31,15 @@ export default function App() {
             element={<RegistrationScreen/>}
           />
           <Route
-            path={'/card-edit'}
+            path={AppRoute.CardEdit}
             element={<CardEditScreen/>}
           />
           <Route
-            path={'/exam-list'}
+            path={AppRoute.ExamList}
             element={<ExamListScreen/>}
           />
           <Route
-            path={'/favorite-exam-list'}
+            path={AppRoute.FavouriteExamList}
             element={<FavoriteExamListScreen/>}
           />
         </Routes>

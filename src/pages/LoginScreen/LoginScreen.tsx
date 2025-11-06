@@ -1,7 +1,7 @@
 import styles from './LoginScreen.module.scss';
 import {BlueButton} from '../../components/BlueButton/BlueButton.tsx';
 import { useState } from 'react';
-import { login } from '../../api';
+import { login } from '../../api/auth.ts';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
