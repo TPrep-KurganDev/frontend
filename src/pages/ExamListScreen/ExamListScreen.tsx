@@ -14,17 +14,11 @@ export function ExamListScreen() {
     getCreatedExams(userId).then(setExams);
   }, []);
 
-  function getOnClick(exam: ExamOut) {
-    return () => {
-      navigate(`/exam-cover?examId=${exam.id}`);
-    };
-  }
-
   return (
     <>
       <Header title={'Мои тесты'}/>
       <div className={styles.examList}>
-        {exams.map((exam: ExamOut) => (<div className={styles.button} onClick={ getOnClick(exam) }>
+        {exams.map((exam: ExamOut) => (<div className={styles.button} onClick={ () => {navigate(`/exam-cover?examId=${exam.id}`);} }>
           {exam.title}
         </div>))}
       </div>
