@@ -6,5 +6,6 @@ export enum AppRoute {
   CardEdit = '/card-edit',
   ExamList = '/exam-list',
   FavouriteExamList = '/favourite-exam-list',
+  ExamCover = '/exam-cover',
   NotFound = '*'
 }

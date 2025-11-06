@@ -8,6 +8,7 @@ import {RegistrationScreen} from '../../pages/RegistrationScreen/RegistrationScr
 import {CardEditScreen} from '../../pages/CardEditScreen/CardEditScreen.tsx';
 import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
 import {FavoriteExamListScreen} from '../../pages/FavoriteExamScreen/FavoriteExamScreen.tsx';
+import ExamCover from "../../pages/ExamCover/ExamCover.tsx";
 
 export default function App() {
   return (
@@ -41,6 +42,10 @@ export default function App() {
           <Route
             path={AppRoute.FavouriteExamList}
             element={<FavoriteExamListScreen/>}
+          />
+          <Route
+            path={AppRoute.ExamCover}
+            element={<ExamCover/>}
           />
         </Routes>
       </BrowserRouter>
