@@ -2,15 +2,24 @@
   .examList{
     margin-top: 25px;
   }
-  .button{
-    text-align: left;
-    background: linear-gradient(to right, #EFF6FF, #DDECFF, #C0DCFF);
-    border-radius: 18px;
-    box-shadow: 0 0 26.6px 0 rgba(0, 0, 0, 0.14);
+  .listItem{
     padding: 25px;
+    border-radius: 23px;
     margin: 0 25px 15px 25px;
+    background: linear-gradient(to right, #EFF6FF, #DDECFF, #C0DCFF);
+  }
+  .name{
     font-size: 22px;
     font-weight: 500;
     word-break: break-word;
+  }
+  .author{
+    font-size: 18px;
+    color: #636363;
+    word-break: break-word;
+  }
+
+  .favorites{
+    background: linear-gradient(to right, #93939340, #93939373, #939393A6);
   }
 }
