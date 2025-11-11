@@ -3,7 +3,7 @@ import '../../styles/global.scss';
 import {CardScreen} from '../../pages/CardScreen/CardScreen.tsx';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {AppRoute} from '../../const.ts';
-import {CardEditScreen} from '../../pages/CardEditScreen/CardEditScreen.tsx';
+import {EditCardScreen} from '../../pages/EditCardScreen/EditCardScreen.tsx';
 import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
 import {FavoriteExamListScreen} from '../../pages/FavoriteExamScreen/FavoriteExamScreen.tsx';
 
@@ -22,7 +22,7 @@ export default function App() {
           />
           <Route
             path={'/card-edit'}
-            element={<CardEditScreen/>}
+            element={<EditCardScreen/>}
           />
           <Route
             path={'/exam-list'}

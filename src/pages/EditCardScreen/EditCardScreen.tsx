@@ -1,7 +1,7 @@
 import Header from '../../components/Header/Header.tsx';
-import styles from './CardEditScreen.module.scss';
+import styles from './EditCardScreen.module.scss';
 
-export function CardEditScreen() {
+export function EditCardScreen() {
   return (
     <>
       <Header title={'Вопрос 2'} imgSrc='deleteCard.svg' widthImg="38" heightImg="30"/>
