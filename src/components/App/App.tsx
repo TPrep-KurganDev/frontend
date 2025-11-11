@@ -22,7 +22,7 @@ export default function App() {
           />
           <Route
             path={'/card-edit'}
-            element={<EditCardScreen/>}
+            element={<EditCardScreen canEdit={true}/>}
           />
           <Route
             path={'/exam-list'}
