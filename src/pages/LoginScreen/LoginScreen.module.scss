@@ -1,3 +1,65 @@
 :local {
+  .loginForm {
+    padding: 20px 30px;
+    background: #fff;
+    border-radius: 40px;
+    margin: 0 10px;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.14);
+    width: 92%;
+  }
 
+  .loginForm h2 {
+    text-align: center;
+    margin-top: 3px;
+    margin-bottom: 24px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .formGroup {
+    margin-top: 20px;
+  }
+
+  .formGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 18px;
+    padding-left: 10px;
+  }
+
+  .formGroup input {
+    width: 90%;
+    padding: 12px 16px;
+    border: 1px solid #909090;
+    border-radius: 16px;
+    font-size: 20px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    display: block;
+    margin: auto;
+    box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .formGroup input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  }
+
+  .formFooter {
+    text-align: right;
+    margin-bottom: 26px;
+  }
+
+  .forgotPassword {
+    font-size: 14px;
+    color: #777;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 0 10px;
+  }
+
+  .forgotPassword:hover {
+    text-decoration: underline;
+  }
 }

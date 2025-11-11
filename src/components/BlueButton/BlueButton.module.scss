@@ -1,0 +1,16 @@
+:local {
+  .blueButton {
+    padding: 10px 80px;
+    background: linear-gradient(-45deg, #D9EAFF, #EFF6FF);
+    border: none;
+    border-radius: 30px;
+    font-size: 24px;
+    color: black;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    font-family: "Tinkoff", sans-serif;
+    margin: 0 auto;
+    display: block;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.14);
+  }
+}

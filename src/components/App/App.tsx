@@ -5,6 +5,8 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {AppRoute} from '../../const.ts';
 import {EditCardScreen} from '../../pages/EditCardScreen/EditCardScreen.tsx';
 import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
+import {LoginScreen} from '../../pages/LoginScreen/LoginScreen.tsx';
+import {RegistrationScreen} from '../../pages/RegistrationScreen/RegistrationScreen.tsx';
 
 export default function App() {
   return (
@@ -26,6 +28,14 @@ export default function App() {
           <Route
             path={'/exam-list'}
             element={<ExamListScreen isFavorites={true}/>}
+          />
+          <Route
+            path={AppRoute.Login}
+            element={<LoginScreen/>}
+          />
+          <Route
+            path={AppRoute.Registration}
+            element={<RegistrationScreen/>}
           />
         </Routes>
       </BrowserRouter>
