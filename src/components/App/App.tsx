@@ -14,7 +14,7 @@ export default function App() {
         <Routes>
           <Route
             path={AppRoute.Exam}
-            element={<ExamScreen/>}
+            element={<ExamScreen canEdit={true}/>}
           />
           <Route
             path={AppRoute.Card}
