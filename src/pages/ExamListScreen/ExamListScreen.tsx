@@ -1,18 +1,12 @@
-const exams = [{
-  name: 'Зачёт по сетям',
-  author: 'автор: К. С.'},
-  {
-    name: 'Экзамен по матстату',
-    author: 'автор: Hlopin'}];
 import Header from '../../components/Header/Header';
 import styles from './ExamListScreen.module.scss';
 
-import { useEffect, useState } from 'react';
-import { getCreatedExams, ExamOut } from '../../api/exam';
-import { useNavigate } from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {getCreatedExams, ExamOut} from '../../api/exam';
+import {useNavigate} from 'react-router-dom';
 
 type ExamListScreenProps = {
-  isFavorites : boolean;
+  isFavorites: boolean;
 }
 
 export function ExamListScreen({isFavorites}: ExamListScreenProps) {
@@ -28,13 +22,11 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
     <>
       <Header title={isFavorites ? 'Готовлюсь к этим тестам' : 'Мои тесты'}/>
       <div className={styles.examList}>
-        {exams.map((exam: ExamOut) => (<div className={styles.button} onClick={ () => {navigate(`/exam-cover?examId=${exam.id}`);} }>
-          {exam.title}
-        </div>))}
         {exams.map((exam) => (
-          <div className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`}>
-            <div className={styles.name}>{exam.name}</div>
-            {isFavorites && <div className={styles.author}>{exam.author}</div>}
+          <div className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`} onClick={() => {
+            navigate(`/exam-cover?examId=${exam.id}`);}} >
+            <div className={styles.name}>{exam.title}</div>
+            {isFavorites && <div className={styles.author}>{exam.creator_id}</div>}
           </div>
         ))}
       </div>

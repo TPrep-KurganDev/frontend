@@ -1,8 +1,6 @@
 import styles from './ExamScreen.module.scss';
 
 import Header from '../../components/Header/Header';
-import {questions} from '../../mocks/ListCards.ts';
-import {titleExam} from '../../mocks/Header.ts';
 import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 
 import {useEffect, useState} from 'react';

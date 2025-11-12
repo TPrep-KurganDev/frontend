@@ -6,10 +6,9 @@ import {AppRoute} from '../../const.ts';
 import {EditCardScreen} from '../../pages/EditCardScreen/EditCardScreen.tsx';
 import {LoginScreen} from '../../pages/LoginScreen/LoginScreen.tsx';
 import {RegistrationScreen} from '../../pages/RegistrationScreen/RegistrationScreen.tsx';
-import {CardEditScreen} from '../../pages/CardEditScreen/CardEditScreen.tsx';
 import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
-import {FavoriteExamListScreen} from '../../pages/FavoriteExamScreen/FavoriteExamScreen.tsx';
-import ExamCover from "../../pages/ExamCover/ExamCover.tsx";
+import ExamCover from '../../pages/ExamCover/ExamCover.tsx';
+
 
 export default function App() {
   return (
@@ -38,15 +37,11 @@ export default function App() {
           />
           <Route
             path={AppRoute.CardEdit}
-            element={<CardEditScreen/>}
+            element={<EditCardScreen canEdit={false}/>}
           />
           <Route
             path={AppRoute.ExamList}
             element={<ExamListScreen isFavorites={true}/>}
-          />
-          <Route
-            path={AppRoute.FavouriteExamList}
-            element={<FavoriteExamListScreen/>}
           />
           <Route
             path={AppRoute.ExamCover}
