@@ -2,7 +2,7 @@ import Header from '../../components/Header/Header';
 import styles from './ExamListScreen.module.scss';
 
 import {useEffect, useState} from 'react';
-import {getCreatedExams, ExamOut} from '../../api/exam';
+import {getCreatedExams, getPinnedExams, ExamOut} from '../../api/exam';
 import {useNavigate} from 'react-router-dom';
 
 type ExamListScreenProps = {
@@ -14,8 +14,13 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userId = 4;
-    getCreatedExams(userId).then(setExams);
+    const userId = 1;
+    if (isFavorites){
+      getPinnedExams(userId).then(setExams);
+    }
+    else {
+      getCreatedExams(userId).then(setExams);
+    }
   }, []);
 
   return (

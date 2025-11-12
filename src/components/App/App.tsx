@@ -40,8 +40,12 @@ export default function App() {
             element={<EditCardScreen canEdit={false}/>}
           />
           <Route
-            path={AppRoute.ExamList}
+            path={AppRoute.FavouriteExamList}
             element={<ExamListScreen isFavorites={true}/>}
+          />
+          <Route
+            path={AppRoute.ExamList}
+            element={<ExamListScreen isFavorites={false}/>}
           />
           <Route
             path={AppRoute.ExamCover}
