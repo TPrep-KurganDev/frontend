@@ -1,7 +1,7 @@
 import styles from './Header.module.scss';
 
 type HeaderProps = {
-  title: string,
+  title: string | undefined,
   imgSrc?: string,
   widthImg?: string,
   heightImg?: string,
