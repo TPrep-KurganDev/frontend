@@ -27,7 +27,7 @@ jobs:
             exit 1
           fi
 
-          VERSION=$(echo "$BRANCH" | sed -E 's|^release-frontend||')
+          VERSION=$(echo "$BRANCH" | sed -E 's|^release-frontend-||')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "✅ Validated branch: $BRANCH → version: $VERSION"
 
