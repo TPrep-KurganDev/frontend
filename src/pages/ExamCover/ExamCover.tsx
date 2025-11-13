@@ -4,11 +4,12 @@ import Header from '../../components/Header/Header';
 
 import { useEffect, useState } from 'react';
 import { getExam, ExamOut } from '../../api/exam';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const examIdParam = searchParams.get('examId');
@@ -24,7 +25,8 @@ export default function ExamCover() {
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}>
           <p className={styles.title}>{ exam?.title }</p>
-          <p className={styles.questionCount}>12 вопросов</p>
+          <p className={styles.questionCount} onClick={() => {
+            navigate(`/exam?examId=${exam?.id}`);}}>12 вопросов</p>
           <p className={styles.author}>автор: Беня Салин</p>
         </div>
         <div className={styles.firstRow}>

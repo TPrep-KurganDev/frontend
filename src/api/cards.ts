@@ -10,8 +10,8 @@ export async function createCard(examId: number, data: CardBase) {
   return res.data;
 }
 
-export async function getCard(examId: number, cardId: number): Promise<CardBase> {
-  const res = await api.get<CardBase>(`/exams/${examId}/cards/${cardId}`);
+export async function getCard(cardId: number): Promise<CardBase> {
+  const res = await api.get<CardBase>(`/cards/${cardId}`);
   return res.data;
 }
 
@@ -22,4 +22,9 @@ export async function updateCard(examId: number, cardId: number, data: CardBase)
 
 export async function deleteCard(examId: number, cardId: number) {
   await api.delete(`/exams/${examId}/cards/${cardId}`);
+}
+
+export async function getCardsList(examId: number): Promise<CardBase[]> {
+  const res = await api.get<CardBase[]>(`/exams/${examId}/cards/`);
+  return res.data;
 }
