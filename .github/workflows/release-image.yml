@@ -19,7 +19,7 @@ jobs:
         run: |
           BRANCH="${{ github.event.inputs.release_branch }}"
 
-          if ! [[ "$BRANCH" =~ ^release-backend-[0-9]+\.[0-9]+$ ]]; then
+          if ! [[ "$BRANCH" =~ ^release-frontend-[0-9]+\.[0-9]+$ ]]; then
             echo "❌ Invalid branch format. Must be: rrelease-frontend-X.Y (e.g. release-frontend-1.0, release-frontend-2.5)"
             echo "   Examples of valid names:"
             echo "     ✅ release-frontend-1.0"
