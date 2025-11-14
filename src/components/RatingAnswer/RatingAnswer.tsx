@@ -1,20 +1,28 @@
 import styles from './RatingAnswer.module.scss';
-import {ratingAnswers} from '../../mocks/RatingAnswer.ts';
 
-export function RatingAnswer(){
+type RatingProps = {
+  onCorrect: () => void;
+  onFail: () => void;
+}
+
+export function RatingAnswer({onCorrect, onFail}: RatingProps){
   return (
     <div className={styles.ratingCard}>
-      <span className={styles.title}>{ratingAnswers.title}</span>
+      <span className={styles.title}>Вы правильно ответили?</span>
 
       <div className={styles.ratingOptions}>
-        {ratingAnswers.rating.map((rating) => (
-          <div key={rating.value} className={styles.ratingOption}>
-            <button className={`${styles.ratingButton} ${styles[rating.color]}`}>
-              {rating.value}
-            </button>
-            <span className={styles.ratingLabel}>{rating.text}</span>
-          </div>
-        ))}
+        <div className={styles.ratingOption}>
+          <button className={`${styles.ratingButton} ${styles.lightGray}`} onClick={onFail}>
+            <img src={"cross.svg"} width="50px"/>
+          </button>
+          <span className={styles.ratingLabel}>Нет</span>
+        </div>
+        <div className={styles.ratingOption}>
+          <button className={`${styles.ratingButton}  ${styles.lightBlue}`} onClick={onCorrect}>
+            <img src={"mark.svg"} width="50px"/>
+          </button>
+          <span className={styles.ratingLabel}>Да</span>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 export enum AppRoute {
   Exam = '/exam',
-  Card = '/card',
+  Card = '/session',
   Login = '/login',
   Registration = '/registration',
   CardEdit = '/card-edit',

@@ -1,17 +1,16 @@
 import styles from './Card.module.scss';
+import {CardState} from '../../pages/CardScreen/CardScreen.tsx';
 
 type CardProps = {
-  question: string;
-  answer: string;
   onFlip: () => void;
-  isFlipped: boolean;
+  card: CardState;
 }
 
-export function Card({question, answer, onFlip, isFlipped}: CardProps) {
+export function Card({onFlip, card}: CardProps) {
   return (
-    <div className={`${styles.card} ${isFlipped ? styles.cardFlipped : ''}`} onClick={onFlip}>
-      <div className={styles.question}>{question}</div>
-      <div className={styles.answer}>{answer}</div>
+    <div className={`${styles.card} ${card.isFlipped ? styles.cardFlipped : ''}`} onClick={onFlip}>
+      <div className={styles.question}>{card.question}</div>
+      <div className={styles.answer}>{card.answer}</div>
     </div>
   );
 }

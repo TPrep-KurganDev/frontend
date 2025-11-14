@@ -1,7 +1,6 @@
 :local {
   .ratingCard {
     border-radius: 35px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 100%;
     padding: 20px;
@@ -15,9 +14,9 @@
   .ratingOptions {
     padding-top: 10px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 60px;
     align-items: flex-start;
-    gap: 16px;
     flex-wrap: wrap;
   }
 
@@ -32,21 +31,22 @@
   .ratingButton {
     width: 64px;
     height: 64px;
-    border-radius: 50%;
+    border-radius: 20px;
     border: none;
     font-size: 30px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0 50px;
   }
 
   .lightGray {
-    background-color: #e5e7eb;
+    background-color: #f7f7f7;
   }
 
-  .lightYellow {
-    background-color: #fef3c7;
+  .lightBlue {
+    background-color: #eff6ff;
   }
 
   .yellow {
@@ -59,7 +59,6 @@
 
   .ratingLabel {
     font-size: 18px;
-    color: #939393;
     text-align: center;
     margin-top: 8px;
   }

@@ -4,8 +4,8 @@ import Header from '../../components/Header/Header';
 import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 
 import {useEffect, useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
-import {CardBase, getCard} from '../../api/cards.ts';
+import {useSearchParams, useNavigate} from 'react-router-dom';
+import {CardBase, getCardsList} from '../../api/cards.ts';
 import {ExamOut, getExam} from '../../api/exam.ts';
 
 type ExamScreenProps = {
@@ -17,11 +17,7 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
   const [cards, setCards] = useState<CardBase[]>([]);
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
-
-  async function getMultipleCards(examId: number, cardsIds: number[]): Promise<CardBase[]> {
-    const promises = cardsIds.map((id) => getCard(examId, id));
-    return await Promise.all(promises);
-  }
+  const navigate = useNavigate();
 
   useEffect(() => {
     const examIdParam = searchParams.get('examId');
@@ -31,9 +27,7 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
 
     getExam(examId).then(setExam);
 
-    const cardsIds = [2];
-
-    getMultipleCards(examId, cardsIds)
+    getCardsList(examId)
       .then(setCards);
   }, [searchParams]);
 
@@ -50,10 +44,11 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
             key={index + 1}
             question={q.question}
             answer={q.answer}
-            id={(index + 1).toString()}            // порядковый номер начинается с 1
+            id={(index + 1).toString()}
+            navigate={navigate}
           />
         ))}
-        {canEdit && <CardListEntry question={''} answer={''} id={'+'}/>}
+        {canEdit && <CardListEntry question={''} answer={''} id={'+'} navigate={navigate}/>}
       </div>
     </>
   );
