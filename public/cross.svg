@@ -1,0 +1,7 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <!-- Синий круг -->
+    <circle cx="40" cy="40" r="20" fill="#2196F3" />
+
+    <!-- Крестик -->
+    <path d="M30 30 L50 50 M50 30 L30 50" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>

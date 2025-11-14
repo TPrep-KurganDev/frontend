@@ -5,6 +5,7 @@ import Header from '../../components/Header/Header';
 import { useEffect, useState } from 'react';
 import { getExam, ExamOut } from '../../api/exam';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import {createSession} from '../../api/session'
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
@@ -17,7 +18,13 @@ export default function ExamCover() {
 
     const examId = Number(examIdParam);
     getExam(examId).then(setExam);
-  }, []);
+  }, [searchParams]);
+
+  const startNewSession = (exam_id: number, strategy: string) => {
+    createSession({exam_id: exam_id, strategy: strategy, n: null}).then(
+      (response) => {navigate(`/session?sessionId=${response.id}`)}
+    )
+  }
 
   return (
     <>
@@ -30,7 +37,8 @@ export default function ExamCover() {
           <p className={styles.author}>автор: Беня Салин</p>
         </div>
         <div className={styles.firstRow}>
-          <div className={`${styles.button} ${styles.yellowButton} ${styles.roundedBox}`}>
+          <div className={`${styles.button} ${styles.yellowButton} ${styles.roundedBox}`}
+          onClick={() => {startNewSession(exam.id, 'full')}}>
             <p>Пройти весь<br/>тест</p>
           </div>
           <div className={`${styles.button} ${styles.hardButton} ${styles.roundedBox}`}>
