@@ -8,6 +8,7 @@ import {LoginScreen} from '../../pages/LoginScreen/LoginScreen.tsx';
 import {RegistrationScreen} from '../../pages/RegistrationScreen/RegistrationScreen.tsx';
 import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
 import ExamCover from '../../pages/ExamCover/ExamCover.tsx';
+import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
 
 
 export default function App() {
@@ -50,6 +51,10 @@ export default function App() {
           <Route
             path={AppRoute.ExamCover}
             element={<ExamCover/>}
+          />
+          <Route
+            path={AppRoute.Main}
+            element={<MainScreen/>}
           />
         </Routes>
       </BrowserRouter>

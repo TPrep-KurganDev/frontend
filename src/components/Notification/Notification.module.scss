@@ -1,0 +1,26 @@
+.notification {
+  box-shadow: 0 0 24px 0 #00033B24;
+  border-radius: 23px;
+  margin: 0 30px 20px 30px;
+  display: flex;
+  flex-direction: column;
+}
+.examName {
+  padding: 15px 15px 6px;
+  font-weight: 500;
+  font-size: 24px;
+}
+
+.nextRepeat {
+  padding: 0 15px;
+  font-size: 14px;
+}
+
+.buttonNotification {
+
+  font-size: 10px;
+  color: #939393;
+  text-decoration: underline;
+  align-self: flex-end;
+  padding: 10px 20px;
+}

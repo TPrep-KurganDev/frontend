@@ -1,0 +1,73 @@
+:local {
+  .header {
+    box-shadow: 0 25px 26px -20px #00033B24;
+    border-radius: 35px;
+  }
+
+  .avatar {
+    margin: 16px 16px 16px 16px;
+  }
+
+  .buttonsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+
+  .user {
+    display: flex;
+    align-items: center;
+  }
+
+  .textButtonHeader {
+    font-size: 14px;
+    color: #939393;
+  }
+
+  .name {
+    font-size: 28px;
+    font-weight: 500;
+    color: linear-gradient(343.42deg, rgba(53, 53, 53, 0.37) -6.09%, #353535 58.36%);
+  }
+
+  .buttonsBody {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+  .buttonBody {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px 10px 15px 10px;
+    border-radius: 30px;
+    box-shadow: 0 0 26.6px 0 #00033B1A;
+    margin: 40px 10px 30px 10px;
+  }
+
+  .yellowButton {
+    background: linear-gradient(165.84deg, #FEDD2C 9.89%, rgba(254, 221, 44, 0.74) 66.76%, rgba(254, 221, 44, 0.5) 88.4%);
+  }
+
+  .textButtonBody {
+    font-size: 24px;
+    margin-top: 8px;
+  }
+
+  .buttonHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .imageButtonHeader {
+    border-radius: 21px;
+    box-shadow: 0 0 26.6px 0 #00033B1A;
+    margin: 10px;
+    padding: 10px 25px;
+  }
+}
