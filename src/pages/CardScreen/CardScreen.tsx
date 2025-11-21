@@ -84,8 +84,6 @@ export function CardScreen() {
       <Header title={titleExam}/>
       <div className="screenСontent screenContentCentered">
         <Card
-          question={currentQuestion.title}
-          answer={currentQuestion.answer}
           onFlip={handleCardClick}
           card={card}
         />

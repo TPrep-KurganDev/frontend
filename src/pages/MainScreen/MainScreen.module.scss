@@ -68,6 +68,10 @@
     align-items: center;
   }
 
+  .buttonHeader:hover {
+    cursor: pointer;
+  }
+
   .imageButtonHeader {
     border-radius: 21px;
     box-shadow: 0 0 26.6px 0 #00033B1A;

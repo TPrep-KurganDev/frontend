@@ -17,11 +17,11 @@ export function MainScreen() {
           <div className={styles.name}>Роман</div>
         </div>
         <div className={styles.buttonsHeader}>
-          <div className={styles.buttonHeader}>
+          <div className={styles.buttonHeader} onClick={() => {navigate('/favourite-exam-list')}}>
             <img className={styles.imageButtonHeader} width={40} height={40} src='starActive.svg'/>
             <div className={styles.textButtonHeader}>Закреплённые</div>
           </div>
-          <div className={styles.buttonHeader}>
+          <div className={styles.buttonHeader} onClick={() => {navigate('/exam-list')}}>
             <img className={styles.imageButtonHeader} src='createdTests.svg' width={38} height={38}/>
             <div className={styles.textButtonHeader}>Созданные</div>
           </div>

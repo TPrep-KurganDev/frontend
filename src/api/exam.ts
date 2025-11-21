@@ -45,5 +45,9 @@ export async function updateExam(examId: number, data: ExamCreate) {
 }
 
 export async function deleteExam(examId: number) {
-  await api.delete(`/exams/${examId}`);
+  const token = localStorage.getItem('accessToken');
+  await api.delete(`/exams/${examId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }});
 }

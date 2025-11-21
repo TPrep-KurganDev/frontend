@@ -42,8 +42,9 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
-    deleteCard(Number(examIdParam), Number(cardIdParam))
-    navigate(`/exam?examId=${examIdParam}`)
+    deleteCard(Number(examIdParam), Number(cardIdParam)).then(() => {
+      navigate(`/exam?examId=${examIdParam}`);
+    })
   }
 
   return (

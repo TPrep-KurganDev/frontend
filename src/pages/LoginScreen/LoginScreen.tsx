@@ -11,7 +11,7 @@ export function LoginScreen() {
     e.preventDefault();
     try {
       await login({ email, password });
-      window.location.href = '/profile';
+      window.location.href = '/';
     } catch (err) {
       alert('Login failed');
     }

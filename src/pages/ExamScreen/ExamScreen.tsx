@@ -6,9 +6,8 @@ import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 import {useEffect, useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {CardBase, CardOut, getCardsList} from '../../api/cards.ts';
-import {ExamOut, getExam} from '../../api/exam.ts';
+import {ExamOut, getExam, deleteExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
-import {c} from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
 
 type ExamScreenProps = {
   canEdit: boolean;
@@ -19,6 +18,7 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
   const [cards, setCards] = useState<CardOut[]>([]);
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
+  const [examTitle, setExamTitle] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +27,10 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
 
     const examId = Number(examIdParam);
 
-    getExam(examId).then(setExam);
+    getExam(examId).then((ex) => {
+      setExam(ex);
+      setExamTitle(ex.title);
+    });
 
     getCardsList(examId)
       .then(setCards);
@@ -38,17 +41,26 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
     if (!examIdParam) return;
 
     const examId = Number(examIdParam);
-    createCard(examId, {question: 'Вопрос', answer: 'Ответ'});
-    getCardsList(examId)
-      .then(setCards);
+    createCard(examId, {question: 'Вопрос', answer: 'Ответ'}).then(
+      () => {
+        getCardsList(examId)
+          .then(setCards);
+      }
+    );
+
+  }
+
+  const deleteExamClick = () => {
+    deleteExam(exam?.id).then(() => {navigate('/exam-list')});
   }
 
   return (
     <>
-      <Header title={exam?.title} {...(canEdit && {
-        imgSrc: 'settingsCard.svg',
+      <Header title={examTitle} {...(canEdit && {
+        imgSrc: 'deleteCard.svg',
         widthImg: '38',
         heightImg: '36',
+        onRightImageClick: deleteExamClick
       })}/>
       <div className={styles.list}>
         {cards.map((q, index) => (
