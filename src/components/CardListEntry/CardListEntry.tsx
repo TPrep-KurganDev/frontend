@@ -5,12 +5,12 @@ type CardListEntryProps = {
   id: string;
   question: string;
   answer: string;
-  navigate: NavigateFunction
+  onclick: () => void;
 }
 
-export function CardListEntry({question, answer, id, navigate}: CardListEntryProps) {
+export function CardListEntry({question, answer, id, onclick}: CardListEntryProps) {
   return (
-    <div key={id} className={styles.item} onClick={() => {navigate(`/card-edit?cardId=${id}`);}}>
+    <div key={id} className={styles.item} onClick={() => {onclick()}}>
       <div className={styles.itemNumber}>{id}</div>
       <div className={styles.listItem}>
         <p className={styles.itemTitle}>{question}</p>

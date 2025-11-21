@@ -5,8 +5,10 @@ import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 
 import {useEffect, useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
-import {CardBase, getCardsList} from '../../api/cards.ts';
+import {CardBase, CardOut, getCardsList} from '../../api/cards.ts';
 import {ExamOut, getExam} from '../../api/exam.ts';
+import {createCard} from '../../api/cards.ts';
+import {c} from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
 
 type ExamScreenProps = {
   canEdit: boolean;
@@ -14,7 +16,7 @@ type ExamScreenProps = {
 
 
 export default function ExamScreen({canEdit} : ExamScreenProps) {
-  const [cards, setCards] = useState<CardBase[]>([]);
+  const [cards, setCards] = useState<CardOut[]>([]);
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
   const navigate = useNavigate();
@@ -31,6 +33,16 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
       .then(setCards);
   }, [searchParams]);
 
+  const createCardClick = () => {
+    const examIdParam = searchParams.get('examId');
+    if (!examIdParam) return;
+
+    const examId = Number(examIdParam);
+    createCard(examId, {question: 'Вопрос', answer: 'Ответ'});
+    getCardsList(examId)
+      .then(setCards);
+  }
+
   return (
     <>
       <Header title={exam?.title} {...(canEdit && {
@@ -41,14 +53,14 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
       <div className={styles.list}>
         {cards.map((q, index) => (
           <CardListEntry
-            key={index + 1}
+            key={q.card_id}
             question={q.question}
             answer={q.answer}
             id={(index + 1).toString()}
-            navigate={navigate}
+            onclick={() => {navigate(`/card-edit?cardId=${q.card_id}&examId=${searchParams.get('examId')}`);}}
           />
         ))}
-        {canEdit && <CardListEntry question={''} answer={''} id={'+'} navigate={navigate}/>}
+        {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {createCardClick()}}/>}
       </div>
     </>
   );
