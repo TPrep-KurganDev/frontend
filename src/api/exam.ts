@@ -30,8 +30,12 @@ export async function getPinnedExams(pinnedId: number) {
   return res.data;
 }
 
-export async function createExam(data: ExamCreate) {
-  const res = await api.post<ExamOut>('/exams/', data);
+export async function createExam(data: string) {
+  const token = localStorage.getItem('accessToken');
+  const res = await api.post<ExamOut>('/exams/', {'title': data}, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }});
   return res.data;
 }
 

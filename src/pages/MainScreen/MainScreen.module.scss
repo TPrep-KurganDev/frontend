@@ -53,6 +53,10 @@
     background: linear-gradient(165.84deg, #FEDD2C 9.89%, rgba(254, 221, 44, 0.74) 66.76%, rgba(254, 221, 44, 0.5) 88.4%);
   }
 
+  .buttonBody:hover {
+    cursor: pointer;
+  }
+
   .textButtonBody {
     font-size: 24px;
     margin-top: 8px;

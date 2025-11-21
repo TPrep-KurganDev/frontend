@@ -1,7 +1,14 @@
 import styles from './MainScreen.module.scss'
 import {Notification} from '../../components/Notification/Notification.tsx';
+import {createExam} from '../../api/exam'
+import {useNavigate} from 'react-router-dom';
 
 export function MainScreen() {
+  const navigate = useNavigate();
+  const createExamClick = () => {
+    createExam('Новый экзамен').then((res) => {navigate(`/exam-cover?examId=${res.id}`)});
+  }
+
   return (
     <>
       <header className={styles.header}>
@@ -21,7 +28,7 @@ export function MainScreen() {
         </div>
       </header>
       <div className={styles.buttonsBody}>
-        <div className={`${styles.buttonBody} ${styles.yellowButton}`}>
+        <div className={`${styles.buttonBody} ${styles.yellowButton}`} onClick={createExamClick}>
           <img width={25} height={25} src='createTest.svg'/>
           <div className={styles.textButtonBody}>Создать тест</div>
         </div>
