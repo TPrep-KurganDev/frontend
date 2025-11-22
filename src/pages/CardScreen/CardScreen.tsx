@@ -1,6 +1,5 @@
 import {Footer} from '../../components/Footer/Footer.tsx';
 import {Card} from '../../components/Card/Card.tsx';
-import {questions} from '../../mocks/ListCards.ts';
 import {RatingAnswer} from '../../components/RatingAnswer/RatingAnswer.tsx';
 import Header from '../../components/Header/Header.tsx';
 import {titleExam} from '../../mocks/Header.ts';
@@ -8,7 +7,6 @@ import {useState, useEffect} from 'react';
 import {FooterCard} from '../../types/FooterCard.ts';
 import {answerQuestion, getSession} from '../../api/session.ts';
 import {useSearchParams} from 'react-router-dom';
-import {fa, ne} from "@faker-js/faker";
 import {getCard} from "../../api/cards.ts";
 
 export type CardState = {
@@ -18,7 +16,6 @@ export type CardState = {
 }
 
 export function CardScreen() {
-  const currentQuestion = questions[3];
   const [card, setCard] = useState<CardState>({isFlipped: false, question: '', answer:''});
   const [searchParams] = useSearchParams();
 

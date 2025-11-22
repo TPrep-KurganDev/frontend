@@ -1,5 +1,4 @@
 import styles from './CardListEntry.module.scss';
-import {NavigateFunction} from 'react-router-dom';
 
 type CardListEntryProps = {
   id: string;

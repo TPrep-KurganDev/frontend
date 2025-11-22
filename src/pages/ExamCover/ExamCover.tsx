@@ -4,9 +4,10 @@ import Header from '../../components/Header/Header';
 
 import { useEffect, useState } from 'react';
 import { getExam, ExamOut } from '../../api/exam';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import {useSearchParams, useNavigate, Navigate} from 'react-router-dom';
 import {createSession} from '../../api/session'
 import {getCardsList} from '../../api/cards'
+import {AppRoute} from "../../const.ts";
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
@@ -22,6 +23,8 @@ export default function ExamCover() {
     getExam(examId).then(setExam);
     getCardsList(examId).then((res) => {setCardsCount(res.length)})
   }, [searchParams]);
+
+  if (!exam) return <Navigate to={AppRoute.NotFound} />
 
   const startNewSession = (exam_id: number, strategy: string) => {
     createSession({exam_id: exam_id, strategy: strategy, n: null}).then(
