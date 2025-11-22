@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = 'https://89.232.188.125.sslip.io/api';
 
 export const api = axios.create({
   baseURL: API_URL,
