@@ -9,7 +9,7 @@ import {RegistrationScreen} from '../../pages/RegistrationScreen/RegistrationScr
 import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
 import ExamCover from '../../pages/ExamCover/ExamCover.tsx';
 import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
-import NotFoundScreen from "../../pages/NotFoundScreen/NotFoundScreen.tsx";
+import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
 
 
 export default function App() {
