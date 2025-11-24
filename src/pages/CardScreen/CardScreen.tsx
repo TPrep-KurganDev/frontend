@@ -6,7 +6,7 @@ import {titleExam} from '../../mocks/Header.ts';
 import {useState, useEffect} from 'react';
 import {FooterCard} from '../../types/FooterCard.ts';
 import {answerQuestion, getSession} from '../../api/session.ts';
-import {useSearchParams} from 'react-router-dom';
+import {useSearchParams, useNavigate} from 'react-router-dom';
 import {getCard} from '../../api/cards.ts';
 
 export type CardState = {
@@ -18,6 +18,7 @@ export type CardState = {
 export function CardScreen() {
   const [card, setCard] = useState<CardState>({isFlipped: false, question: '', answer:''});
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const handleCardClick = () => {
     setCard({...card, isFlipped: !card.isFlipped});
@@ -66,6 +67,9 @@ export function CardScreen() {
     }
     setFooter(updatedFooter);
     setCard({...card, isFlipped: !card.isFlipped});
+    if (currentCards.length == updatedFooter.doneCardsCount){
+      navigate('/')
+    }
     setNewCard(currentCards[updatedFooter.doneCardsCount]);
     answerQuestion(sessionIdParam, currentCards[updatedFooter.doneCardsCount - 1], answerCorrectness);
   }
