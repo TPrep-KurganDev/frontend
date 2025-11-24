@@ -1,7 +1,9 @@
 import styles from './MainScreen.module.scss'
 import {Notification} from '../../components/Notification/Notification.tsx';
 import {createExam} from '../../api/exam'
+import {getUserById} from '../../api/users'
 import {useNavigate} from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 export function MainScreen() {
   const navigate = useNavigate();
@@ -9,12 +11,20 @@ export function MainScreen() {
     createExam('Новый экзамен').then((res) => {navigate(`/exam-cover?examId=${res.id}`)});
   }
 
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    getUserById(Number(localStorage.getItem('userId'))).then((res_user) => {
+      setUsername(res_user.user_name);
+    })
+  })
+
   return (
     <>
       <header className={styles.header}>
         <div className={styles.user}>
           <img className={styles.avatar} width={43} height={43} src="avatar.png"/>
-          <div className={styles.name}>Роман</div>
+          <div className={styles.name}>{username}</div>
         </div>
         <div className={styles.buttonsHeader}>
           <div className={styles.buttonHeader} onClick={() => {navigate('/favourite-exam-list')}}>
