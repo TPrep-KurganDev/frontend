@@ -7,7 +7,7 @@ import { getExam, ExamOut } from '../../api/exam';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {createSession} from '../../api/session'
 import {getCardsList} from '../../api/cards'
-import {AppRoute} from "../../const.ts";
+import {AppRoute} from '../../const.ts';
 import {getUserById} from '../../api/users'
 
 export default function ExamCover() {
@@ -31,9 +31,11 @@ export default function ExamCover() {
     getCardsList(examId).then((res) => {setCardsCount(res.length)})
   }, [searchParams]);
 
-  if (!exam) return <Navigate to={AppRoute.NotFound} />
+  if (!exam){
+    navigate(AppRoute.NotFound);
+  }
 
-  const startNewSession = (exam_id: number, strategy: string) => {
+  const startNewSession = (exam_id: number | undefined, strategy: string) => {
     createSession({exam_id: exam_id, strategy: strategy, n: null}).then(
       (response) => {navigate(`/session?sessionId=${response.id}`)}
     )
@@ -51,7 +53,7 @@ export default function ExamCover() {
         </div>
         <div className={styles.firstRow}>
           <div className={`${styles.button} ${styles.yellowButton} ${styles.roundedBox}`}
-          onClick={() => {startNewSession(exam.id, 'full')}}>
+          onClick={() => {startNewSession(exam?.id, 'full')}}>
             <p>Пройти весь<br/>тест</p>
           </div>
           <div className={`${styles.button} ${styles.hardButton} ${styles.roundedBox}`}>

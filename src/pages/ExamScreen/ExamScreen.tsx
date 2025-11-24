@@ -8,7 +8,7 @@ import {useSearchParams, useNavigate} from 'react-router-dom';
 import {CardOut, getCardsList} from '../../api/cards.ts';
 import {ExamOut, getExam, deleteExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
-import {AppRoute} from "../../const.ts";
+import {AppRoute} from '../../const.ts';
 
 type ExamScreenProps = {
   canEdit: boolean;
@@ -37,7 +37,9 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
       .then(setCards);
   }, [searchParams]);
 
-  if (!exam) return <Navigate to={AppRoute.NotFound} />
+  if (!exam) {
+    navigate(AppRoute.NotFound);
+  }
 
   const createCardClick = () => {
     const examIdParam = searchParams.get('examId');

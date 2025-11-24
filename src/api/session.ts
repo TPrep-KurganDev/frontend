@@ -1,7 +1,7 @@
 import { api } from './api';
 
 export interface ExamSessionStartRequest {
-  exam_id: number
+  exam_id: number|undefined
   strategy: string
   n: number|null
 }
