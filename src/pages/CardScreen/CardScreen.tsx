@@ -1,6 +1,5 @@
 import {Footer} from '../../components/Footer/Footer.tsx';
 import {Card} from '../../components/Card/Card.tsx';
-import {questions} from '../../mocks/ListCards.ts';
 import {RatingAnswer} from '../../components/RatingAnswer/RatingAnswer.tsx';
 import Header from '../../components/Header/Header.tsx';
 import {titleExam} from '../../mocks/Header.ts';
@@ -8,8 +7,7 @@ import {useState, useEffect} from 'react';
 import {FooterCard} from '../../types/FooterCard.ts';
 import {answerQuestion, getSession} from '../../api/session.ts';
 import {useSearchParams} from 'react-router-dom';
-import {fa, ne} from "@faker-js/faker";
-import {getCard} from "../../api/cards.ts";
+import {getCard} from '../../api/cards.ts';
 
 export type CardState = {
   isFlipped: boolean,
@@ -18,7 +16,6 @@ export type CardState = {
 }
 
 export function CardScreen() {
-  const currentQuestion = questions[3];
   const [card, setCard] = useState<CardState>({isFlipped: false, question: '', answer:''});
   const [searchParams] = useSearchParams();
 
@@ -47,7 +44,7 @@ export function CardScreen() {
       setCurrentCards(session.questions);
       setNewCard(session.questions[footer.doneCardsCount]);
     });
-  }, [sessionIdParam]);
+  }, [footer.doneCardsCount, sessionIdParam]);
 
 
 
@@ -57,27 +54,21 @@ export function CardScreen() {
     })
   }
 
-  const handleCorrectAnswer = () => {
+  const handleAnswer = (answerCorrectness: boolean) => {
     const updatedFooter = {...footer};
-    updatedFooter.cardsProgress.push(true);
-    updatedFooter.doneCardsCount += 1;
+    updatedFooter.cardsProgress.push(answerCorrectness);
+    if (answerCorrectness){
+      updatedFooter.doneCardsCount += 1;
+    }
+    else {
+      updatedFooter.mistakesCount += 1;
+      updatedFooter.doneCardsCount += 1;
+    }
     setFooter(updatedFooter);
     setCard({...card, isFlipped: !card.isFlipped});
     setNewCard(currentCards[updatedFooter.doneCardsCount]);
-    answerQuestion(sessionIdParam, currentCards[updatedFooter.doneCardsCount - 1], true);
+    answerQuestion(sessionIdParam, currentCards[updatedFooter.doneCardsCount - 1], answerCorrectness);
   }
-
-  const handleFalseAnswer = () => {
-    const updatedFooter = {...footer};
-    updatedFooter.cardsProgress.push(false);
-    updatedFooter.mistakesCount += 1;
-    updatedFooter.doneCardsCount += 1;
-    setFooter(updatedFooter);
-    setCard({...card, isFlipped: !card.isFlipped});
-    setNewCard(currentCards[updatedFooter.doneCardsCount]);
-    answerQuestion(sessionIdParam, currentCards[updatedFooter.doneCardsCount - 1], false);
-  }
-
 
   return (
     <>
@@ -87,7 +78,9 @@ export function CardScreen() {
           onFlip={handleCardClick}
           card={card}
         />
-        {card.isFlipped && <RatingAnswer onCorrect={handleCorrectAnswer} onFail={handleFalseAnswer}/>}
+        {card.isFlipped && <RatingAnswer
+          onCorrect={() => {handleAnswer(true)}}
+          onFail={() => {handleAnswer(false)}}/>}
       </div>
       <Footer footer={footer}/>
     </>

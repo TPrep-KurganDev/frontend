@@ -5,7 +5,7 @@ import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 
 import {useEffect, useState} from 'react';
 import {useSearchParams, useNavigate} from 'react-router-dom';
-import {CardBase, CardOut, getCardsList} from '../../api/cards.ts';
+import {CardOut, getCardsList} from '../../api/cards.ts';
 import {ExamOut, getExam, deleteExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
 
