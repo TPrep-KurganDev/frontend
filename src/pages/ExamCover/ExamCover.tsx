@@ -4,15 +4,17 @@ import Header from '../../components/Header/Header';
 
 import { useEffect, useState } from 'react';
 import { getExam, ExamOut } from '../../api/exam';
-import {useSearchParams, useNavigate, Navigate} from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {createSession} from '../../api/session'
 import {getCardsList} from '../../api/cards'
 import {AppRoute} from "../../const.ts";
+import {getUserById} from '../../api/users'
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
   const [cardsCount, setCardsCount] = useState<number>(0);
+  const [creator, setCreator] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +22,12 @@ export default function ExamCover() {
     if (!examIdParam) return;
 
     const examId = Number(examIdParam);
-    getExam(examId).then(setExam);
+    getExam(examId).then((res) => {
+      setExam(res);
+      getUserById(res.creator_id).then((user_res) => {
+        setCreator(user_res.user_name);
+      })
+    });
     getCardsList(examId).then((res) => {setCardsCount(res.length)})
   }, [searchParams]);
 
@@ -40,7 +47,7 @@ export default function ExamCover() {
           <p className={styles.title}>{ exam?.title }</p>
           <p className={styles.questionCount} onClick={() => {
             navigate(`/exam?examId=${exam?.id}`);}}>{cardsCount} вопросов</p>
-          <p className={styles.author}>автор: Беня Салин</p>
+          <p className={styles.author}>автор: {creator}</p>
         </div>
         <div className={styles.firstRow}>
           <div className={`${styles.button} ${styles.yellowButton} ${styles.roundedBox}`}
