@@ -1,0 +1,46 @@
+:local {
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .container {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: -200px;
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 16px 16px 0 0;
+    transition: bottom 0.25s ease;
+  }
+
+  .container.open {
+    bottom: 0;
+  }
+
+  .button {
+    width: 100%;
+    padding: 14px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #333;
+    }
+  }
+
+}

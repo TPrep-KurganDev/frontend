@@ -10,6 +10,7 @@ import {ExamListScreen} from '../../pages/ExamListScreen/ExamListScreen.tsx';
 import ExamCover from '../../pages/ExamCover/ExamCover.tsx';
 import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
 import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
+import Test from "../../pages/TestPage/Test.tsx";
 
 
 export default function App() {
@@ -60,6 +61,10 @@ export default function App() {
           <Route
             path={AppRoute.NotFound}
             element={<NotFoundScreen/>}
+          />
+          <Route
+            path={AppRoute.Test}
+            element={<Test/>}
           />
         </Routes>
       </BrowserRouter>
