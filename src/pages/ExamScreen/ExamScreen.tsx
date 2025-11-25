@@ -9,6 +9,8 @@ import {CardOut, getCardsList} from '../../api/cards.ts';
 import {ExamOut, getExam, deleteExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
 import {AppRoute} from '../../const.ts';
+import {BottomSheet} from "../../components/BottomSheet/BottomSheet.tsx";
+import {tr} from "@faker-js/faker";
 
 type ExamScreenProps = {
   canEdit: boolean;
@@ -20,6 +22,7 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
   const [examTitle, setExamTitle] = useState('');
+  const [bottomScreenOpen, setBottom] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,10 +65,10 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
   return (
     <>
       <Header title={examTitle} {...(canEdit && {
-        imgSrc: 'deleteCard.svg',
+        imgSrc: 'settingsCard.svg',
         widthImg: '38',
         heightImg: '36',
-        onRightImageClick: deleteExamClick
+        onRightImageClick: () => {setBottom(true)}
       })}/>
       <div className={styles.list}>
         {cards.map((q, index) => (
@@ -79,6 +82,16 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
         ))}
         {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {createCardClick()}}/>}
       </div>
+
+      <BottomSheet
+        open={bottomScreenOpen}
+        onClose={() => setBottom(false)}
+        buttons={[
+          { text: 'Переименовать', onclick: () => alert('edit'), color: '#353535' },
+          { text: 'Редактировать права доступа', onclick: () => alert('share'), color: '#353535' },
+          { text: 'Удалить', onclick: () => alert('delete'), color: '#F7474A' }
+        ]}
+      />
     </>
   );
 }

@@ -12,9 +12,9 @@ export default function Test() {
         open={open}
         onClose={() => setOpen(false)}
         buttons={[
-          { text: "Редактировать", onclick: () => alert("edit"), color: "red" },
-          { text: "Поделиться", onclick: () => alert("share"), color: "red" },
-          { text: "Удалить", onclick: () => alert("delete"), color: "red" }
+          { text: 'Редактировать', onclick: () => alert('edit'), color: 'red' },
+          { text: 'Поделиться', onclick: () => alert('share'), color: 'red' },
+          { text: 'Удалить', onclick: () => alert('delete'), color: 'red' }
         ]}
       />
     </>

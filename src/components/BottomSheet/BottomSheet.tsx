@@ -25,16 +25,18 @@ export function BottomSheet({buttons, open, onClose}: BottomSheetProps) {
       <div
         className={`${styles.container} ${open ? styles.open : ""}`}
       >
-        {buttons.map((btn, i) => (
-          <button
-            key={i}
-            className={styles.button}
-            onClick={btn.onclick}
-            style={{ color: btn.color ?? "inherit" }}
-          >
-            {btn.text}
-          </button>
-        ))}
+        <div className={`${styles.containerInner}`}>
+          {buttons.map((btn, i) => (
+            <button
+              key={i}
+              className={styles.button}
+              onClick={btn.onclick}
+              style={{ color: btn.color ?? "inherit" }}
+            >
+              {btn.text}
+            </button>
+          ))}
+        </div>
       </div>
     </>
   );

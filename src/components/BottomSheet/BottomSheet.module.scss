@@ -2,7 +2,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(53, 53, 53, 0.32);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -18,10 +18,18 @@
     left: 0;
     right: 0;
     bottom: -200px;
-    background: #1a1a1a;
+    transition: bottom 0.25s ease;
+
+
+
+  }
+
+  .containerInner {
+    background: white;
     padding: 16px;
     border-radius: 16px 16px 0 0;
-    transition: bottom 0.25s ease;
+    max-width: 450px;
+    margin: auto;
   }
 
   .container.open {
@@ -30,17 +38,14 @@
 
   .button {
     width: 100%;
-    padding: 14px;
+    padding: 10px;
     text-align: left;
     background: transparent;
     border: none;
-    font-size: 16px;
+    font-size: 19px;
     color: white;
     cursor: pointer;
-
-    &:not(:last-child) {
-      border-bottom: 1px solid #333;
-    }
+    font-family: "Tinkoff", sans-serif;
   }
 
 }
