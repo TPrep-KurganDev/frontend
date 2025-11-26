@@ -1,0 +1,37 @@
+:local {
+  .errorsCount {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .placeError {
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .error {
+    font-size: 18px;
+    margin: 10px 0 5px;
+  }
+
+  .errors {
+    text-align: left;
+    padding-bottom: 10px;
+  }
+
+  .resultErrors {
+    padding: 10px 30px;
+    border-radius: 30px;
+    background: linear-gradient(165.84deg, #F7474A 9.89%, rgba(247, 71, 74, 0.74) 66.76%, rgba(247, 71, 74, 0.5) 88.4%);
+  }
+
+  .yellowButton {
+    border-radius: 25px;
+    padding: 20px 0;
+    background: linear-gradient(165.84deg, #FEDD2C 9.89%, rgba(254, 221, 44, 0.74) 66.76%, rgba(254, 221, 44, 0.5) 88.4%);
+  }
+
+  .color {
+    color: #FFFFFF;
+  }
+}

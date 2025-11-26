@@ -1,10 +1,10 @@
-import {Footer} from '../../components/Footer/Footer.tsx';
+import {ProgressBar} from '../../components/ProgressBar/ProgressBar.tsx';
 import {Card} from '../../components/Card/Card.tsx';
 import {RatingAnswer} from '../../components/RatingAnswer/RatingAnswer.tsx';
 import Header from '../../components/Header/Header.tsx';
 import {titleExam} from '../../mocks/Header.ts';
 import {useState, useEffect} from 'react';
-import {FooterCard} from '../../types/FooterCard.ts';
+import {ProgressBarType} from '../../types/ProgressBarType.ts';
 import {answerQuestion, getSession} from '../../api/session.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {getCard} from '../../api/cards.ts';
@@ -24,7 +24,7 @@ export function CardScreen() {
     setCard({...card, isFlipped: !card.isFlipped});
   };
 
-  const [footer, setFooter] = useState<FooterCard>({
+  const [progressBar, setProgressBar] = useState<ProgressBarType>({
     mistakesCount: 0,
     cardsCount: 0,
     doneCardsCount: 0,
@@ -38,14 +38,14 @@ export function CardScreen() {
 
   useEffect(() => {
     getSession(sessionIdParam).then((session) => {
-      setFooter((prevFooter) => ({
-        ...prevFooter,
+      setProgressBar((prevProgressBar) => ({
+        ...prevProgressBar,
         cardsCount: session.questions.length
       }));
       setCurrentCards(session.questions);
-      setNewCard(session.questions[footer.doneCardsCount]);
+      setNewCard(session.questions[progressBar.doneCardsCount]);
     });
-  }, [footer.doneCardsCount, sessionIdParam]);
+  }, [progressBar.doneCardsCount, sessionIdParam]);
 
 
 
@@ -56,22 +56,22 @@ export function CardScreen() {
   }
 
   const handleAnswer = (answerCorrectness: boolean) => {
-    const updatedFooter = {...footer};
-    updatedFooter.cardsProgress.push(answerCorrectness);
+    const updatedProgressBar = {...progressBar};
+    updatedProgressBar.cardsProgress.push(answerCorrectness);
     if (answerCorrectness){
-      updatedFooter.doneCardsCount += 1;
+      updatedProgressBar.doneCardsCount += 1;
     }
     else {
-      updatedFooter.mistakesCount += 1;
-      updatedFooter.doneCardsCount += 1;
+      updatedProgressBar.mistakesCount += 1;
+      updatedProgressBar.doneCardsCount += 1;
     }
-    setFooter(updatedFooter);
+    setProgressBar(updatedProgressBar);
     setCard({...card, isFlipped: !card.isFlipped});
-    if (currentCards.length == updatedFooter.doneCardsCount){
+    if (currentCards.length === updatedProgressBar.doneCardsCount){
       navigate('/')
     }
-    setNewCard(currentCards[updatedFooter.doneCardsCount]);
-    answerQuestion(sessionIdParam, currentCards[updatedFooter.doneCardsCount - 1], answerCorrectness);
+    setNewCard(currentCards[updatedProgressBar.doneCardsCount]);
+    answerQuestion(sessionIdParam, currentCards[updatedProgressBar.doneCardsCount - 1], answerCorrectness);
   }
 
   return (
@@ -86,7 +86,7 @@ export function CardScreen() {
           onCorrect={() => {handleAnswer(true)}}
           onFail={() => {handleAnswer(false)}}/>}
       </div>
-      <Footer footer={footer}/>
+      <ProgressBar progressBar={progressBar}/>
     </>
   )
 }

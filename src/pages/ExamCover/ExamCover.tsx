@@ -5,10 +5,10 @@ import Header from '../../components/Header/Header';
 import { useEffect, useState } from 'react';
 import { getExam, ExamOut } from '../../api/exam';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import {createSession} from '../../api/session'
 import {getCardsList} from '../../api/cards'
 import {AppRoute} from '../../const.ts';
 import {getUserById} from '../../api/users'
+import {StartButtons} from '../../components/StartButtons/StartButtons.tsx';
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
@@ -35,12 +35,6 @@ export default function ExamCover() {
     navigate(AppRoute.NotFound);
   }
 
-  const startNewSession = (exam_id: number | undefined, strategy: string) => {
-    createSession({exam_id: exam_id, strategy: strategy, n: null}).then(
-      (response) => {navigate(`/session?sessionId=${response.id}`)}
-    )
-  }
-
   return (
     <>
       <Header title={''} imgSrc={'settingsCard.svg'} widthImg="38" heightImg="36" />
@@ -51,18 +45,7 @@ export default function ExamCover() {
             navigate(`/exam?examId=${exam?.id}`);}}>{cardsCount} вопросов</p>
           <p className={styles.author}>автор: {creator}</p>
         </div>
-        <div className={styles.firstRow}>
-          <div className={`${styles.button} ${styles.yellowButton} ${styles.roundedBox}`}
-          onClick={() => {startNewSession(exam?.id, 'full')}}>
-            <p>Пройти весь<br/>тест</p>
-          </div>
-          <div className={`${styles.button} ${styles.hardButton} ${styles.roundedBox}`}>
-            <p>Умный подбор<br/>вопросов</p>
-          </div>
-        </div>
-        <div className={`${styles.button} ${styles.grayButton} ${styles.roundedBox}`}>
-          <p>Пройти n случайных<br/>вопросов</p>
-        </div>
+        <StartButtons exam={exam}/>
       </div>
     </>
   );

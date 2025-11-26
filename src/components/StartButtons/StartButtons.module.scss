@@ -1,0 +1,37 @@
+:local {
+  .firstRow,
+  .secondRow{
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    padding: 0 25px;
+  }
+
+
+  .button {
+    align-content: center;
+    border-radius: 30px;
+    padding: 20px 30px;
+    text-align: center;
+    width: 165px;
+  }
+
+  .button:hover{
+    cursor: pointer;
+  }
+
+  .yellowButton {
+    font-size: 20px;
+    background: linear-gradient(165.84deg, #FEDD2C 9.89%, rgba(254, 221, 44, 0.74) 66.76%, rgba(254, 221, 44, 0.5) 88.4%);
+  }
+
+  .hardButton {
+    font-size: 18px;
+    background: linear-gradient(85.22deg, #E0F2FF 2.78%, #ECE8F9 50.25%, #FCF4E9 97.73%);
+  }
+
+  .grayButton {
+    font-size: 18px;
+    background: linear-gradient(180deg, rgba(217, 217, 217, 0.3) 0%, rgba(115, 115, 115, 0.069) 100%);
+  }
+}
