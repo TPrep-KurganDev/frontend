@@ -10,6 +10,9 @@ export async function login(data: { email: string; password: string }) {
 
   console.log(res);
   localStorage.setItem('accessToken', res.data.access_token);
+  if (res.data.refresh_token) {
+    localStorage.setItem('refreshToken', res.data.refresh_token);
+  }
   localStorage.setItem('tokenType', res.data.token_type);
   localStorage.setItem('userId', res.data.user_id);
 
@@ -17,11 +20,13 @@ export async function login(data: { email: string; password: string }) {
 }
 
 export async function getProfile() {
-  const token = localStorage.getItem('accessToken');
+  return api.get('/users/me');
+}
 
-  return api.get('/users/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export function logout() {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('tokenType');
+  localStorage.removeItem('userId');
+  window.location.href = '/login';
 }
