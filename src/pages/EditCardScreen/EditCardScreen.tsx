@@ -67,7 +67,7 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
         widthImg: '38',
         heightImg: '30',
         onRightImageClick: deleteCardClick
-      })}/>
+      })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
       <input
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         type="text"

@@ -49,7 +49,8 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
   const renameClick = () => {
     setInputDisabled(false);
     setBottom(false);
-    setTimeout(() => {inputRef.current.focus();}, 50);
+    setTimeout(() => { // @ts-ignore
+      inputRef.current.focus();}, 50);
   };
 
   const renameEnd = () => {

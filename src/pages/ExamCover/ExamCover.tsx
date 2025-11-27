@@ -43,7 +43,8 @@ export default function ExamCover() {
 
   return (
     <>
-      <Header title={''} imgSrc={'settingsCard.svg'} widthImg="38" heightImg="36" />
+      <Header title={''} imgSrc={'settingsCard.svg'} widthImg="38" heightImg="36"
+              inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}>
           <p className={styles.title}>{ exam?.title }</p>

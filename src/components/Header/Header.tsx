@@ -8,7 +8,7 @@ type HeaderProps = {
   heightImg?: string,
   onRightImageClick?: () => void
   inputDisabled: boolean
-  inputRef: React.MutableRefObject<null>
+  inputRef: React.MutableRefObject<null>|undefined
   onInputBlur: () => void
   onTitleChange: (value: string) => void
 }
