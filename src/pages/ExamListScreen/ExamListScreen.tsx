@@ -14,7 +14,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userId = 1;
+    const userId = Number(localStorage.getItem('userId'));
     if (isFavorites){
       getPinnedExams(userId).then(setExams);
     }
