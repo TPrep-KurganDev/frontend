@@ -49,7 +49,7 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
   const renameClick = () => {
     setInputDisabled(false);
     setBottom(false);
-    setTimeout(() => { // @ts-ignore
+    setTimeout(() => { // @ts-expect-error ignore
       inputRef.current.focus();}, 50);
   };
 
@@ -75,19 +75,15 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
     deleteExam(exam?.id).then(() => {navigate('/exam-list')});
   }
 
-  const renameExam = () => {
-    updateExam(exam?.id, {title: examTitle});
-  }
-
   useEffect(() => {
     const handler = setTimeout(() => {
-      renameExam();
+      updateExam(exam?.id, {title: examTitle});
     }, 500);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [examTitle]);
+  }, [exam?.id, examTitle]);
 
   return (
     <>
