@@ -1,5 +1,4 @@
 import styles from './MainScreen.module.scss'
-import {Notification} from '../../components/Notification/Notification.tsx';
 import {createExam} from '../../api/exam'
 import {getUserById} from '../../api/users'
 import {useNavigate} from 'react-router-dom';

@@ -8,7 +8,7 @@ import {ExamSessionResponse, getSession} from '../../api/session.ts';
 import {useSearchParams} from 'react-router-dom';
 import {useEffect, useState} from 'react';
 import {ProgressBarType} from '../../types/ProgressBarType.ts';
-import {ExamOut, getExam} from "../../api/exam.ts";
+import {ExamOut, getExam} from '../../api/exam.ts';
 
 export function ResultScreen(){
   const [searchParams] = useSearchParams();
@@ -45,7 +45,7 @@ export function ResultScreen(){
   return (
     <>
       <Header title={exam.title} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}}
-              onTitleChange={() => {}}/>
+              onTitleChange={() => {}} backButtonPage={`/exam-cover?examId=${exam.id}`}/>
 
       <div className={styles.body}>
         <ProgressBar progressBar={progressBar}/>

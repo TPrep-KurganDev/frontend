@@ -1,5 +1,6 @@
 import styles from './Header.module.scss';
 import React, {useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 type HeaderProps = {
   title: string | undefined,
@@ -11,11 +12,20 @@ type HeaderProps = {
   inputRef: React.MutableRefObject<null>|undefined
   onInputBlur: () => void
   onTitleChange: (value: string) => void
+  backButtonPage: string|null
 }
 
-export default function Header({title, imgSrc, widthImg, heightImg, onRightImageClick, inputDisabled, inputRef, onInputBlur, onTitleChange}: HeaderProps) {
+export default function Header({title, imgSrc, widthImg, heightImg, onRightImageClick, inputDisabled,
+                                 inputRef, onInputBlur, onTitleChange, backButtonPage=null}: HeaderProps) {
+  const navigate = useNavigate();
   const handleBack = () => {
-    window.history.back();
+    if (backButtonPage == null){
+      window.history.back();
+    }
+    else {
+      navigate(backButtonPage);
+    }
+
   };
 
   // const [inputText, setInputText] = useState('');

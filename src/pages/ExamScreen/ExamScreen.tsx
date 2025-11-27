@@ -92,7 +92,8 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
         widthImg: '38',
         heightImg: '36',
         onRightImageClick: () => {setBottom(true)}
-      })}/>
+      })}
+              backButtonPage={`/exam-cover?examId=${exam?.id}`}/>
       <div className={styles.list}>
         {cards.map((q, index) => (
           <CardListEntry

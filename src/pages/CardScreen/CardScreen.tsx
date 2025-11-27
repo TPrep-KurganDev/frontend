@@ -82,7 +82,8 @@ export function CardScreen() {
 
   return (
     <>
-      <Header title={exam.title} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
+      <Header title={exam.title} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}}
+              onTitleChange={()=>{}} backButtonPage={`/exam-cover?examId=${exam.id}`}/>
       <div className="screenСontent screenContentCentered">
         <Card
           onFlip={handleCardClick}

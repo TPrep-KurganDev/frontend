@@ -13,6 +13,7 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
   const [searchParams] = useSearchParams();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const [examId, setExamId] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
     if (!cardIdParam) return;
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
+    setExamId(Number(examIdParam));
 
     updateCard(Number(examIdParam), Number(cardIdParam), {question, answer});
   }
@@ -67,7 +69,8 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
         widthImg: '38',
         heightImg: '30',
         onRightImageClick: deleteCardClick
-      })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
+      })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}
+              backButtonPage={`/exam?examId=${examId}`}/>
       <input
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         type="text"
