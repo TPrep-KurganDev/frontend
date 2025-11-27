@@ -10,6 +10,13 @@
     font-weight: 500;
     font-size: 24px;
     margin: 0;
+    border: none;
+    border-radius: 10px;
+    padding: 7px;
+  }
+
+  .title:focus {
+    outline: 2px solid black;
   }
 
   .backButton,

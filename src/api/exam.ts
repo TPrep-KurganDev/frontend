@@ -40,7 +40,11 @@ export async function createExam(data: string) {
 }
 
 export async function updateExam(examId: number, data: ExamCreate) {
-  const res = await api.patch<ExamOut>(`/exams/${examId}`, data);
+  const token = localStorage.getItem('accessToken');
+  const res = await api.patch<ExamOut>(`/exams/${examId}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }});
   return res.data;
 }
 
