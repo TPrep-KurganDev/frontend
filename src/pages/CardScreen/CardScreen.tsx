@@ -76,7 +76,7 @@ export function CardScreen() {
 
   return (
     <>
-      <Header title={titleExam}/>
+      <Header title={titleExam} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
       <div className="screenСontent screenContentCentered">
         <Card
           onFlip={handleCardClick}

@@ -4,7 +4,6 @@ import styles from './EditCardScreen.module.scss';
 import {useEffect, useState} from 'react';
 import {getCard, updateCard, deleteCard} from '../../api/cards.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
-import {BlueButton} from '../../components/BlueButton/BlueButton.tsx';
 
 type EditCardScreenProps = {
   canEdit: boolean;
@@ -27,7 +26,7 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
     });
   }, [searchParams])
 
-  const updateCardClick = () => {
+  const sendUpdateCard = () => {
     const cardIdParam = searchParams.get('cardId');
     if (!cardIdParam) return;
     const examIdParam = searchParams.get('examId');
@@ -47,6 +46,20 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
     })
   }
 
+  const onQuestionChange = (value: string) => {
+    setQuestion(value);
+  }
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      sendUpdateCard();
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [question, answer]);
+
   return (
     <>
       <Header title='' {...(canEdit && {
@@ -54,12 +67,12 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
         widthImg: '38',
         heightImg: '30',
         onRightImageClick: deleteCardClick
-      })}/>
+      })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
       <input
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         type="text"
         value={question}
-        onChange={(e) => setQuestion(e.target.value)}
+        onChange={(e) => onQuestionChange(e.target.value)}
       />
       <input
         className={`${styles.answer} ${!canEdit ? styles.noEdit : ''}`}
@@ -67,9 +80,6 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
       />
-      <div onClick={() => {updateCardClick()}}>
-        <BlueButton title="Сохранить"/>
-      </div>
     </>
   )
 }
