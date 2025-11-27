@@ -3,17 +3,17 @@ import {ProgressBarType} from '../../types/ProgressBarType.ts';
 import {ReactElement} from 'react';
 
 type ProgressBarProps = {
-  progressBar: ProgressBarType;
+  progressBar: ProgressBarType|undefined;
 }
 
 export function ProgressBar({progressBar}: ProgressBarProps) {
   const renderProgressSegments = () => {
     const segments: ReactElement[] = [];
 
-    for (let i = 0; i < progressBar.cardsCount; i++) {
+    for (let i = 0; i < progressBar!.cardsCount; i++) {
       let segmentClass = styles.segmentPending;
-      if (i < progressBar.cardsProgress.length) {
-        segmentClass = progressBar.cardsProgress[i] ? styles.segmentCompleted : styles.segmentError;
+      if (i < progressBar!.cardsProgress.length) {
+        segmentClass = progressBar!.cardsProgress[i] ? styles.segmentCompleted : styles.segmentError;
       } else {
         segmentClass = styles.segmentPending;
       }
@@ -29,10 +29,10 @@ export function ProgressBar({progressBar}: ProgressBarProps) {
     <div className={styles.progressBar}>
       <div className={styles.info}>
         <span className={styles.progressText}>
-          {progressBar.doneCardsCount} из {progressBar.cardsCount}
+          {progressBar!.doneCardsCount} из {progressBar!.cardsCount}
         </span>
         <span className={styles.errorsText}>
-          Ошибок: {progressBar.mistakesCount}
+          Ошибок: {progressBar!.mistakesCount}
         </span>
       </div>
       <div className={styles.segments}>

@@ -6,12 +6,18 @@ export interface ExamSessionStartRequest {
   n: number|null
 }
 
+export type Answers = {
+  [key: number]: boolean;
+};
+
 export interface ExamSessionResponse {
   id: string
   questions: number[]
+  answers: Answers
+  exam_id: number
 }
 
-export async function getSession(session_id: string) {
+export async function getSession(session_id: string | null) {
   const token = localStorage.getItem('accessToken');
   const res = await api.get<ExamSessionResponse>(`/session/${session_id}`, {
     headers: {

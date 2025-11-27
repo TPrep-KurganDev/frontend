@@ -25,14 +25,17 @@ export function StartButtons({exam}: StartButtonsProps) {
              }}>
           Пройти весь тест
         </div>
-        <div className={`${styles.button} ${styles.hardButton}`}>
+        <div className={`${styles.button} ${styles.hardButton}`}
+             onClick={() => {
+               startNewSession(exam?.id, 'smart')
+             }}>
           Умный подбор вопросов
         </div>
       </div>
       <div className={styles.secondRow}>
-      <div className={`${styles.button} ${styles.grayButton}`}>
-        Пройти n случайных вопросов
-      </div>
+      {/*<div className={`${styles.button} ${styles.grayButton}`}>*/}
+      {/*  Пройти n случайных вопросов*/}
+      {/*</div>*/}
       </div>
     </>
   )

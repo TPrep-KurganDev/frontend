@@ -1,14 +1,35 @@
 import styles from './ResultErrors.module.scss';
+import {getCard} from '../../api/cards'
+import {useEffect, useState} from 'react';
 
 type ResultErrorsProps = {
-  errorsCount: number;
+  mistakesId: number[]
 }
 
-export function ResultErrors({errorsCount}: ResultErrorsProps) {
-  const hasErrors = errorsCount > 0;
+export function ResultErrors({mistakesId}: ResultErrorsProps) {
+  const hasErrors = mistakesId.length > 0;
   const message = hasErrors
-    ? `Ошибок: ${errorsCount}`
+    ? `Ошибок: ${mistakesId.length}`
     : 'Тест пройден без ошибок!';
+
+  const [mistakes, setMistakes] = useState<string[]>(['Было']);
+
+  useEffect(() => {
+    async function loadMistakes() {
+      const cards = await Promise.all(
+        mistakesId.map(id => getCard(id))
+      );
+
+      const mistakes = cards.map((card, index) =>
+        `${mistakesId[index]}. ${card.question}`
+      );
+
+      setMistakes(mistakes);
+    }
+
+    loadMistakes();
+  }, [mistakesId]);
+
 
   return (
 
@@ -18,8 +39,9 @@ export function ResultErrors({errorsCount}: ResultErrorsProps) {
       {hasErrors && <>
         <div className={`${styles.placeError} ${styles.color}`}>в вопросах:</div>
         <div className={styles.errors}>
-          <div className={`${styles.error} ${styles.color}`}>2. Что такое ядро гомоморфизма?</div>
-          <div className={`${styles.error} ${styles.color}`}>12. Что называют рангом матрицы?</div>
+          {mistakes!.map((mistake, q) => (
+            <div key={q} className={`${styles.error} ${styles.color}`}>{mistake}</div>
+          ))}
         </div>
       </>}
     </div>

@@ -47,10 +47,10 @@ export function MainScreen() {
           <div className={styles.textButtonBody}>Найти тест</div>
         </div>
       </div>
-      <Notification examName='Тест по алгему' nextRepeat='Следующее повторение через 21 минуту
-сегодня в 14:51'/>
-      <Notification examName='Экзамен ПДД' nextRepeat='Следующее повторение через 7 часов 31 минуту
-завтра в 8:14'/>
+{/*      <Notification examName='Тест по алгему' nextRepeat='Следующее повторение через 21 минуту*/}
+{/*сегодня в 14:51'/>*/}
+{/*      <Notification examName='Экзамен ПДД' nextRepeat='Следующее повторение через 7 часов 31 минуту*/}
+{/*завтра в 8:14'/>*/}
     </>
 
   );

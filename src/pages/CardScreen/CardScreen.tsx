@@ -2,12 +2,12 @@ import {ProgressBar} from '../../components/ProgressBar/ProgressBar.tsx';
 import {Card} from '../../components/Card/Card.tsx';
 import {RatingAnswer} from '../../components/RatingAnswer/RatingAnswer.tsx';
 import Header from '../../components/Header/Header.tsx';
-import {titleExam} from '../../mocks/Header.ts';
 import {useState, useEffect} from 'react';
 import {ProgressBarType} from '../../types/ProgressBarType.ts';
 import {answerQuestion, getSession} from '../../api/session.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {getCard} from '../../api/cards.ts';
+import {ExamOut, getExam} from "../../api/exam.ts";
 
 export type CardState = {
   isFlipped: boolean,
@@ -17,6 +17,7 @@ export type CardState = {
 
 export function CardScreen() {
   const [card, setCard] = useState<CardState>({isFlipped: false, question: '', answer:''});
+  const [exam, setExam] = useState<ExamOut>({created_at: '', creator_id: 0, id: 0, title: ''});
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -44,6 +45,9 @@ export function CardScreen() {
       }));
       setCurrentCards(session.questions);
       setNewCard(session.questions[progressBar.doneCardsCount]);
+      getExam(session.exam_id).then((exam_res) => {
+        setExam(exam_res);
+      })
     });
   }, [progressBar.doneCardsCount, sessionIdParam]);
 
@@ -67,16 +71,18 @@ export function CardScreen() {
     }
     setProgressBar(updatedProgressBar);
     setCard({...card, isFlipped: !card.isFlipped});
-    if (currentCards.length === updatedProgressBar.doneCardsCount){
-      navigate('/')
-    }
+
     setNewCard(currentCards[updatedProgressBar.doneCardsCount]);
-    answerQuestion(sessionIdParam, currentCards[updatedProgressBar.doneCardsCount - 1], answerCorrectness);
+    answerQuestion(sessionIdParam, currentCards[updatedProgressBar.doneCardsCount - 1], answerCorrectness).then(() => {
+      if (currentCards.length === updatedProgressBar.doneCardsCount){
+        navigate(`/result?sessionId=${sessionIdParam}`)
+      }
+    });
   }
 
   return (
     <>
-      <Header title={titleExam} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
+      <Header title={exam.title} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}/>
       <div className="screenСontent screenContentCentered">
         <Card
           onFlip={handleCardClick}
