@@ -1,5 +1,5 @@
 import styles from './Header.module.scss';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 
 type HeaderProps = {
   title: string | undefined,
