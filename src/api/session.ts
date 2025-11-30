@@ -28,7 +28,7 @@ export async function getSession(session_id: string | null) {
 
 export async function createSession(data: ExamSessionStartRequest) {
   const token = localStorage.getItem('accessToken');
-  const res = await api.post<ExamSessionResponse>('/session', data, {
+  const res = await api.post<ExamSessionResponse>('/session/', data, {
     headers: {
       Authorization: `Bearer ${token}`,
     }});
