@@ -43,6 +43,6 @@ export async function deleteCard(examId: number, cardId: number) {
 }
 
 export async function getCardsList(examId: number): Promise<CardOut[]> {
-  const res = await api.get<CardOut[]>(`/exams/${examId}/cards/`);
+  const res = await api.get<CardOut[]>(`/exams/${examId}/cards`);
   return res.data;
 }
