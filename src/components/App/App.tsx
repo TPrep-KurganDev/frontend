@@ -1,7 +1,7 @@
 import ExamScreen from '../../pages/ExamScreen/ExamScreen.tsx';
 import '../../styles/global.scss';
 import {CardScreen} from '../../pages/CardScreen/CardScreen.tsx';
-import {BrowserRouter, Navigate, Route, Routes, useLocation} from 'react-router-dom';
+import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {AppRoute} from '../../const.ts';
 import {EditCardScreen} from '../../pages/EditCardScreen/EditCardScreen.tsx';
 import {LoginScreen} from '../../pages/LoginScreen/LoginScreen.tsx';
@@ -27,7 +27,6 @@ export default function App() {
 
   return (
     <div className="screen">
-      <BrowserRouter>
         <Routes>
           <Route
             path={AppRoute.Exam}
@@ -78,7 +77,6 @@ export default function App() {
             element={<ResultScreen/>}
           />
         </Routes>
-      </BrowserRouter>
     </div>
   );
 }
