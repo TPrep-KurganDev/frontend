@@ -31,27 +31,15 @@ export async function getPinnedExams(pinnedId: number) {
 }
 
 export async function createExam(data: string) {
-  const token = localStorage.getItem('accessToken');
-  const res = await api.post<ExamOut>('/exams', {'title': data}, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }});
+  const res = await api.post<ExamOut>('/exams', {'title': data});
   return res.data;
 }
 
 export async function updateExam(examId: number | undefined, data: ExamCreate) {
-  const token = localStorage.getItem('accessToken');
-  const res = await api.patch<ExamOut>(`/exams/${examId}`, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }});
+  const res = await api.patch<ExamOut>(`/exams/${examId}`, data);
   return res.data;
 }
 
 export async function deleteExam(examId: number | undefined) {
-  const token = localStorage.getItem('accessToken');
-  await api.delete(`/exams/${examId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }});
+  await api.delete(`/exams/${examId}`);
 }

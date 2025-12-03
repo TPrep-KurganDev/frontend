@@ -18,28 +18,16 @@ export interface ExamSessionResponse {
 }
 
 export async function getSession(session_id: string | null) {
-  const token = localStorage.getItem('accessToken');
-  const res = await api.get<ExamSessionResponse>(`/session/${session_id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }});
+  const res = await api.get<ExamSessionResponse>(`/session/${session_id}`);
   return res.data;
 }
 
 export async function createSession(data: ExamSessionStartRequest) {
-  const token = localStorage.getItem('accessToken');
-  const res = await api.post<ExamSessionResponse>('/session/', data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }});
+  const res = await api.post<ExamSessionResponse>('/session/', data);
   return res.data;
 }
 
 export async function answerQuestion(session_id: string, question_id: number, value: boolean) {
-  const token = localStorage.getItem('accessToken');
-  const res = await api.post<ExamSessionResponse>(`/session/${session_id}/answer?question_id=${question_id}&value=${value}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }});
+  const res = await api.post<ExamSessionResponse>(`/session/${session_id}/answer?question_id=${question_id}&value=${value}`);
   return res.data;
 }
