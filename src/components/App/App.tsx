@@ -1,7 +1,7 @@
 import ExamScreen from '../../pages/ExamScreen/ExamScreen.tsx';
 import '../../styles/global.scss';
 import {CardScreen} from '../../pages/CardScreen/CardScreen.tsx';
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {AppRoute} from '../../const.ts';
 import {EditCardScreen} from '../../pages/EditCardScreen/EditCardScreen.tsx';
 import {LoginScreen} from '../../pages/LoginScreen/LoginScreen.tsx';
@@ -14,9 +14,19 @@ import {ResultScreen} from '../../pages/ResultScreen/ResultScreen.tsx';
 
 
 export default function App() {
+  const location = useLocation();
+  const token = localStorage.getItem('accessToken');
+
+  const isAuthPage =
+    location.pathname === AppRoute.Registration ||
+    location.pathname === AppRoute.Login;
+
+  if (!token && !isAuthPage) {
+    return <Navigate to={AppRoute.Registration} replace />;
+  }
+
   return (
     <div className="screen">
-      <BrowserRouter>
         <Routes>
           <Route
             path={AppRoute.Exam}
@@ -67,7 +77,6 @@ export default function App() {
             element={<ResultScreen/>}
           />
         </Routes>
-      </BrowserRouter>
     </div>
   );
 }

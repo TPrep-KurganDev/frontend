@@ -9,6 +9,15 @@ export const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -18,12 +27,21 @@ api.interceptors.response.use(
         if (!refreshToken) throw new Error('No refresh token');
 
         const res = await axios.post(`${API_URL}/auth/refresh`, {
-          refreshToken,
+          refresh_token: refreshToken,
         });
 
-        localStorage.setItem('accessToken', res.data.accessToken);
+        const newAccessToken = res.data.access_token;
+        const newRefreshToken = res.data.refresh_token;
 
-        error.config.headers['Authorization'] = `Bearer ${res.data.accessToken}`;
+        if (newAccessToken) {
+          localStorage.setItem('accessToken', newAccessToken);
+        }
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
+        }
+
+        error.config.headers = error.config.headers ?? {};
+        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
         return axios(error.config);
       } catch {
         console.log('Refresh failed — redirect to login');
