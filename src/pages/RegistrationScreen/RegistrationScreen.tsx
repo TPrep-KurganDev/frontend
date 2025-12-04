@@ -3,12 +3,15 @@ import styles from './RegistrationScreen.module.scss'
 import {BlueButton} from '../../components/BlueButton/BlueButton.tsx';
 import { useState } from 'react';
 import { register } from '../../api/auth.ts';
+import {useNavigate} from 'react-router-dom';
 
 export function RegistrationScreen() {
   const [email, setEmail] = useState('');
   const [user_name, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password_confirm, setPasswordConfirm] = useState('');
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +58,7 @@ export function RegistrationScreen() {
 
       <div className={`${styles.yellowButton} ${styles.yellowButtonPadding}`}>
         <p className={styles.yellowButtonP}>или</p>
-        <p className={styles.yellowButtonTitle}>Вход</p>
+        <p className={styles.yellowButtonTitle} onClick={() => {navigate('/login')}}>Вход</p>
       </div>
     </div>
   );

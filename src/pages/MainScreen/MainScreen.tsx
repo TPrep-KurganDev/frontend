@@ -41,10 +41,10 @@ export function MainScreen() {
           <img width={25} height={25} src='createTest.svg'/>
           <div className={styles.textButtonBody}>Создать тест</div>
         </div>
-        <div className={styles.buttonBody}>
-          <img width={30} height={30} src='findTest.svg'/>
-          <div className={styles.textButtonBody}>Найти тест</div>
-        </div>
+        {/*<div className={styles.buttonBody}>*/}
+        {/*  <img width={30} height={30} src='findTest.svg'/>*/}
+        {/*  <div className={styles.textButtonBody}>Найти тест</div>*/}
+        {/*</div>*/}
       </div>
 {/*      <Notification examName='Тест по алгему' nextRepeat='Следующее повторение через 21 минуту*/}
 {/*сегодня в 14:51'/>*/}
