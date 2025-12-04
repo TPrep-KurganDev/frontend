@@ -34,15 +34,15 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
     getExam(examId).then((ex) => {
       setExam(ex);
       setExamTitle(ex.title);
+    }).catch(() => {
+      navigate(AppRoute.NotFound);
     });
 
     getCardsList(examId)
-      .then(setCards);
-  }, [searchParams]);
-
-  if (!exam) {
-    navigate(AppRoute.NotFound);
-  }
+      .then(setCards).catch(() => {
+      navigate(AppRoute.NotFound);
+    });
+  }, [navigate, searchParams]);
 
   const inputRef = useRef(null);
 
