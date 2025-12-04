@@ -6,9 +6,9 @@ body {
 }
 
 .screen {
-  min-height: 95vh;
+  min-height: 90vh;
   background: #fff;
-  max-width: 450px;
+  width: min(450px, 95vw);
   margin: 0 auto;
   padding: 0 5px;
   display: flex;
