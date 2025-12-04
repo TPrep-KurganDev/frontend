@@ -22,18 +22,25 @@ export default function ExamCover() {
     if (!examIdParam) return;
 
     const examId = Number(examIdParam);
-    getExam(examId).then((res) => {
-      setExam(res);
-      getUserById(res.creator_id).then((user_res) => {
+
+    const fetchData = async () => {
+      try {
+        const res = await getExam(examId);
+        setExam(res);
+
+        const user_res = await getUserById(res.creator_id);
         setCreator(user_res.user_name);
-      })
-    });
-    getCardsList(examId).then((res) => {setCardsCount(res.length)})
+
+        const cards = await getCardsList(examId);
+        setCardsCount(cards.length);
+      } catch (e) {
+        navigate(AppRoute.NotFound);
+      }
+    };
+
+    fetchData();
   }, [searchParams]);
 
-  if (!exam){
-    navigate(AppRoute.NotFound);
-  }
 
   return (
     <>
