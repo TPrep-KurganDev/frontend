@@ -1,7 +1,11 @@
-import { api } from './api';
+import {api} from './api';
 
 export interface ExamCreate {
   title: string;
+}
+
+export interface ExamPinStatus {
+  is_pinned: boolean;
 }
 
 export interface ExamOut {
@@ -42,4 +46,16 @@ export async function updateExam(examId: number | undefined, data: ExamCreate) {
 
 export async function deleteExam(examId: number | undefined) {
   await api.delete(`/exams/${examId}`);
+}
+
+export async function pinExam(examId: number | undefined) {
+  await api.post(`/exams/${examId}/pin`);
+}
+
+export async function unpinExam(examId: number | undefined) {
+  await api.post(`/exams/${examId}/unpin`);
+}
+
+export async function isExamPinned(examId: number | undefined) {
+  return (await api.get<ExamPinStatus>(`/exams/${examId}/check_pinning`)).data;
 }

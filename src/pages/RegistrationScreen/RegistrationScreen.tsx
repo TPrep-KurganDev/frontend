@@ -20,7 +20,7 @@ export function RegistrationScreen() {
     }
     try {
       await register({ email, user_name, password });
-      window.location.href = '/profile';
+      window.location.href = '/login';
     } catch (err) {
       alert('Login failed');
     }

@@ -22,7 +22,8 @@ export function MainScreen() {
     <>
       <header className={styles.header}>
         <div className={styles.user}>
-          <img className={styles.avatar} width={43} height={43} src="avatar3.png"/>
+          <img className={styles.avatar} width={43} height={43}
+               src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg"/>
           <div className={styles.name}>{username}</div>
         </div>
         <div className={styles.buttonsHeader}>

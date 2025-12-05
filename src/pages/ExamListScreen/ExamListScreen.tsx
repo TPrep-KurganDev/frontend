@@ -33,7 +33,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
           <div className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`} onClick={() => {
             navigate(`/exam-cover?examId=${exam.id}`);}} >
             <div className={styles.name}>{exam.title}</div>
-            {isFavorites && <div className={styles.author}>{exam.creator_id}</div>}
+            {/*{isFavorites && <div className={styles.author}>{exam.creator_id}</div>}*/}
           </div>
         ))}
       </div>

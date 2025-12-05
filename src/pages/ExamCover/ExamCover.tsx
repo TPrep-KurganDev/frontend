@@ -3,7 +3,7 @@ import styles from './ExamCover.module.scss';
 import Header from '../../components/Header/Header';
 
 import { useEffect, useState } from 'react';
-import { getExam, ExamOut } from '../../api/exam';
+import { getExam, pinExam, unpinExam, getPinnedExams, ExamOut } from '../../api/exam';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {getCardsList} from '../../api/cards'
 import {AppRoute} from '../../const.ts';
@@ -15,6 +15,7 @@ export default function ExamCover() {
   const [exam, setExam] = useState<ExamOut>();
   const [cardsCount, setCardsCount] = useState<number>(0);
   const [creator, setCreator] = useState('');
+  const [starImage, setStarImage] = useState('star.svg');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,12 +42,37 @@ export default function ExamCover() {
     fetchData();
   }, [searchParams]);
 
+  useEffect(() => {
+    getPinnedExams(Number(localStorage.getItem('userId'))).then((res) => {
+      for (const i of res){
+        if (i.id == exam?.id){
+          setStarImage('starActive.svg');
+          return;
+        }
+      }
+      setStarImage('star.svg');
+    });
+  }, [exam?.id]);
+
+  const changePinState = () => {
+    if (starImage == 'star.svg'){
+      pinExam(exam?.id).then(() => {
+        setStarImage('starActive.svg');
+      });
+    }
+    else {
+      unpinExam(exam?.id).then(() => {
+        setStarImage('star.svg');
+      });
+    }
+  }
+
 
   return (
     <>
-      <Header title={''} imgSrc={'star.svg'} widthImg="38" heightImg="36"
+      <Header title={''} imgSrc={starImage} widthImg="38" heightImg="36"
               inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}
-              backButtonPage={'/'}/>
+              backButtonPage={'/'} onRightImageClick={() => {changePinState()}}/>
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}>
           <p className={styles.title}>{ exam?.title }</p>
