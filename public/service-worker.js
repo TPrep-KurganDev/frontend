@@ -1,28 +1,41 @@
 self.addEventListener('install', () => {
-  console.log('Service Worker installing...');
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', () => {
-  console.log('Service Worker activated');
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('push', (event) => {
   if (!event.data) {
-    console.log('Push notification received but no data');
     return;
   }
 
   const data = event.data.json();
+  const title = data.exam_title || 'Уведомление';
+  const body = 'Напоминание';
+  const notificationId = data.id;
+
   const options = {
-    body: data.body,
+    body: body,
     icon: '/logo192.png',
     badge: '/badge.png',
-    tag: data.tag || 'notification',
-    data: data.data || {}
+    tag: 'notification',
+    data: { notificationId: notificationId }
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    Promise.all([
+      self.registration.showNotification(title, options),
+      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({
+            type: 'NOTIFICATION_SHOWN',
+            notificationId: notificationId
+          });
+        });
+      })
+    ])
   );
 });
 

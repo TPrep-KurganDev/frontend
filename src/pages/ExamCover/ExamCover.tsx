@@ -7,7 +7,6 @@ import {getCardsList} from '../../api/cards';
 import {AppRoute} from '../../const';
 import {getUserById} from '../../api/users';
 import {StartButtons} from '../../components/StartButtons/StartButtons';
-import {PushNotificationButton} from '../../components/PushNotificationButton/PushNotificationButton';
 import {api} from '../../api/api';
 
 export default function ExamCover() {
@@ -80,9 +79,8 @@ export default function ExamCover() {
           <p className={styles.author}>автор: {creator}</p>
         </div>
         <StartButtons exam={exam}/>
-        <PushNotificationButton/>
         <button disabled={testLoading} onClick={handleTestNotification}>
-          {testLoading ? 'Запрос отправляется...' : 'Тест уведомлений'}
+          {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}
         </button>
       </div>
     </>
