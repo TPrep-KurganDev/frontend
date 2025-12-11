@@ -4,7 +4,7 @@
     display: flex;
     justify-content: space-between;
     gap: 25px;
-    padding: 0;
+    padding: 0 30px;
   }
 
 
@@ -22,15 +22,23 @@
   .yellowButton {
     font-size: 20px;
     background: linear-gradient(165.84deg, #FEDD2C 9.89%, rgba(254, 221, 44, 0.74) 66.76%, rgba(254, 221, 44, 0.5) 88.4%);
+    box-shadow: 0 0 14.1px 0 #00033B24;
   }
 
   .hardButton {
     font-size: 18px;
     background: linear-gradient(85.22deg, #E0F2FF 2.78%, #ECE8F9 50.25%, #FCF4E9 97.73%);
+    box-shadow: 0 0 17.1px 0 #00033B21;
   }
 
   .grayButton {
     font-size: 18px;
     background: linear-gradient(180deg, rgba(217, 217, 217, 0.3) 0%, rgba(115, 115, 115, 0.069) 100%);
+    box-shadow: 0 0 28.8px 0 #00033B24;
+  }
+
+  .whiteButton {
+    font-size: 18px;
+    box-shadow: 0 0 43.4px 0 #00033B26;
   }
 }

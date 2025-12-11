@@ -98,7 +98,7 @@ export default function ExamCover() {
           </p>
           <p className={styles.author}>автор: {creator}</p>
         </div>
-        <StartButtons exam={exam}/>
+        <StartButtons exam={exam} cardsCount={cardsCount}/>
         <button disabled={testLoading} onClick={handleTestNotification}>
           {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}
         </button>

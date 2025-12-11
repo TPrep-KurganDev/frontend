@@ -51,7 +51,7 @@ export function ResultScreen(){
         <ProgressBar progressBar={progressBar}/>
         <ResultErrors mistakesId={Object.entries(sessionResponse!.answers).filter(([, value]) => !value).map(([key]) => Number(key))}/>
         {/*<div className={styles.nextRepeat}>Следующее повторение через 2 часа сегодня в 14:45</div>*/}
-        <StartButtons exam={exam}/>
+        <StartButtons exam={exam} cardsCount={sessionResponse.questions.length}/>
       </div>
     </>
   )
