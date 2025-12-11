@@ -21,7 +21,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
     else {
       getCreatedExams(userId).then(setExams);
     }
-  }, []);
+  }, [isFavorites]);
 
   return (
     <>
