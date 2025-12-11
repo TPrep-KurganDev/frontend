@@ -1,26 +1,32 @@
 import styles from './ExamCover.module.scss';
 
 import Header from '../../components/Header/Header';
-
-import { useEffect, useState } from 'react';
-import { getExam, pinExam, unpinExam, getPinnedExams, ExamOut } from '../../api/exam';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import {getCardsList} from '../../api/cards'
-import {AppRoute} from '../../const.ts';
-import {getUserById} from '../../api/users'
-import {StartButtons} from '../../components/StartButtons/StartButtons.tsx';
+import {useEffect, useState} from 'react';
+import {getExam, pinExam, unpinExam, getPinnedExams, ExamOut} from '../../api/exam';
+import {useSearchParams, useNavigate} from 'react-router-dom';
+import {getCardsList} from '../../api/cards';
+import {AppRoute} from '../../const';
+import {getUserById} from '../../api/users';
+import {StartButtons} from '../../components/StartButtons/StartButtons';
+import {api} from '../../api/api';
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
-  const [exam, setExam] = useState<ExamOut>();
-  const [cardsCount, setCardsCount] = useState<number>(0);
+  const [cardsCount, setCardsCount] = useState(0);
   const [creator, setCreator] = useState('');
   const [starImage, setStarImage] = useState('star.svg');
   const navigate = useNavigate();
 
+  const [exam, setExam] = useState<ExamOut | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [testLoading, setTestLoading] = useState(false);
+
   useEffect(() => {
     const examIdParam = searchParams.get('examId');
-    if (!examIdParam) return;
+    if (!examIdParam) {
+      navigate(AppRoute.NotFound);
+      return;
+    }
 
     const examId = Number(examIdParam);
 
@@ -67,6 +73,17 @@ export default function ExamCover() {
     }
   }
 
+  const handleTestNotification = async () => {
+    if (!exam) return;
+    setTestLoading(true);
+
+    try {
+      await api.post(`/exams/${exam.id}/pin`);
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
 
   return (
     <>
@@ -75,12 +92,16 @@ export default function ExamCover() {
               backButtonPage={'/'} onRightImageClick={() => {changePinState()}}/>
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}>
-          <p className={styles.title}>{ exam?.title }</p>
-          <p className={styles.questionCount} onClick={() => {
-            navigate(`/exam?examId=${exam?.id}`);}}>{cardsCount} вопросов</p>
+          <p className={styles.title}>{exam.title}</p>
+          <p className={styles.questionCount} onClick={() => navigate(`/exam?examId=${exam.id}`)}>
+            {cardsCount} вопросов
+          </p>
           <p className={styles.author}>автор: {creator}</p>
         </div>
         <StartButtons exam={exam}/>
+        <button disabled={testLoading} onClick={handleTestNotification}>
+          {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}
+        </button>
       </div>
     </>
   );
