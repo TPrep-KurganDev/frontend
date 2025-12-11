@@ -89,12 +89,12 @@ export const usePushNotifications = () => {
 
     try {
       const registration = await navigator.serviceWorker.ready;
-      const key =
-        'BLQ3BRPjbOjHMW8FbI45LXfCq19XnCUgOdtFSQHhshiGzPi2_IL-fUiDoUR8zrlEzFfAI4qCO9WRPer3XVw7BEI';
+      const vapid_public_key =
+        'BEhL4UUKHfRvlJ_hIFsNUCvs9Hst-rJWkFJV4Ia5S5WavZ81EgIw0Ta1_96q4p9kU-hIJANRoYk-bWUFCcD1dek';
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(key)
+        applicationServerKey: urlBase64ToUint8Array(vapid_public_key)
       });
 
       setState((s) => ({...s, subscription}));
