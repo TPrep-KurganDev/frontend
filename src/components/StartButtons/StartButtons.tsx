@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import {ExamOut} from '../../api/exam.ts';
 
 type StartButtonsProps = {
-  exam?: ExamOut | undefined;
+  exam?: ExamOut | null;
 }
 
 export function StartButtons({exam}: StartButtonsProps) {

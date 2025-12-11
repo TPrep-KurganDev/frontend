@@ -18,7 +18,7 @@ export default function ExamCover() {
   const navigate = useNavigate();
 
   const [exam, setExam] = useState<ExamOut | null>(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [testLoading, setTestLoading] = useState(false);
 
   useEffect(() => {
@@ -92,8 +92,8 @@ export default function ExamCover() {
               backButtonPage={'/'} onRightImageClick={() => {changePinState()}}/>
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}>
-          <p className={styles.title}>{exam.title}</p>
-          <p className={styles.questionCount} onClick={() => navigate(`/exam?examId=${exam.id}`)}>
+          <p className={styles.title}>{exam?.title}</p>
+          <p className={styles.questionCount} onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
             {cardsCount} вопросов
           </p>
           <p className={styles.author}>автор: {creator}</p>
