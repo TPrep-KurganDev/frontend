@@ -8,7 +8,7 @@ import {getCardsList} from '../../api/cards';
 import {AppRoute} from '../../const';
 import {getUserById} from '../../api/users';
 import {StartButtons} from '../../components/StartButtons/StartButtons';
-import {api} from '../../api/api';
+// import {api} from '../../api/api';
 
 export default function ExamCover() {
   const [searchParams] = useSearchParams();
@@ -19,7 +19,7 @@ export default function ExamCover() {
 
   const [exam, setExam] = useState<ExamOut | null>(null);
   // const [loading, setLoading] = useState(true);
-  const [testLoading, setTestLoading] = useState(false);
+  // const [testLoading, setTestLoading] = useState(false);
 
   useEffect(() => {
     const examIdParam = searchParams.get('examId');
@@ -73,16 +73,16 @@ export default function ExamCover() {
     }
   }
 
-  const handleTestNotification = async () => {
-    if (!exam) return;
-    setTestLoading(true);
-
-    try {
-      await api.post(`/exams/${exam.id}/pin`);
-    } finally {
-      setTestLoading(false);
-    }
-  };
+  // const handleTestNotification = async () => {
+  //   if (!exam) return;
+  //   setTestLoading(true);
+  //
+  //   try {
+  //     await api.post(`/exams/${exam.id}/pin`);
+  //   } finally {
+  //     setTestLoading(false);
+  //   }
+  // };
 
 
   return (
