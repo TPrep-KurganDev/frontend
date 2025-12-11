@@ -91,18 +91,19 @@ export default function ExamCover() {
               inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}
               backButtonPage={'/'} onRightImageClick={() => {changePinState()}}/>
       <div className="screenСontent screenContentCentered">
-        <div className={`${styles.titleBlock} ${styles.roundedBox}`}>
+        <div className={`${styles.titleBlock} ${styles.roundedBox}`} onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
           <p className={styles.title}>{exam?.title}</p>
-          <p className={styles.questionCount} onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
+          <p className={styles.questionCount}>
             {cardsCount} вопросов
           </p>
           <p className={styles.author}>автор: {creator}</p>
         </div>
         <StartButtons exam={exam}/>
-        <button disabled={testLoading} onClick={handleTestNotification}>
-          {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}
-        </button>
+        {/*<button disabled={testLoading} onClick={handleTestNotification}>*/}
+        {/*  {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}*/}
+        {/*</button>*/}
       </div>
+      <div className={styles.bottomGap}></div>
     </>
   );
 }

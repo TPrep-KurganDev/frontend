@@ -4,7 +4,7 @@
     display: flex;
     justify-content: space-between;
     gap: 25px;
-    padding: 0;
+    padding: 0 15px;
   }
 
 
@@ -13,6 +13,7 @@
     border-radius: 30px;
     padding: 20px 30px;
     text-align: center;
+    box-shadow: 0 0 20px rgba(0, 3, 59, 0.15);
   }
 
   .button:hover{
@@ -32,5 +33,10 @@
   .grayButton {
     font-size: 18px;
     background: linear-gradient(180deg, rgba(217, 217, 217, 0.3) 0%, rgba(115, 115, 115, 0.069) 100%);
+  }
+
+  .checkExamButton {
+    font-size: 18px;
+    background: white;
   }
 }

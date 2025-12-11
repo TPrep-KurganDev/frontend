@@ -32,10 +32,14 @@ export function StartButtons({exam}: StartButtonsProps) {
           Умный подбор вопросов
         </div>
       </div>
-      <div className={styles.secondRow}>
-      {/*<div className={`${styles.button} ${styles.grayButton}`}>*/}
-      {/*  Пройти n случайных вопросов*/}
-      {/*</div>*/}
+      <div className={styles.firstRow}>
+      <div className={`${styles.button} ${styles.grayButton}`}>
+        Пройти n случайных вопросов
+      </div>
+        <div className={`${styles.button} ${styles.checkExamButton}`}
+             onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
+          Просмотреть
+        </div>
       </div>
     </>
   )
