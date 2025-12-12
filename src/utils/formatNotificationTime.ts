@@ -1,5 +1,5 @@
 export function formatNotificationTime(timeString: string): string {
-  const targetDate = new Date(timeString);
+  const targetDate = new Date(timeString + 'Z');
   const now = new Date();
 
   const diffMs = targetDate.getTime() - now.getTime();

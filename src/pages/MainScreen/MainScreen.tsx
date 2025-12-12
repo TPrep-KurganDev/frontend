@@ -40,7 +40,8 @@ export function MainScreen() {
       setNotifications(prev => {
         const expiredIds: number[] = [];
         const filtered = prev.filter(notification => {
-          const notificationTime = new Date(notification.time).getTime();
+          const notificationTime = new Date(notification.time + 'Z').getTime();
+
           if (notificationTime + delay <= now) {
             expiredIds.push(notification.id);
             return false;
@@ -48,9 +49,9 @@ export function MainScreen() {
           return true;
         });
 
-        expiredIds.forEach(id => {
-          deleteNotification(id);
-        });
+        // expiredIds.forEach(id => {
+        //   deleteNotification(id);
+        // });
 
         return filtered;
       });

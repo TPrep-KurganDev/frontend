@@ -4,6 +4,7 @@ import styles from './EditCardScreen.module.scss';
 import {useEffect, useState} from 'react';
 import {getCard, updateCard, deleteCard} from '../../api/cards.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import {TextAreaAuto} from '../../components/TextAreaAuto/TextAreaAuto';
 
 type EditCardScreenProps = {
   canEdit: boolean;
@@ -71,18 +72,21 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
         onRightImageClick: deleteCardClick
       })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}
               backButtonPage={`/exam?examId=${examId}`}/>
-      <input
-        className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
-        type="text"
+
+      <TextAreaAuto
         value={question}
-        onChange={(e) => onQuestionChange(e.target.value)}
+        onChange={onQuestionChange}
+        className={`${styles.question} ${!canEdit ? styles.noEdit : ""}`}
       />
-      <input
-        className={`${styles.answer} ${!canEdit ? styles.noEdit : ''}`}
-        type="text"
+
+      <TextAreaAuto
         value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
+        onChange={setAnswer}
+        className={`${styles.answer} ${!canEdit ? styles.noEdit : ""}`}
       />
+
+
+
     </>
   )
 }

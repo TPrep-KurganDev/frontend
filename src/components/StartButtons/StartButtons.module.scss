@@ -4,7 +4,7 @@
     display: flex;
     justify-content: space-between;
     gap: 25px;
-    padding: 0 30px;
+    padding: 0 15px;
   }
 
 
@@ -13,6 +13,7 @@
     border-radius: 30px;
     padding: 20px 30px;
     text-align: center;
+    box-shadow: 0 0 20px rgba(0, 3, 59, 0.15);
   }
 
   .button:hover{
@@ -40,5 +41,10 @@
   .whiteButton {
     font-size: 18px;
     box-shadow: 0 0 43.4px 0 #00033B26;
+  }
+
+  .checkExamButton {
+    font-size: 18px;
+    background: white;
   }
 }
