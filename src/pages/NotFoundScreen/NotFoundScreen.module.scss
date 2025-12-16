@@ -1,0 +1,19 @@
+:local {
+  .error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px;
+  }
+  .numberError {
+    font-size: 198px;
+    color: #FEDD2C;
+  }
+  .header {
+    font-weight: 500;
+    font-size: 36px;
+  }
+  .text {
+    font-size: 20px;
+  }
+}
