@@ -4,6 +4,7 @@ import styles from './ExamListScreen.module.scss';
 import {useEffect, useState} from 'react';
 import {getCreatedExams, getPinnedExams, ExamOut} from '../../api/exam';
 import {useNavigate} from 'react-router-dom';
+import {getUserById} from '../../api/users';
 
 type ExamListScreenProps = {
   isFavorites: boolean;
@@ -11,6 +12,7 @@ type ExamListScreenProps = {
 
 export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const [exams, setExams] = useState<ExamOut[]>([]);
+  const [authorNames, setAuthorNames] = useState<Record<number, string>>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +25,23 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
     }
   }, [isFavorites]);
 
+  useEffect(() => {
+    const fetchAuthorNames = async () => {
+      const names: Record<number, string> = {};
+      for (const exam of exams) {
+        if (!names[exam.creator_id]) {
+          const user = await getUserById(exam.creator_id);
+          names[exam.creator_id] = user.user_name;
+        }
+      }
+      setAuthorNames(names);
+    };
+
+    if (exams.length > 0) {
+      void fetchAuthorNames();
+    }
+  }, [exams]);
+
   return (
     <>
       <Header title={isFavorites ? 'Готовлюсь к этим тестам' : 'Мои тесты'}
@@ -33,7 +52,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
           <div className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`} onClick={() => {
             navigate(`/exam-cover?examId=${exam.id}`);}} >
             <div className={styles.name}>{exam.title}</div>
-            {/*{isFavorites && <div className={styles.author}>{exam.creator_id}</div>}*/}
+            {isFavorites && <div className={styles.author}>автор: {authorNames[exam.creator_id] || 'Загрузка...'}</div>}
           </div>
         ))}
       </div>
