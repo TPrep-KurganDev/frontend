@@ -51,7 +51,7 @@ export default function App() {
           />
           <Route
             path={AppRoute.CardEdit}
-            element={<EditCardScreen canEdit={false}/>}
+            element={<EditCardScreen/>}
           />
           <Route
             path={AppRoute.FavouriteExamList}
