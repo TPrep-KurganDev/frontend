@@ -49,10 +49,6 @@ export function MainScreen() {
           return true;
         });
 
-        // expiredIds.forEach(id => {
-        //   deleteNotification(id);
-        // });
-
         return filtered;
       });
     };
@@ -96,24 +92,25 @@ export function MainScreen() {
     <>
       <header className={styles.header}>
         <div className={styles.user}>
-          <img className={styles.avatar} width={43} height={43}
+          <img className={styles.avatar} width={43} height={43} alt=''
                src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg"/>
           <div className={styles.name}>{username}</div>
+          <PushNotificationButton/>
         </div>
         <div className={styles.buttonsHeader}>
           <div className={styles.buttonHeader} onClick={() => {navigate('/favourite-exam-list')}}>
-            <img className={styles.imageButtonHeader} width={40} height={40} src='starActive.svg'/>
+            <img className={styles.imageButtonHeader} width={40} height={40} src='starActive.svg' alt=''/>
             <div className={styles.textButtonHeader}>Закреплённые</div>
           </div>
           <div className={styles.buttonHeader} onClick={() => {navigate('/exam-list')}}>
-            <img className={styles.imageButtonHeader} src='createdTests.svg' width={38} height={38}/>
+            <img className={styles.imageButtonHeader} src='createdTests.svg' width={38} height={38} alt=''/>
             <div className={styles.textButtonHeader}>Созданные</div>
           </div>
         </div>
       </header>
       <div className={styles.buttonsBody}>
         <div className={`${styles.buttonBody} ${styles.yellowButton}`} onClick={createExamClick}>
-          <img width={25} height={25} src='createTest.svg'/>
+          <img width={25} height={25} src='createTest.svg' alt=''/>
           <div className={styles.textButtonBody}>Создать тест</div>
         </div>
         {/*<div className={styles.buttonBody}>*/}
@@ -121,7 +118,6 @@ export function MainScreen() {
         {/*  <div className={styles.textButtonBody}>Найти тест</div>*/}
         {/*</div>*/}
       </div>
-      <PushNotificationButton />
       {notifications.map((notification) => (
         <Notification
           key={notification.id}

@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {usePushNotifications} from '../../hooks/usePushNotifications';
+import styles from './PushNotificationButton.module.scss';
 
 export const PushNotificationButton: React.FC = () => {
   const {
     isSupported,
     subscription,
     userConsent,
-    loading,
     requestPermission,
     subscribeAndSave,
     unsubscribe,
@@ -14,16 +14,22 @@ export const PushNotificationButton: React.FC = () => {
 
   const [busy, setBusy] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [bellSvg, setBellSvg] = useState('bell inactive.svg');
+
 
   useEffect(() => {
     setIsSubscribed(!!subscription);
+    if (subscription){
+      setBellSvg('bell active.svg')
+    }
+    else {
+      setBellSvg('bell inactive.svg')
+    }
   }, [subscription]);
 
   if (!isSupported) {
-    return <div>Push-уведомления не поддерживаются</div>;
+    return <div></div>;
   }
-
-  if (loading) return <div>Загрузка...</div>;
 
   const enable = async () => {
     setBusy(true);
@@ -42,13 +48,16 @@ export const PushNotificationButton: React.FC = () => {
     setBusy(false);
   };
 
+  const onBellClick = () => {
+    if (busy){
+      return;
+    }
+    isSubscribed ? disable() : enable();
+  }
+
   return (
     <div>
-      <button disabled={busy} onClick={isSubscribed ? disable : enable}>
-        {busy ? 'Загрузка...' : isSubscribed ? 'Отключить уведомления' : 'Включить уведомления'}
-      </button>
-
-      <div>Статус: <strong>{isSubscribed ? 'включены' : 'выключены'}</strong></div>
+      <img className={styles.bellButton} src={bellSvg} alt='' width={27} height={27} onClick={onBellClick}/>
     </div>
   );
 };

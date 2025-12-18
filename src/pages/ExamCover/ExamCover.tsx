@@ -91,18 +91,6 @@ export default function ExamCover() {
   };
 
 
-  // const handleTestNotification = async () => {
-  //   if (!exam) return;
-  //   setTestLoading(true);
-  //
-  //   try {
-  //     await api.post(`/exams/${exam.id}/pin`);
-  //   } finally {
-  //     setTestLoading(false);
-  //   }
-  // };
-
-
   return (
     <>
       <Header title={''} imgSrc={starImage} widthImg="38" heightImg="36"
