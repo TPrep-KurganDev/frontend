@@ -5,37 +5,43 @@ import {useEffect, useState} from 'react';
 import {getCard, updateCard, deleteCard} from '../../api/cards.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TextAreaAuto} from '../../components/TextAreaAuto/TextAreaAuto';
+import {getExam} from "../../api/exam.ts";
+import {AppRoute} from "../../const.ts";
 
-type EditCardScreenProps = {
-  canEdit: boolean;
-}
 
-export function EditCardScreen({canEdit}: EditCardScreenProps) {
+export function EditCardScreen() {
   const [searchParams] = useSearchParams();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [examId, setExamId] = useState(0);
+  const [cardId, setCardId] = useState(0);
+  const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const cardIdParam = searchParams.get('cardId');
     if (!cardIdParam) return;
-
-    const cardId = Number(cardIdParam);
-    getCard(cardId).then((card) => {
+    setCardId(Number(cardIdParam));
+    getCard(Number(cardIdParam)).then((card) => {
       setAnswer(card.answer);
       setQuestion(card.question);
     });
-  }, [searchParams])
 
-  const sendUpdateCard = () => {
-    const cardIdParam = searchParams.get('cardId');
-    if (!cardIdParam) return;
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
     setExamId(Number(examIdParam));
+    getExam(Number(examIdParam)).then((ex) => {
+      setExamId(ex.id);
+      if (ex.creator_id === Number(localStorage.getItem('userId'))){
+        setCanEdit(true);
+      }
+    }).catch(() => {
+      navigate(AppRoute.NotFound);
+    });
+  }, [navigate, searchParams])
 
-    updateCard(Number(examIdParam), Number(cardIdParam), {question, answer});
+  const sendUpdateCard = () => {
+    updateCard(Number(examId), Number(cardId), {question, answer});
   }
 
   const deleteCardClick = () => {
@@ -50,7 +56,15 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
   }
 
   const onQuestionChange = (value: string) => {
-    setQuestion(value);
+    if (canEdit){
+      setQuestion(value);
+    }
+  }
+
+  const onAnswerChange = (value: string) => {
+    if (canEdit){
+      setAnswer(value);
+    }
   }
 
   useEffect(() => {
@@ -76,13 +90,15 @@ export function EditCardScreen({canEdit}: EditCardScreenProps) {
       <TextAreaAuto
         value={question}
         onChange={onQuestionChange}
-        className={`${styles.question} ${!canEdit ? styles.noEdit : ""}`}
+        className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
+        disabled={!canEdit}
       />
 
       <TextAreaAuto
         value={answer}
-        onChange={setAnswer}
-        className={`${styles.answer} ${!canEdit ? styles.noEdit : ""}`}
+        onChange={onAnswerChange}
+        className={`${styles.answer} ${!canEdit ? styles.noEdit : ''}`}
+        disabled={!canEdit}
       />
 
 

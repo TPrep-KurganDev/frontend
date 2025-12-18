@@ -11,18 +11,15 @@ import {createCard} from '../../api/cards.ts';
 import {AppRoute} from '../../const.ts';
 import {BottomSheet} from '../../components/BottomSheet/BottomSheet.tsx';
 
-type ExamScreenProps = {
-  canEdit: boolean;
-}
 
-
-export default function ExamScreen({canEdit} : ExamScreenProps) {
+export default function ExamScreen() {
   const [cards, setCards] = useState<CardOut[]>([]);
   const [searchParams] = useSearchParams();
   const [exam, setExam] = useState<ExamOut>();
   const [examTitle, setExamTitle] = useState('');
   const [bottomScreenOpen, setBottom] = useState(false);
   const [inputDisabled, setInputDisabled] = useState(true);
+  const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +31,9 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
     getExam(examId).then((ex) => {
       setExam(ex);
       setExamTitle(ex.title);
+      if (ex.creator_id === Number(localStorage.getItem('userId'))){
+        setCanEdit(true);
+      }
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
@@ -105,14 +105,16 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
           />
         ))}
         {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {createCardClick()}}/>}
-        <div key={1000} className={styles.uploadItem} onClick={() => {navigate(`/file-upload?examId=${exam?.id}`)}}>
-          <div className={styles.uploadIcon}>
-            <img src='upload button.svg' alt='' width={16}/>
+        {canEdit &&
+          <div key={1000} className={styles.uploadItem} onClick={() => {navigate(`/file-upload?examId=${exam?.id}`)}}>
+            <div className={styles.uploadIcon}>
+              <img src='upload button.svg' alt='' width={16}/>
+            </div>
+            <div className={styles.uploadListItem}>
+              <p className={styles.uploadTitle}>Загрузить из файла</p>
+            </div>
           </div>
-          <div className={styles.uploadListItem}>
-            <p className={styles.uploadTitle}>Загрузить из файла</p>
-          </div>
-        </div>
+        }
       </div>
 
       <BottomSheet

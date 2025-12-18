@@ -11,7 +11,7 @@ import ExamCover from '../../pages/ExamCover/ExamCover.tsx';
 import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
 import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
 import {ResultScreen} from '../../pages/ResultScreen/ResultScreen.tsx';
-import {FileUploadScreen} from "../../pages/FileUploadScreen/FileUploadScreen.tsx";
+import {FileUploadScreen} from '../../pages/FileUploadScreen/FileUploadScreen.tsx';
 
 
 export default function App() {
@@ -31,7 +31,7 @@ export default function App() {
         <Routes>
           <Route
             path={AppRoute.Exam}
-            element={<ExamScreen canEdit={true}/>}
+            element={<ExamScreen/>}
           />
           <Route
             path={AppRoute.Card}
@@ -39,7 +39,7 @@ export default function App() {
           />
           <Route
             path={AppRoute.CardEdit}
-            element={<EditCardScreen canEdit={true}/>}
+            element={<EditCardScreen/>}
             />
           <Route
             path={AppRoute.Login}

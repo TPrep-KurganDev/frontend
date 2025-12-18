@@ -4,12 +4,14 @@ interface TextAreaAutoProps {
   value: string;
   onChange: (val: string) => void;
   className?: string;
+  disabled: boolean
 }
 
 export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
                                                             value,
                                                             onChange,
                                                             className,
+                                                            disabled
                                                           }) => {
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
@@ -22,6 +24,7 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
 
   return (
     <textarea
+      disabled={disabled}
       ref={ref}
       className={className}
       value={value}

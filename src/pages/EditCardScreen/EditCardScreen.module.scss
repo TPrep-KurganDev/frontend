@@ -11,6 +11,11 @@
     word-break: break-word;
   }
 
+  .answer:disabled,
+  .question:disabled {
+    color: black;
+  }
+
   textarea {
     resize: none;
     overflow: hidden;
