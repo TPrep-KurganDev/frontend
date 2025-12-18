@@ -11,6 +11,7 @@ import ExamCover from '../../pages/ExamCover/ExamCover.tsx';
 import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
 import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
 import {ResultScreen} from '../../pages/ResultScreen/ResultScreen.tsx';
+import {FileUploadScreen} from "../../pages/FileUploadScreen/FileUploadScreen.tsx";
 
 
 export default function App() {
@@ -73,8 +74,12 @@ export default function App() {
             element={<NotFoundScreen/>}
           />
           <Route
-            path={'/result'}
+            path={AppRoute.Result}
             element={<ResultScreen/>}
+          />
+          <Route
+            path={AppRoute.FileUpload}
+            element={<FileUploadScreen/>}
           />
         </Routes>
     </div>

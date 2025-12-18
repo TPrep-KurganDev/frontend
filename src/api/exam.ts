@@ -59,3 +59,17 @@ export async function unpinExam(examId: number | undefined) {
 export async function isExamPinned(examId: number | undefined) {
   return (await api.get<ExamPinStatus>(`/exams/${examId}/check_pinning`)).data;
 }
+
+export async function uploadCardsFile(examId: number | undefined, file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  await api.post(
+    `/exams/${examId}/cards/upload`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+}

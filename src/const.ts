@@ -8,6 +8,8 @@ export enum AppRoute {
   FavouriteExamList = '/favourite-exam-list',
   ExamCover = '/exam-cover',
   Test = '/test',
+  Result = '/result',
+  FileUpload = '/file-upload',
   Main = '/',
   NotFound = '*'
 }

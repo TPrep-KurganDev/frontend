@@ -1,0 +1,21 @@
+:local {
+  .yellowButton {
+    border-radius: 25px;
+    padding: 20px 0;
+    background: linear-gradient(165.84deg, #FEDD2C 9.89%, rgba(254, 221, 44, 0.74) 66.76%, rgba(254, 221, 44, 0.5) 88.4%);
+    border: white;
+    width: 200px;
+    font-size: 20px;
+    font-family: "Tinkoff", sans-serif;
+
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .yellowButton:hover{
+    cursor: pointer;
+  }
+
+  .buttonContainer{
+    margin: auto;
+  }
+}

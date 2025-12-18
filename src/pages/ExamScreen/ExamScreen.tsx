@@ -105,6 +105,14 @@ export default function ExamScreen({canEdit} : ExamScreenProps) {
           />
         ))}
         {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {createCardClick()}}/>}
+        <div key={1000} className={styles.uploadItem} onClick={() => {navigate(`/file-upload?examId=${exam?.id}`)}}>
+          <div className={styles.uploadIcon}>
+            <img src='upload button.svg' alt='' width={16}/>
+          </div>
+          <div className={styles.uploadListItem}>
+            <p className={styles.uploadTitle}>Загрузить из файла</p>
+          </div>
+        </div>
       </div>
 
       <BottomSheet
