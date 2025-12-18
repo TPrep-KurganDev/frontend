@@ -10,6 +10,7 @@
   }
 
   .titleBlock {
+    position: relative; // 👈 ВАЖНО
     box-shadow: 0 0 10px 7px rgba(0, 0, 0, 0.045);
     width: 90%;
     padding: 25px 10px 20px 10px;
@@ -27,6 +28,7 @@
     text-align: center;
   }
 
+
   .questionCount {
     font-size: 25px;
     color: #353535;
@@ -42,4 +44,12 @@
   .bottomGap {
     margin-bottom: 150px;
   }
+
+  .shareButton {
+    position: absolute;
+    right: 25px;
+    bottom: 20px;
+    cursor: pointer;
+  }
+
 }

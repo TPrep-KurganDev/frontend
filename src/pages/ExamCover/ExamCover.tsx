@@ -8,6 +8,7 @@ import {getCardsList} from '../../api/cards';
 import {AppRoute} from '../../const';
 import {getUserById} from '../../api/users';
 import {StartButtons} from '../../components/StartButtons/StartButtons';
+import { Toaster, toast } from 'react-hot-toast';
 // import {api} from '../../api/api';
 
 export default function ExamCover() {
@@ -73,6 +74,23 @@ export default function ExamCover() {
     }
   }
 
+  const handleShareClick = async (
+    e: React.MouseEvent<HTMLImageElement>
+  ) => {
+    e.stopPropagation();
+
+    const url = window.location.href;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Ссылка скопирована');
+    } catch (err) {
+      toast.error('Не удалось скопировать ссылку');
+      console.error(err);
+    }
+  };
+
+
   // const handleTestNotification = async () => {
   //   if (!exam) return;
   //   setTestLoading(true);
@@ -97,12 +115,19 @@ export default function ExamCover() {
             {cardsCount} вопросов
           </p>
           <p className={styles.author}>автор: {creator}</p>
+          <div className={styles.shareButton} onClick={handleShareClick}>
+            <img
+              src="../../public/share2.svg"
+              width='25'
+            />
+          </div>
         </div>
         <StartButtons exam={exam} cardsCount={cardsCount}/>
         {/*<button disabled={testLoading} onClick={handleTestNotification}>*/}
         {/*  {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}*/}
         {/*</button>*/}
       </div>
+      <Toaster position="top-center" />
       <div className={styles.bottomGap}></div>
     </>
   );
