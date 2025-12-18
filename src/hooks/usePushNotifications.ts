@@ -89,8 +89,7 @@ export const usePushNotifications = () => {
 
     try {
       const registration = await navigator.serviceWorker.ready;
-      const vapid_public_key =
-        'BEhL4UUKHfRvlJ_hIFsNUCvs9Hst-rJWkFJV4Ia5S5WavZ81EgIw0Ta1_96q4p9kU-hIJANRoYk-bWUFCcD1dek';
+      const vapid_public_key = import.meta.env.VAPID_PUBLIC_KEY;
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
