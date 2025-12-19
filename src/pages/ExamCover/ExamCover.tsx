@@ -105,7 +105,7 @@ export default function ExamCover() {
           <p className={styles.author}>автор: {creator}</p>
           <div className={styles.shareButton} onClick={handleShareClick}>
             <img
-              src="../../public/share2.svg"
+              src="share2.svg"
               width='25'
             />
           </div>
