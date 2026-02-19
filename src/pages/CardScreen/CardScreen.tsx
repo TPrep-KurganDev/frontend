@@ -2,12 +2,12 @@ import {ProgressBar} from '../../components/ProgressBar/ProgressBar.tsx';
 import {Card} from '../../components/Card/Card.tsx';
 import {RatingAnswer} from '../../components/RatingAnswer/RatingAnswer.tsx';
 import Header from '../../components/Header/Header.tsx';
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {ProgressBarType} from '../../types/ProgressBarType.ts';
 import {answerQuestion, getSession} from '../../api/session.ts';
-import {useSearchParams, useNavigate} from 'react-router-dom';
-import {getCard} from '../../api/cards.ts';
-import {ExamOut, getExam} from "../../api/exam.ts";
+import {useNavigate, useSearchParams} from 'react-router-dom';
+import {CardOut, getCard} from '../../api/cards.ts';
+import {ExamOut, getExam} from '../../api/exam.ts';
 
 export type CardState = {
   isFlipped: boolean,
@@ -16,14 +16,27 @@ export type CardState = {
 }
 
 export function CardScreen() {
-  const [card, setCard] = useState<CardState>({isFlipped: false, question: '', answer:''});
-  const [exam, setExam] = useState<ExamOut>({created_at: '', creator_id: 0, id: 0, title: ''});
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const sessionIdParam = searchParams.get('sessionId');
 
-  const handleCardClick = () => {
-    setCard({...card, isFlipped: !card.isFlipped});
-  };
+  if (!sessionIdParam) return null;
+
+  const [card, setCard] = useState<CardState>({
+    isFlipped: false,
+    question: '',
+    answer: '',
+  });
+
+  const [exam, setExam] = useState<ExamOut>({
+    created_at: '',
+    creator_id: 0,
+    id: 0,
+    title: '',
+  });
+
+  const [currentCards, setCurrentCards] = useState<CardOut[]>([]);
+  const [currentCardNum, setCurrentCardNum] = useState(0);
 
   const [progressBar, setProgressBar] = useState<ProgressBarType>({
     mistakesCount: 0,
@@ -32,53 +45,77 @@ export function CardScreen() {
     cardsProgress: [],
   });
 
-  const sessionIdParam = searchParams.get('sessionId');
-  if (!sessionIdParam) return null;
+  useEffect(() => {
+    const loadData = async () => {
+      const session = await getSession(sessionIdParam);
 
-  const [currentCards, setCurrentCards] = useState<number[]>([]);
+      setProgressBar((prev) => ({
+        ...prev,
+        cardsCount: session.questions.length,
+      }));
+
+      const cards = await Promise.all(
+        session.questions.map((id: number) => getCard(id))
+      );
+
+      setCurrentCards(cards);
+
+      const examData = await getExam(session.exam_id);
+      setExam(examData);
+    };
+
+    loadData();
+  }, [sessionIdParam]);
 
   useEffect(() => {
-    getSession(sessionIdParam).then((session) => {
-      setProgressBar((prevProgressBar) => ({
-        ...prevProgressBar,
-        cardsCount: session.questions.length
-      }));
-      setCurrentCards(session.questions);
-      setNewCard(session.questions[progressBar.doneCardsCount]);
-      getExam(session.exam_id).then((exam_res) => {
-        setExam(exam_res);
-      })
+    if (currentCards.length === 0) return;
+    if (currentCardNum >= currentCards.length) return;
+
+    const newCard = currentCards[currentCardNum];
+
+    setCard({
+      isFlipped: false,
+      question: newCard.question,
+      answer: newCard.answer,
     });
-  }, [progressBar.doneCardsCount, sessionIdParam]);
+  }, [currentCardNum, currentCards]);
 
 
+  const handleCardClick = () => {
+    setCard((prev) => ({
+      ...prev,
+      isFlipped: !prev.isFlipped,
+    }));
+  };
 
-  const setNewCard = (cardId: number) => {
-    getCard(cardId).then((new_card) => {
-      setCard({isFlipped: false, answer: new_card.answer, question: new_card.question});
-    })
-  }
+  const handleAnswer = async (answerCorrectness: boolean) => {
+    const currentCard = currentCards[currentCardNum];
 
-  const handleAnswer = (answerCorrectness: boolean) => {
-    const updatedProgressBar = {...progressBar};
-    updatedProgressBar.cardsProgress.push(answerCorrectness);
-    if (answerCorrectness){
-      updatedProgressBar.doneCardsCount += 1;
+    // Обновляем progressBar БЕЗ мутации
+    setProgressBar((prev) => ({
+      ...prev,
+      doneCardsCount: prev.doneCardsCount + 1,
+      mistakesCount: answerCorrectness
+        ? prev.mistakesCount
+        : prev.mistakesCount + 1,
+      cardsProgress: [...prev.cardsProgress, answerCorrectness],
+    }));
+
+    await answerQuestion(
+      sessionIdParam,
+      currentCard.card_id,
+      answerCorrectness
+    );
+
+    const nextIndex = currentCardNum + 1;
+
+    if (nextIndex >= currentCards.length) {
+      navigate(`/result?sessionId=${sessionIdParam}`);
+      return;
     }
-    else {
-      updatedProgressBar.mistakesCount += 1;
-      updatedProgressBar.doneCardsCount += 1;
-    }
-    setProgressBar(updatedProgressBar);
-    setCard({...card, isFlipped: !card.isFlipped});
 
-    setNewCard(currentCards[updatedProgressBar.doneCardsCount]);
-    answerQuestion(sessionIdParam, currentCards[updatedProgressBar.doneCardsCount - 1], answerCorrectness).then(() => {
-      if (currentCards.length === updatedProgressBar.doneCardsCount){
-        navigate(`/result?sessionId=${sessionIdParam}`)
-      }
-    });
-  }
+    setCurrentCardNum(nextIndex);
+  };
 
   return (
     <>
