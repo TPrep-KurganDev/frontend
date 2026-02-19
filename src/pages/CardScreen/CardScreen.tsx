@@ -4,7 +4,7 @@ import {RatingAnswer} from '../../components/RatingAnswer/RatingAnswer.tsx';
 import Header from '../../components/Header/Header.tsx';
 import {useEffect, useState} from 'react';
 import {ProgressBarType} from '../../types/ProgressBarType.ts';
-import {answerQuestion, getSession} from '../../api/session.ts';
+import {answerQuestion, ExamSessionResponse, getSession} from '../../api/session.ts';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {CardOut, getCard} from '../../api/cards.ts';
 import {ExamOut, getExam} from '../../api/exam.ts';
@@ -38,6 +38,8 @@ export function CardScreen() {
   const [currentCards, setCurrentCards] = useState<CardOut[]>([]);
   const [currentCardNum, setCurrentCardNum] = useState(0);
 
+  const [currentSession, setCurrentSession] = useState<ExamSessionResponse>();
+
   const [progressBar, setProgressBar] = useState<ProgressBarType>({
     mistakesCount: 0,
     cardsCount: 0,
@@ -48,6 +50,7 @@ export function CardScreen() {
   useEffect(() => {
     const loadData = async () => {
       const session = await getSession(sessionIdParam);
+      setCurrentSession(session)
 
       setProgressBar((prev) => ({
         ...prev,
@@ -90,8 +93,6 @@ export function CardScreen() {
 
   const handleAnswer = async (answerCorrectness: boolean) => {
     const currentCard = currentCards[currentCardNum];
-
-    // Обновляем progressBar БЕЗ мутации
     setProgressBar((prev) => ({
       ...prev,
       doneCardsCount: prev.doneCardsCount + 1,
@@ -100,10 +101,10 @@ export function CardScreen() {
         : prev.mistakesCount + 1,
       cardsProgress: [...prev.cardsProgress, answerCorrectness],
     }));
-
+    console.log(currentCard);
     await answerQuestion(
       sessionIdParam,
-      currentCard.card_id,
+      currentSession?.questions[currentCardNum] as number,
       answerCorrectness
     );
 
