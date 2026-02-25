@@ -32,7 +32,7 @@ export const usePushNotifications = () => {
 
     const init = async () => {
       try {
-        const registration = await navigator.serviceWorker.register('/service-worker.js');
+        const registration = (await navigator.serviceWorker.getRegistration('/service-worker.js')) ?? (await navigator.serviceWorker.ready);
         const subscription = await registration.pushManager.getSubscription();
         setState((s) => ({
           ...s,
