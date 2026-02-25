@@ -7,7 +7,23 @@ const APP_SHELL_ASSETS = [
   '/favicon.ico',
   '/cards.ico',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/avatar.png',
+  '/Arrow 1.svg',
+  '/bell active.svg',
+  '/bell inactive.svg',
+  '/createdTests.svg',
+  '/createTest.svg',
+  '/cross.svg',
+  '/deleteCard.svg',
+  '/findTest.svg',
+  '/mark.svg',
+  '/settingsCard.svg',
+  '/share.svg',
+  '/share2.svg',
+  '/star.svg',
+  '/starActive.svg',
+  '/upload button.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -56,8 +72,12 @@ async function networkFirst(request) {
   }
 }
 
+function isDevHost(url) {
+  return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+}
+
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
+  const {request} = event;
   if (request.method !== 'GET') {
     return;
   }
@@ -68,6 +88,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const devHost = isDevHost(url);
+
   if (request.mode === 'navigate') {
     event.respondWith(networkFirst(request));
     return;
@@ -75,7 +97,7 @@ self.addEventListener('fetch', (event) => {
 
   const isStaticAsset = ['script', 'style', 'image', 'font', 'worker'].includes(request.destination);
   if (isStaticAsset) {
-    event.respondWith(cacheFirst(request));
+    event.respondWith(devHost ? networkFirst(request) : cacheFirst(request));
     return;
   }
 
@@ -98,13 +120,13 @@ self.addEventListener('push', (event) => {
     icon: '/icon-192.png',
     badge: '/icon-192.png',
     tag: 'notification',
-    data: { notificationId, url: '/' }
+    data: {notificationId, url: '/'}
   };
 
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(title, options),
-      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      self.clients.matchAll({type: 'window', includeUncontrolled: true}).then((clients) => {
         clients.forEach((client) => {
           client.postMessage({
             type: 'NOTIFICATION_SHOWN',
@@ -121,7 +143,7 @@ self.addEventListener('notificationclick', (event) => {
   const targetUrl = event.notification?.data?.url || '/';
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+    clients.matchAll({type: 'window', includeUncontrolled: true}).then((clientList) => {
       for (const client of clientList) {
         if (client.url.includes(targetUrl) && 'focus' in client) {
           return client.focus();

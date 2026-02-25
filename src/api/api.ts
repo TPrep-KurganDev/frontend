@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-const API_URL = 'https://89.232.188.125.sslip.io/api';
+const API_URL = 'http://127.0.0.1:8000/api';
+
+function clearAuthStorage() {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('tokenType');
+  localStorage.removeItem('userId');
+}
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -22,6 +29,18 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
+      const config = error.config as (typeof error.config & { _retry?: boolean } | undefined);
+
+      if (!config) {
+        return Promise.reject(error);
+      }
+
+      if (config._retry) {
+        return Promise.reject(error);
+      }
+
+      config._retry = true;
+
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token');
@@ -40,13 +59,31 @@ api.interceptors.response.use(
           localStorage.setItem('refreshToken', newRefreshToken);
         }
 
-        error.config.headers = error.config.headers ?? {};
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axios(error.config);
-      } catch {
-        console.log('Refresh failed — redirect to login');
-        localStorage.clear();
-        window.location.href = '/login';
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${newAccessToken}`;
+        return axios(config);
+      } catch (refreshError) {
+        const typedRefreshError = refreshError as {
+          response?: { status?: number };
+          request?: unknown;
+          code?: string;
+        };
+        const status = typedRefreshError.response?.status;
+        const networkFailure =
+          typedRefreshError.code === 'ERR_NETWORK' || (typeof navigator !== 'undefined' && !navigator.onLine) ||
+          (!typedRefreshError.response && !!typedRefreshError.request);
+
+        if (networkFailure) {
+          return Promise.reject(typedRefreshError);
+        }
+
+        if (status === 401 || status === 403) {
+          console.log('Refresh failed — redirect to login');
+          clearAuthStorage();
+          window.location.href = '/login';
+        }
+
+        return Promise.reject(typedRefreshError);
       }
     }
     return Promise.reject(error);

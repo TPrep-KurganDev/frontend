@@ -1,9 +1,11 @@
-import { api } from './api';
+import {api} from './api';
+import {buildCacheKey} from '../offline/cacheKey';
+import {readThroughCache} from '../offline/readThroughCache';
 
 export interface ExamSessionStartRequest {
-  exam_id: number|undefined
+  exam_id: number | undefined
   strategy: string
-  n: number|null
+  n: number | null
 }
 
 export type Answers = {
@@ -18,8 +20,10 @@ export interface ExamSessionResponse {
 }
 
 export async function getSession(session_id: string | null) {
-  const res = await api.get<ExamSessionResponse>(`/session/${session_id}`);
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('sessions:getSession', [session_id ?? 'null']),
+    async () => (await api.get<ExamSessionResponse>(`/session/${session_id}`)).data
+  );
 }
 
 export async function createSession(data: ExamSessionStartRequest) {

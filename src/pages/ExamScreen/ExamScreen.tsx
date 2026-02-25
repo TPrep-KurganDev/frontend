@@ -23,25 +23,36 @@ export default function ExamScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let cancelled = false;
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
     const examId = Number(examIdParam);
 
     getExam(examId).then((ex) => {
+      if (cancelled) {
+        return;
+      }
       setExam(ex);
       setExamTitle(ex.title);
-      if (ex.creator_id === Number(localStorage.getItem('userId'))){
-        setCanEdit(true);
-      }
+      setCanEdit(ex.creator_id === Number(localStorage.getItem('userId')));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
 
     getCardsList(examId)
-      .then(setCards).catch(() => {
+      .then((cardsList) => {
+        if (cancelled) {
+          return;
+        }
+        setCards(cardsList);
+      }).catch(() => {
       navigate(AppRoute.NotFound);
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [navigate, searchParams]);
 
   const inputRef = useRef(null);
@@ -50,7 +61,8 @@ export default function ExamScreen() {
     setInputDisabled(false);
     setBottom(false);
     setTimeout(() => { // @ts-expect-error ignore
-      inputRef.current.focus();}, 50);
+      inputRef.current.focus();
+    }, 50);
   };
 
   const renameEnd = () => {
@@ -64,7 +76,7 @@ export default function ExamScreen() {
     const examId = Number(examIdParam);
     createCard(examId, {question: 'Вопрос', answer: 'Ответ'}).then(
       () => {
-        getCardsList(examId)
+        getCardsList(examId, {forceRefresh: true})
           .then(setCards);
       }
     );
@@ -72,7 +84,9 @@ export default function ExamScreen() {
   }
 
   const deleteExamClick = () => {
-    deleteExam(exam?.id).then(() => {navigate('/exam-list')});
+    deleteExam(exam?.id).then(() => {
+      navigate('/exam-list')
+    });
   }
 
   useEffect(() => {
@@ -87,11 +101,14 @@ export default function ExamScreen() {
 
   return (
     <>
-      <Header inputDisabled={inputDisabled} title={examTitle} inputRef={inputRef} onInputBlur={renameEnd} onTitleChange={setExamTitle} {...(canEdit && {
+      <Header inputDisabled={inputDisabled} title={examTitle} inputRef={inputRef} onInputBlur={renameEnd}
+              onTitleChange={setExamTitle} {...(canEdit && {
         imgSrc: 'settingsCard.svg',
         widthImg: '38',
         heightImg: '36',
-        onRightImageClick: () => {setBottom(true)}
+        onRightImageClick: () => {
+          setBottom(true)
+        }
       })}
               backButtonPage={`/exam-cover?examId=${exam?.id}`}/>
       <div className={styles.list}>
@@ -101,12 +118,18 @@ export default function ExamScreen() {
             question={q.question}
             answer={q.answer}
             id={(index + 1).toString()}
-            onclick={() => {navigate(`/card-edit?cardId=${q.card_id}&examId=${searchParams.get('examId')}`);}}
+            onclick={() => {
+              navigate(`/card-edit?cardId=${q.card_id}&examId=${searchParams.get('examId')}`);
+            }}
           />
         ))}
-        {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {createCardClick()}}/>}
+        {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {
+          createCardClick()
+        }}/>}
         {canEdit &&
-          <div key={1000} className={styles.uploadItem} onClick={() => {navigate(`/file-upload?examId=${exam?.id}`)}}>
+          <div key={1000} className={styles.uploadItem} onClick={() => {
+            navigate(`/file-upload?examId=${exam?.id}`)
+          }}>
             <div className={styles.uploadIcon}>
               <img src='upload button.svg' alt='' width={16}/>
             </div>
@@ -121,9 +144,9 @@ export default function ExamScreen() {
         open={bottomScreenOpen}
         onClose={() => setBottom(false)}
         buttons={[
-          { text: 'Переименовать', onclick: renameClick, color: '#353535' },
+          {text: 'Переименовать', onclick: renameClick, color: '#353535'},
           // { text: 'Редактировать права доступа', onclick: () => alert('share'), color: '#353535' },
-          { text: 'Удалить', onclick: deleteExamClick, color: '#F7474A' }
+          {text: 'Удалить', onclick: deleteExamClick, color: '#F7474A'}
         ]}
       />
     </>

@@ -2,33 +2,62 @@ import styles from './MainScreen.module.scss'
 import {Notification} from '../../components/Notification/Notification.tsx';
 import {createExam} from '../../api/exam'
 import {getUserById} from '../../api/users'
-import {getNotifications, NotificationOut, deleteNotification} from '../../api/notifications'
+import {NotificationOut, deleteNotification} from '../../api/notifications'
 import {formatNotificationTime} from '../../utils/formatNotificationTime'
 import {PushNotificationButton} from '../../components/PushNotificationButton/PushNotificationButton'
 import {usePushNotifications} from '../../hooks/usePushNotifications'
+import {
+  prefetchCreatedExamsGraph,
+  prefetchNotificationsForUser,
+  prefetchPinnedExamsGraph
+} from '../../offline/prefetch';
 import {useNavigate} from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 
 export function MainScreen() {
-  const [notifications, setNotifications] = useState<NotificationOut[]>([]);
   const [, setTick] = useState(0);
   const navigate = useNavigate();
-  const { subscription } = usePushNotifications();
+  const {subscription} = usePushNotifications();
+  const userId = Number(localStorage.getItem('userId'));
+  const [notifications, setNotifications] = useState<NotificationOut[]>([]);
   const createExamClick = () => {
-    createExam('Новый экзамен').then((res) => {navigate(`/exam-cover?examId=${res.id}`)});
+    createExam('Новый экзамен').then((res) => {
+      navigate(`/exam-cover?examId=${res.id}`)
+    });
   }
 
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    getUserById(Number(localStorage.getItem('userId'))).then((res_user) => {
-      setUsername(res_user.user_name);
-    })
-  }, [])
+    if (Number.isNaN(userId) || userId <= 0) {
+      return;
+    }
+
+    getUserById(userId)
+      .then((resUser) => {
+        setUsername(resUser.user_name);
+      })
+      .catch(() => undefined);
+  }, [userId]);
 
   useEffect(() => {
-    getNotifications().then(setNotifications);
-  }, []);
+    if (Number.isNaN(userId) || userId <= 0) {
+      return;
+    }
+
+    void prefetchCreatedExamsGraph(userId);
+    void prefetchPinnedExamsGraph(userId);
+  }, [userId]);
+
+  useEffect(() => {
+    if (Number.isNaN(userId) || userId <= 0) {
+      return;
+    }
+
+    prefetchNotificationsForUser()
+      .then(setNotifications)
+      .catch(() => undefined);
+  }, [userId]);
 
   useEffect(() => {
     const checkExpiredNotifications = () => {
@@ -88,21 +117,35 @@ export function MainScreen() {
     setNotifications(notifications.filter(n => n.id !== notificationId));
   };
 
+  const handleOpenFavorites = () => {
+    if (!Number.isNaN(userId) && userId > 0) {
+      void prefetchPinnedExamsGraph(userId);
+    }
+    navigate('/favourite-exam-list');
+  };
+
+  const handleOpenCreated = () => {
+    if (!Number.isNaN(userId) && userId > 0) {
+      void prefetchCreatedExamsGraph(userId);
+    }
+    navigate('/exam-list');
+  };
+
   return (
     <>
       <header className={styles.header}>
         <div className={styles.user}>
           <img className={styles.avatar} width={43} height={43} alt=''
-               src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg"/>
+               src="avatar.png"/>
           <div className={styles.name}>{username}</div>
           <PushNotificationButton/>
         </div>
         <div className={styles.buttonsHeader}>
-          <div className={styles.buttonHeader} onClick={() => {navigate('/favourite-exam-list')}}>
+          <div className={styles.buttonHeader} onClick={handleOpenFavorites}>
             <img className={styles.imageButtonHeader} width={40} height={40} src='starActive.svg' alt=''/>
             <div className={styles.textButtonHeader}>Закреплённые</div>
           </div>
-          <div className={styles.buttonHeader} onClick={() => {navigate('/exam-list')}}>
+          <div className={styles.buttonHeader} onClick={handleOpenCreated}>
             <img className={styles.imageButtonHeader} src='createdTests.svg' width={38} height={38} alt=''/>
             <div className={styles.textButtonHeader}>Созданные</div>
           </div>

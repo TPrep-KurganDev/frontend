@@ -1,4 +1,6 @@
-import { api } from './api';
+import {api} from './api';
+import {buildCacheKey} from '../offline/cacheKey';
+import {readThroughCache} from '../offline/readThroughCache';
 
 export interface UserOut {
   email: string,
@@ -7,11 +9,15 @@ export interface UserOut {
 }
 
 export async function getUserById(userId: number) {
-  const res = await api.get<UserOut>(`/users/${userId}`);
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('users:getById', [userId]),
+    async () => (await api.get<UserOut>(`/users/${userId}`)).data
+  );
 }
 
 export async function getUserByEmail(userEmail: string) {
-  const res = await api.get<UserOut>(`/users/${userEmail}`);
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('users:getByEmail', [userEmail]),
+    async () => (await api.get<UserOut>(`/users/${userEmail}`)).data
+  );
 }

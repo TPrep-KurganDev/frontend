@@ -1,4 +1,5 @@
-import { api } from './api.ts'
+import {api} from './api.ts'
+import {clearCacheEntries} from '../offline/cacheDb';
 
 
 export async function register(data: { email: string; password: string; user_name: string }) {
@@ -23,10 +24,17 @@ export async function getProfile() {
   return api.get('/users/me');
 }
 
-export function logout() {
+export async function logout() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('tokenType');
   localStorage.removeItem('userId');
+
+  try {
+    await clearCacheEntries();
+  } catch (error) {
+    console.error('Failed to clear offline cache on logout', error);
+  }
+
   window.location.href = '/login';
 }
