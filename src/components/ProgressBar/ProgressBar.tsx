@@ -9,13 +9,32 @@ type ProgressBarProps = {
 export function ProgressBar({progressBar}: ProgressBarProps) {
   const renderProgressSegments = () => {
     const segments: ReactElement[] = [];
-
     for (let i = 0; i < progressBar!.cardsCount; i++) {
       let segmentClass = styles.segmentPending;
-      if (i < progressBar!.cardsProgress.length) {
-        segmentClass = progressBar!.cardsProgress[i] ? styles.segmentCompleted : styles.segmentError;
+      if (i in progressBar!.cardsProgress) {
+        if (progressBar!.cardsProgress[i]){
+          if (i == progressBar?.currentCard){
+            segmentClass = styles.segmentCompletedCurrent;
+          }
+          else {
+            segmentClass = styles.segmentCompleted;
+          }
+        }
+        else {
+          if (i == progressBar?.currentCard){
+            segmentClass = styles.segmentErrorCurrent;
+          }
+          else {
+            segmentClass = styles.segmentError;
+          }
+        }
       } else {
-        segmentClass = styles.segmentPending;
+        if (i == progressBar?.currentCard){
+          segmentClass = styles.segmentCurrent;
+        }
+        else {
+          segmentClass = styles.segmentPending;
+        }
       }
       segments.push(
         <div key={i} className={`${styles.segment} ${segmentClass}`}/>
@@ -29,10 +48,10 @@ export function ProgressBar({progressBar}: ProgressBarProps) {
     <div className={styles.progressBar}>
       <div className={styles.info}>
         <span className={styles.progressText}>
-          {progressBar!.doneCardsCount} из {progressBar!.cardsCount}
+          {Object.values(progressBar!.cardsProgress).filter(Boolean).length} из {progressBar!.cardsCount}
         </span>
         <span className={styles.errorsText}>
-          Ошибок: {progressBar!.mistakesCount}
+          Ошибок: {Object.values(progressBar!.cardsProgress).filter(v => !v).length}
         </span>
       </div>
       <div className={styles.segments}>

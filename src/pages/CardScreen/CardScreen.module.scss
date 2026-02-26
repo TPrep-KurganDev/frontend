@@ -1,0 +1,21 @@
+:local {
+  .arrow {
+    color: #939393;
+    display: flex;
+    flex-direction: row;
+    font-size: 25px;
+    gap: 10px;
+  }
+
+  .arrow > img {
+    width: 20px;
+  }
+
+  .arrowSection {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+}

@@ -8,6 +8,8 @@ import {answerQuestion, ExamSessionResponse, getSession} from '../../api/session
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {CardOut, getCard} from '../../api/cards.ts';
 import {ExamOut, getExam} from '../../api/exam.ts';
+import styles from './CardScreen.module.scss';
+
 
 export type CardState = {
   isFlipped: boolean,
@@ -75,7 +77,10 @@ export function CardScreen() {
     if (currentCardNum >= currentCards.length) return;
 
     const newCard = currentCards[currentCardNum];
-
+    setProgressBar((prev) => ({
+      ...prev,
+      currentCard: currentCardNum
+    }));
     setCard({
       isFlipped: false,
       question: newCard.question,
@@ -92,31 +97,40 @@ export function CardScreen() {
   };
 
   const handleAnswer = async (answerCorrectness: boolean) => {
-    const currentCard = currentCards[currentCardNum];
     setProgressBar((prev) => ({
       ...prev,
-      doneCardsCount: prev.doneCardsCount + 1,
-      mistakesCount: answerCorrectness
-        ? prev.mistakesCount
-        : prev.mistakesCount + 1,
-      cardsProgress: [...prev.cardsProgress, answerCorrectness],
+      cardsProgress: {...prev.cardsProgress, [currentCardNum]: answerCorrectness}
     }));
-    console.log(currentCard);
     await answerQuestion(
       sessionIdParam,
       currentSession?.questions[currentCardNum] as number,
       answerCorrectness
     );
 
-    const nextIndex = currentCardNum + 1;
-
-    if (nextIndex >= currentCards.length) {
+    let nextIndex = -1;
+    const cardsCount = currentCards.length;
+    for (let i = (currentCardNum + 1) % cardsCount; i != currentCardNum; i = (i + 1)  % cardsCount) {
+      if (!(i in progressBar.cardsProgress)){
+        nextIndex = i;
+        break
+      }
+    }
+    if (nextIndex == -1) {
       navigate(`/result?sessionId=${sessionIdParam}`);
       return;
     }
 
     setCurrentCardNum(nextIndex);
   };
+
+  const handleNextClick = () => {
+    const l = Math.min(currentCardNum + 1, currentCards.length);
+    setCurrentCardNum(l);
+  }
+
+  const handlePreviousClick = () => {
+    setCurrentCardNum(Math.max(currentCardNum - 1, 0));
+  }
 
   return (
     <>
@@ -130,6 +144,10 @@ export function CardScreen() {
         {card.isFlipped && <RatingAnswer
           onCorrect={() => {handleAnswer(true)}}
           onFail={() => {handleAnswer(false)}}/>}
+      </div>
+      <div className={styles.arrowSection}>
+        <div className={styles.arrow} onClick={handlePreviousClick}><img src="left arrow.svg"/><p>Предыдущий</p></div>
+        <div className={styles.arrow} onClick={handleNextClick}><p>Следующий</p><img src="right arrow.svg"/></div>
       </div>
       <ProgressBar progressBar={progressBar}/>
     </>
