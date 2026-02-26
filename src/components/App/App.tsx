@@ -12,6 +12,7 @@ import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
 import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
 import {ResultScreen} from '../../pages/ResultScreen/ResultScreen.tsx';
 import {FileUploadScreen} from '../../pages/FileUploadScreen/FileUploadScreen.tsx';
+import NoAccessScreen from "../../pages/NoAccessScreen/NoAccessScreen.tsx";
 
 
 export default function App() {
@@ -80,6 +81,10 @@ export default function App() {
           <Route
             path={AppRoute.FileUpload}
             element={<FileUploadScreen/>}
+          />
+          <Route
+            path={AppRoute.NoAccess}
+            element={<NoAccessScreen/>}
           />
         </Routes>
     </div>

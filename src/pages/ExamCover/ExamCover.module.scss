@@ -36,7 +36,7 @@
   }
 
   .author {
-    font-size: 18px;
+    font-size: 20px;
     color: #353535;
     margin: 0;
   }
@@ -50,6 +50,11 @@
     right: 25px;
     bottom: 20px;
     cursor: pointer;
+  }
+
+  .linkAccess {
+    margin: 10px 10px 0;
+    color: #939393;
   }
 
 }

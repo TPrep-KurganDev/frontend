@@ -109,11 +109,9 @@ export default function ExamCover() {
               width='25'
             />
           </div>
+          {/*<p className={styles.linkAccess}>Доступ по ссылке</p>*/}
         </div>
         <StartButtons exam={exam} cardsCount={cardsCount}/>
-        {/*<button disabled={testLoading} onClick={handleTestNotification}>*/}
-        {/*  {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}*/}
-        {/*</button>*/}
       </div>
       <Toaster position="top-center" />
       <div className={styles.bottomGap}></div>
