@@ -27,7 +27,7 @@ export async function createSession(data: ExamSessionStartRequest) {
   return res.data;
 }
 
-export async function answerQuestion(session_id: string, question_id: number, value: boolean) {
+export async function answerQuestion(session_id: string | null, question_id: number, value: boolean) {
   const res = await api.post<ExamSessionResponse>(`/session/${session_id}/answer?question_id=${question_id}&value=${value}`);
   return res.data;
 }

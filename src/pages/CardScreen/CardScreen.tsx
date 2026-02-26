@@ -22,8 +22,6 @@ export function CardScreen() {
   const navigate = useNavigate();
   const sessionIdParam = searchParams.get('sessionId');
 
-  if (!sessionIdParam) return null;
-
   const [card, setCard] = useState<CardState>({
     isFlipped: false,
     question: '',
@@ -43,13 +41,16 @@ export function CardScreen() {
   const [currentSession, setCurrentSession] = useState<ExamSessionResponse>();
 
   const [progressBar, setProgressBar] = useState<ProgressBarType>({
-    mistakesCount: 0,
     cardsCount: 0,
-    doneCardsCount: 0,
+    currentCard: 0,
     cardsProgress: [],
   });
 
   useEffect(() => {
+    if (!sessionIdParam) {
+      navigate('/');
+      return;
+    }
     const loadData = async () => {
       const session = await getSession(sessionIdParam);
       setCurrentSession(session)
