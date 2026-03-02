@@ -17,6 +17,19 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  const method = (config.method ?? 'get').toLowerCase();
+  const isReadOnlyMethod = method === 'get' || method === 'head';
+  const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+
+  if (isOffline && !isReadOnlyMethod) {
+    return Promise.reject({
+      name: 'OfflineMutationBlockedError',
+      code: 'OFFLINE_MUTATION_BLOCKED',
+      message: 'This action is only available online.',
+      config
+    });
+  }
+
   const token = localStorage.getItem('accessToken');
   if (token) {
     config.headers = config.headers ?? {};
