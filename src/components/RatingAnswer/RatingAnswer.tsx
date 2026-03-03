@@ -13,13 +13,13 @@ export function RatingAnswer({onCorrect, onFail}: RatingProps){
       <div className={styles.ratingOptions}>
         <div className={styles.ratingOption}>
           <button className={`${styles.ratingButton} ${styles.lightGray}`} onClick={onFail}>
-            <img src={"cross.svg"} width="50px"/>
+            <img src={'cross.svg'} width='50px' alt='' />
           </button>
           <span className={styles.ratingLabel}>Нет</span>
         </div>
         <div className={styles.ratingOption}>
           <button className={`${styles.ratingButton}  ${styles.lightBlue}`} onClick={onCorrect}>
-            <img src={"mark.svg"} width="50px"/>
+            <img src={'mark.svg'} width='50px' alt='' />
           </button>
           <span className={styles.ratingLabel}>Да</span>
         </div>

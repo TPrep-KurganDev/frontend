@@ -21,7 +21,12 @@ export async function login(data: { email: string; password: string }) {
 }
 
 export async function getProfile() {
-  return api.get('/users/me');
+  const userId = Number(localStorage.getItem('userId'));
+  if (Number.isNaN(userId) || userId <= 0) {
+    throw new Error('No user id in local storage');
+  }
+
+  return api.get(`/users/${userId}`);
 }
 
 export async function logout() {

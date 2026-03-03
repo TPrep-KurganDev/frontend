@@ -1,12 +1,14 @@
 import Header from '../../components/Header/Header.tsx';
 import styles from './EditCardScreen.module.scss';
 
-import {useEffect, useState} from 'react';
-import {getCard, updateCard, deleteCard} from '../../api/cards.ts';
+import {useCallback, useEffect, useState} from 'react';
+import {getCard, getCardsList, updateCard, deleteCard} from '../../api/cards.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TextAreaAuto} from '../../components/TextAreaAuto/TextAreaAuto';
 import {getExam} from '../../api/exam.ts';
 import {AppRoute} from '../../const.ts';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 
 
 export function EditCardScreen() {
@@ -17,6 +19,7 @@ export function EditCardScreen() {
   const [cardId, setCardId] = useState(0);
   const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
 
   useEffect(() => {
     const cardIdParam = searchParams.get('cardId');
@@ -29,24 +32,49 @@ export function EditCardScreen() {
     const parsedExamId = Number(examIdParam);
     setExamId(parsedExamId);
 
-    getCard(parsedCardId).then((card) => {
-      setAnswer(card.answer);
-      setQuestion(card.question);
-    });
+    getCard(parsedCardId)
+      .then((card) => {
+        setAnswer(card.answer);
+        setQuestion(card.question);
+      })
+      .catch(() => {
+        getCardsList(parsedExamId)
+          .then((cards) => {
+            const card = cards.find((item) => item.card_id === parsedCardId);
+            if (!card) {
+              return;
+            }
+
+            setAnswer(card.answer);
+            setQuestion(card.question);
+          })
+          .catch(() => undefined);
+      });
 
     getExam(parsedExamId).then((ex) => {
       setExamId(ex.id);
-      setCanEdit(ex.creator_id === Number(localStorage.getItem('userId')));
+      setCanEdit(isOnline && ex.creator_id === Number(localStorage.getItem('userId')));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
-  }, [navigate, searchParams])
+  }, [isOnline, navigate, searchParams])
 
-  const sendUpdateCard = () => {
+  const sendUpdateCard = useCallback(() => {
+    if (!canEdit || examId <= 0 || cardId <= 0) {
+      return;
+    }
+
     updateCard(Number(examId), Number(cardId), {question, answer});
-  }
+  }, [answer, canEdit, cardId, examId, question]);
 
   const deleteCardClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     const cardIdParam = searchParams.get('cardId');
     if (!cardIdParam) return;
     const examIdParam = searchParams.get('examId');
@@ -70,6 +98,10 @@ export function EditCardScreen() {
   }
 
   useEffect(() => {
+    if (!canEdit) {
+      return;
+    }
+
     const handler = setTimeout(() => {
       sendUpdateCard();
     }, 500);
@@ -77,7 +109,7 @@ export function EditCardScreen() {
     return () => {
       clearTimeout(handler);
     };
-  }, [question, answer]);
+  }, [canEdit, sendUpdateCard]);
 
   return (
     <>

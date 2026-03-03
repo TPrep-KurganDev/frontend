@@ -12,15 +12,34 @@ import {MainScreen} from '../../pages/MainScreen/MainScreen.tsx';
 import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
 import {ResultScreen} from '../../pages/ResultScreen/ResultScreen.tsx';
 import {FileUploadScreen} from '../../pages/FileUploadScreen/FileUploadScreen.tsx';
+import {Toaster, toast} from 'react-hot-toast';
+import {useEffect, useRef} from 'react';
 
 
 export default function App() {
   const location = useLocation();
   const token = localStorage.getItem('accessToken');
+  const lastOfflineToastTimeRef = useRef(0);
 
   const isAuthPage =
     location.pathname === AppRoute.Registration ||
     location.pathname === AppRoute.Login;
+
+  useEffect(() => {
+    const onOfflineMutationBlocked = () => {
+      const now = Date.now();
+      if (now - lastOfflineToastTimeRef.current < 1200) {
+        return;
+      }
+      lastOfflineToastTimeRef.current = now;
+      toast.error('Действие доступно только онлайн');
+    };
+
+    window.addEventListener('app:offline-mutation-blocked', onOfflineMutationBlocked);
+    return () => {
+      window.removeEventListener('app:offline-mutation-blocked', onOfflineMutationBlocked);
+    };
+  }, []);
 
   if (!token && !isAuthPage) {
     return <Navigate to={AppRoute.Registration} replace />;
@@ -82,6 +101,7 @@ export default function App() {
             element={<FileUploadScreen/>}
           />
         </Routes>
+      <Toaster position="top-center"/>
     </div>
   );
 }

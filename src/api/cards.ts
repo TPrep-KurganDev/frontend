@@ -28,13 +28,39 @@ function getCardCacheKey(cardId: number): string {
 
 export async function createCard(examId: number, data: CardBase) {
   const res = await api.post<CardOut>(`/exams/${examId}/cards`, data);
+  let createdCard: CardOut = res.data;
+
+  const backendIgnoredPayload =
+    createdCard.question !== data.question ||
+    createdCard.answer !== data.answer;
+
+  if (backendIgnoredPayload) {
+    try {
+      const patched = await api.patch<Partial<CardOut>>(
+        `/exams/${examId}/cards/${createdCard.card_id}`,
+        data
+      );
+
+      createdCard = {
+        ...createdCard,
+        ...patched.data,
+        card_id: createdCard.card_id
+      };
+    } catch {
+      createdCard = {
+        ...createdCard,
+        question: data.question,
+        answer: data.answer
+      };
+    }
+  }
 
   await Promise.allSettled([
     deleteCacheEntry(getCardsListCacheKey(examId)),
-    setCacheEntry(getCardCacheKey(res.data.card_id), res.data)
+    setCacheEntry(getCardCacheKey(createdCard.card_id), createdCard)
   ]);
 
-  return res.data;
+  return createdCard;
 }
 
 export async function getCard(cardId: number): Promise<CardOut> {
@@ -65,9 +91,15 @@ export async function deleteCard(examId: number, cardId: number) {
 }
 
 export async function getCardsList(examId: number, options?: CardsListOptions): Promise<CardOut[]> {
-  return readThroughCache(
+  const cards = await readThroughCache(
     getCardsListCacheKey(examId),
     async () => (await api.get<CardOut[]>(`/exams/${examId}/cards`)).data,
     {preferCache: !(options?.forceRefresh ?? false)}
   );
+
+  void Promise.allSettled(
+    cards.map((card) => setCacheEntry(getCardCacheKey(card.card_id), card))
+  );
+
+  return cards;
 }

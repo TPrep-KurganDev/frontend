@@ -10,6 +10,8 @@ import {ExamOut, getExam, deleteExam, updateExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
 import {AppRoute} from '../../const.ts';
 import {BottomSheet} from '../../components/BottomSheet/BottomSheet.tsx';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 
 
 export default function ExamScreen() {
@@ -21,6 +23,7 @@ export default function ExamScreen() {
   const [inputDisabled, setInputDisabled] = useState(true);
   const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
 
   useEffect(() => {
     let cancelled = false;
@@ -35,7 +38,7 @@ export default function ExamScreen() {
       }
       setExam(ex);
       setExamTitle(ex.title);
-      setCanEdit(ex.creator_id === Number(localStorage.getItem('userId')));
+      setCanEdit(isOnline && ex.creator_id === Number(localStorage.getItem('userId')));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
@@ -53,11 +56,18 @@ export default function ExamScreen() {
     return () => {
       cancelled = true;
     };
-  }, [navigate, searchParams]);
+  }, [isOnline, navigate, searchParams]);
 
   const inputRef = useRef(null);
 
   const renameClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     setInputDisabled(false);
     setBottom(false);
     setTimeout(() => { // @ts-expect-error ignore
@@ -70,6 +80,13 @@ export default function ExamScreen() {
   };
 
   const createCardClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
@@ -84,12 +101,23 @@ export default function ExamScreen() {
   }
 
   const deleteExamClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     deleteExam(exam?.id).then(() => {
       navigate('/exam-list')
     });
   }
 
   useEffect(() => {
+    if (!canEdit || !exam?.id) {
+      return;
+    }
+
     const handler = setTimeout(() => {
       updateExam(exam?.id, {title: examTitle});
     }, 500);
@@ -97,7 +125,7 @@ export default function ExamScreen() {
     return () => {
       clearTimeout(handler);
     };
-  }, [exam?.id, examTitle]);
+  }, [canEdit, exam?.id, examTitle]);
 
   return (
     <>

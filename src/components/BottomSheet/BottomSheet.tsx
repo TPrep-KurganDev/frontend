@@ -17,13 +17,13 @@ export function BottomSheet({buttons, open, onClose}: BottomSheetProps) {
     <>
       {/* затемнение */}
       <div
-        className={`${styles.backdrop} ${open ? styles.open : ""}`}
+        className={`${styles.backdrop} ${open ? styles.open : ''}`}
         onClick={onClose}
       />
 
       {/* само меню */}
       <div
-        className={`${styles.container} ${open ? styles.open : ""}`}
+        className={`${styles.container} ${open ? styles.open : ''}`}
       >
         <div className={`${styles.containerInner}`}>
           {buttons.map((btn, i) => (
@@ -31,7 +31,7 @@ export function BottomSheet({buttons, open, onClose}: BottomSheetProps) {
               key={i}
               className={styles.button}
               onClick={btn.onclick}
-              style={{ color: btn.color ?? "inherit" }}
+              style={{ color: btn.color ?? 'inherit' }}
             >
               {btn.text}
             </button>

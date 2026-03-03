@@ -79,7 +79,10 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
               backButtonPage={'/'}/>
       <div className={styles.examList}>
         {exams.map((exam) => (
-          <div className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`} onClick={() => {
+          <div
+            key={exam.id}
+            className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`}
+            onClick={() => {
             const creatorName = authorNames[exam.creator_id] ?? '';
             navigate(`/exam-cover?examId=${exam.id}`, {
               state: {
@@ -88,7 +91,8 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
                 creatorId: exam.creator_id
               }
             });
-          }}>
+            }}
+          >
             <div className={styles.name}>{exam.title}</div>
             {isFavorites && <div className={styles.author}>автор: {authorNames[exam.creator_id] || 'Загрузка...'}</div>}
           </div>

@@ -1,7 +1,9 @@
 import React, { ChangeEvent, useRef, useState } from 'react';
 import styles from './FileUpload.module.scss';
 import {uploadCardsFile} from '../../api/exam.ts';
-import {useNavigate} from "react-router-dom";
+import {useNavigate} from 'react-router-dom';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 
 interface FileUploadProps {
   exam_id: string;
@@ -12,16 +14,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({ exam_id: examId }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
 
   const openFileDialog = () => {
+    if (!isOnline) {
+      notifyOnlineOnly();
+      return;
+    }
     inputRef.current?.click();
   };
 
   const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    console.log(file);
 
     // const formData = new FormData();
     // formData.append('file', file);
@@ -40,8 +45,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({ exam_id: examId }) => {
 
   return (
     <div className={styles.buttonContainer}>
-      <button className={styles.yellowButton} onClick={openFileDialog} disabled={loading}>
-        {loading ? 'Загрузка...' : 'Выбрать файл'}
+      <button className={styles.yellowButton} onClick={openFileDialog} disabled={loading || !isOnline}>
+        {loading ? 'Загрузка...' : isOnline ? 'Выбрать файл' : 'Только онлайн'}
       </button>
 
       <input

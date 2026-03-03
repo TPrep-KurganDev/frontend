@@ -11,6 +11,8 @@ import {
   prefetchNotificationsForUser,
   prefetchPinnedExamsGraph
 } from '../../offline/prefetch';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 
@@ -18,9 +20,15 @@ export function MainScreen() {
   const [, setTick] = useState(0);
   const navigate = useNavigate();
   const {subscription} = usePushNotifications();
+  const isOnline = useNetworkStatus();
   const userId = Number(localStorage.getItem('userId'));
   const [notifications, setNotifications] = useState<NotificationOut[]>([]);
   const createExamClick = () => {
+    if (!isOnline) {
+      notifyOnlineOnly();
+      return;
+    }
+
     createExam('Новый экзамен').then((res) => {
       navigate(`/exam-cover?examId=${res.id}`)
     });
@@ -152,7 +160,7 @@ export function MainScreen() {
         </div>
       </header>
       <div className={styles.buttonsBody}>
-        <div className={`${styles.buttonBody} ${styles.yellowButton}`} onClick={createExamClick}>
+        <div className={`${styles.buttonBody} ${styles.yellowButton} ${!isOnline ? 'disabledAction' : ''}`} onClick={createExamClick}>
           <img width={25} height={25} src='createTest.svg' alt=''/>
           <div className={styles.textButtonBody}>Создать тест</div>
         </div>

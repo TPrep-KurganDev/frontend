@@ -1,6 +1,34 @@
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000/api';
+export const API_URL = 'http://127.0.0.1:8000/api';
+
+function hasSuppressOfflineToastHeader(headers: unknown): boolean {
+  if (!headers) {
+    return false;
+  }
+
+  const maybeAxiosHeaders = headers as { get?: (name: string) => string | undefined };
+  if (typeof maybeAxiosHeaders.get === 'function') {
+    const value = maybeAxiosHeaders.get('x-suppress-offline-toast');
+    return value === '1';
+  }
+
+  const plainHeaders = headers as Record<string, unknown>;
+  return plainHeaders['x-suppress-offline-toast'] === '1' ||
+    plainHeaders['X-Suppress-Offline-Toast'] === '1';
+}
+
+function emitBackendReachability(isReachable: boolean) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.dispatchEvent(
+    new CustomEvent('app:backend-reachability', {
+      detail: {isReachable}
+    })
+  );
+}
 
 function clearAuthStorage() {
   localStorage.removeItem('accessToken');
@@ -16,12 +44,43 @@ export const api = axios.create({
   },
 });
 
+export async function probeBackendReachability(): Promise<boolean> {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return false;
+  }
+
+  const token = localStorage.getItem('accessToken');
+  const userId = Number(localStorage.getItem('userId'));
+  if (!token || Number.isNaN(userId) || userId <= 0) {
+    return true;
+  }
+
+  try {
+    const response = await axios.get(`${API_URL}/users/${userId}`, {
+      timeout: 3500,
+      validateStatus: () => true,
+      headers: {Authorization: `Bearer ${token}`}
+    });
+
+    return response.status < 500;
+  } catch {
+    return false;
+  }
+}
+
 api.interceptors.request.use((config) => {
   const method = (config.method ?? 'get').toLowerCase();
   const isReadOnlyMethod = method === 'get' || method === 'head';
   const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+  const suppressOfflineToast = hasSuppressOfflineToastHeader(config.headers);
 
   if (isOffline && !isReadOnlyMethod) {
+    if (typeof window !== 'undefined' && !suppressOfflineToast) {
+      window.dispatchEvent(new CustomEvent('app:offline-mutation-blocked'));
+    }
+
+    emitBackendReachability(false);
+
     return Promise.reject({
       name: 'OfflineMutationBlockedError',
       code: 'OFFLINE_MUTATION_BLOCKED',
@@ -39,8 +98,28 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    emitBackendReachability(true);
+    return response;
+  },
   async (error) => {
+    const requestMethod = String(error?.config?.method ?? 'get').toLowerCase();
+    const isMutation = requestMethod !== 'get' && requestMethod !== 'head';
+    const suppressOfflineToast = hasSuppressOfflineToastHeader(error?.config?.headers);
+    const hasNetworkFailure =
+      error?.code === 'ERR_NETWORK' ||
+      (typeof navigator !== 'undefined' && !navigator.onLine) ||
+      (!error?.response && !!error?.request);
+
+    if (hasNetworkFailure) {
+      if (isMutation && typeof window !== 'undefined') {
+        emitBackendReachability(false);
+        if (!suppressOfflineToast) {
+          window.dispatchEvent(new CustomEvent('app:offline-mutation-blocked'));
+        }
+      }
+    }
+
     if (error.response?.status === 401) {
       const config = error.config as (typeof error.config & { _retry?: boolean } | undefined);
 
@@ -87,6 +166,7 @@ api.interceptors.response.use(
           (!typedRefreshError.response && !!typedRefreshError.request);
 
         if (networkFailure) {
+          emitBackendReachability(false);
           return Promise.reject(typedRefreshError);
         }
 

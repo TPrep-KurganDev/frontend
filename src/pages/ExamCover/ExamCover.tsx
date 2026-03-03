@@ -2,13 +2,15 @@ import styles from './ExamCover.module.scss';
 
 import Header from '../../components/Header/Header';
 import {useEffect, useState} from 'react';
-import {getExam, pinExam, unpinExam, isExamPinned, ExamOut} from '../../api/exam';
+import {getExam, pinExam, unpinExam, getPinnedExams, ExamOut} from '../../api/exam';
 import {useSearchParams, useNavigate, useLocation} from 'react-router-dom';
 import {getCardsList} from '../../api/cards';
 import {AppRoute} from '../../const';
 import {getUserById} from '../../api/users';
 import {StartButtons} from '../../components/StartButtons/StartButtons';
-import {Toaster, toast} from 'react-hot-toast';
+import {toast} from 'react-hot-toast';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 // import {api} from '../../api/api';
 
 type ExamCoverState = {
@@ -24,6 +26,7 @@ export default function ExamCover() {
   const [creator, setCreator] = useState('');
   const [starImage, setStarImage] = useState('star.svg');
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
 
   const [exam, setExam] = useState<ExamOut | null>(null);
   // const [loading, setLoading] = useState(true);
@@ -106,14 +109,26 @@ export default function ExamCover() {
       return;
     }
 
-    isExamPinned(exam.id)
-      .then((res) => {
-        setStarImage(res.is_pinned ? 'starActive.svg' : 'star.svg');
+    const userId = Number(localStorage.getItem('userId'));
+    if (Number.isNaN(userId) || userId <= 0) {
+      setStarImage('star.svg');
+      return;
+    }
+
+    getPinnedExams(userId)
+      .then((pinnedExams) => {
+        const isPinned = pinnedExams.some((pinnedExam) => pinnedExam.id === exam.id);
+        setStarImage(isPinned ? 'starActive.svg' : 'star.svg');
       })
       .catch(() => undefined);
   }, [exam?.id]);
 
   const changePinState = () => {
+    if (!isOnline) {
+      notifyOnlineOnly();
+      return;
+    }
+
     if (starImage === 'star.svg') {
       pinExam(exam?.id).then(() => {
         setStarImage('starActive.svg');
@@ -148,9 +163,9 @@ export default function ExamCover() {
               inputDisabled={true} inputRef={undefined} onInputBlur={() => {
       }} onTitleChange={() => {
       }}
-              backButtonPage={'/'} onRightImageClick={() => {
-        changePinState()
-      }}/>
+              backButtonPage={'/'} onRightImageClick={isOnline ? (() => {
+        changePinState();
+      }) : undefined}/>
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}
              onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
@@ -171,7 +186,6 @@ export default function ExamCover() {
         {/*  {testLoading ? 'Запрос отправляется...' : 'Запланировать уведомления'}*/}
         {/*</button>*/}
       </div>
-      <Toaster position="top-center"/>
       <div className={styles.bottomGap}></div>
     </>
   );

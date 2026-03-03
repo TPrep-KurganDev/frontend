@@ -93,9 +93,23 @@ export async function unpinExam(examId: number | undefined) {
 }
 
 export async function isExamPinned(examId: number | undefined) {
+  if (examId === undefined) {
+    return {is_pinned: false};
+  }
+
+  const userId = Number(localStorage.getItem('userId'));
+  if (Number.isNaN(userId) || userId <= 0) {
+    return {is_pinned: false};
+  }
+
   return readThroughCache(
     getPinnedStatusCacheKey(examId),
-    async () => (await api.get<ExamPinStatus>(`/exams/${examId}/check_pinning`)).data
+    async () => {
+      const pinnedExams = (await api.get<ExamOut[]>('/exams/pinned', {
+        params: {pinned_id: userId}
+      })).data;
+      return {is_pinned: pinnedExams.some((exam) => exam.id === examId)};
+    }
   );
 }
 
