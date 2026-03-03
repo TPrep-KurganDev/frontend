@@ -44,7 +44,7 @@ export const api = axios.create({
   },
 });
 
-export async function probeBackendReachability(): Promise<boolean> {
+export async function probeBackendReachability(timeoutMs = 3500): Promise<boolean> {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     return false;
   }
@@ -57,7 +57,7 @@ export async function probeBackendReachability(): Promise<boolean> {
 
   try {
     const response = await axios.get(`${API_URL}/users/${userId}`, {
-      timeout: 3500,
+      timeout: timeoutMs,
       validateStatus: () => true,
       headers: {Authorization: `Bearer ${token}`}
     });
@@ -112,8 +112,9 @@ api.interceptors.response.use(
       (!error?.response && !!error?.request);
 
     if (hasNetworkFailure) {
+      emitBackendReachability(false);
+
       if (isMutation && typeof window !== 'undefined') {
-        emitBackendReachability(false);
         if (!suppressOfflineToast) {
           window.dispatchEvent(new CustomEvent('app:offline-mutation-blocked'));
         }

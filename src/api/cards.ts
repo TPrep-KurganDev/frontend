@@ -1,7 +1,8 @@
 import {api} from './api';
 import {buildCacheKey} from '../offline/cacheKey';
 import {readThroughCache} from '../offline/readThroughCache';
-import {deleteCacheEntry, setCacheEntry} from '../offline/cacheDb';
+import {deleteCacheEntry, getCacheEntry, setCacheEntry} from '../offline/cacheDb';
+import {setWarmCardsForExam} from '../offline/warmCardsCache';
 
 export interface CardBase {
   question: string;
@@ -97,9 +98,16 @@ export async function getCardsList(examId: number, options?: CardsListOptions): 
     {preferCache: !(options?.forceRefresh ?? false)}
   );
 
+  setWarmCardsForExam(examId, cards);
+
   void Promise.allSettled(
     cards.map((card) => setCacheEntry(getCardCacheKey(card.card_id), card))
   );
 
   return cards;
+}
+
+export async function getCachedCardsList(examId: number): Promise<CardOut[]> {
+  const cached = await getCacheEntry<CardOut[]>(getCardsListCacheKey(examId));
+  return cached?.value ?? [];
 }

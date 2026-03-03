@@ -14,7 +14,49 @@ import {
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, type CSSProperties} from 'react';
+
+const CACHE_WARMUP_STORAGE_PREFIX = 'app:cache-warmup:';
+
+type CacheWarmupSnapshot = {
+  progress: number;
+  done: boolean;
+  updatedAt: number;
+};
+
+function getWarmupStorageKey(userId: number): string {
+  return `${CACHE_WARMUP_STORAGE_PREFIX}${userId}`;
+}
+
+function readPersistedWarmup(userId: number): CacheWarmupSnapshot {
+  if (Number.isNaN(userId) || userId <= 0) {
+    return {progress: 0, done: false, updatedAt: 0};
+  }
+
+  const raw = window.localStorage.getItem(getWarmupStorageKey(userId));
+  if (!raw) {
+    return {progress: 0, done: false, updatedAt: 0};
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<CacheWarmupSnapshot>;
+    return {
+      progress: Math.max(0, Math.min(100, Number(parsed.progress ?? 0))),
+      done: Boolean(parsed.done),
+      updatedAt: Number(parsed.updatedAt ?? 0)
+    };
+  } catch {
+    return {progress: 0, done: false, updatedAt: 0};
+  }
+}
+
+function persistWarmup(userId: number, snapshot: CacheWarmupSnapshot): void {
+  if (Number.isNaN(userId) || userId <= 0) {
+    return;
+  }
+
+  window.localStorage.setItem(getWarmupStorageKey(userId), JSON.stringify(snapshot));
+}
 
 export function MainScreen() {
   const [, setTick] = useState(0);
@@ -23,6 +65,14 @@ export function MainScreen() {
   const isOnline = useNetworkStatus();
   const userId = Number(localStorage.getItem('userId'));
   const [notifications, setNotifications] = useState<NotificationOut[]>([]);
+  const [cacheWarmupProgress, setCacheWarmupProgress] = useState(() => {
+    const initialUserId = Number(localStorage.getItem('userId'));
+    return readPersistedWarmup(initialUserId).progress;
+  });
+  const [isCacheWarmupDone, setIsCacheWarmupDone] = useState(() => {
+    const initialUserId = Number(localStorage.getItem('userId'));
+    return readPersistedWarmup(initialUserId).done;
+  });
   const createExamClick = () => {
     if (!isOnline) {
       notifyOnlineOnly();
@@ -49,23 +99,81 @@ export function MainScreen() {
   }, [userId]);
 
   useEffect(() => {
-    if (Number.isNaN(userId) || userId <= 0) {
-      return;
-    }
-
-    void prefetchCreatedExamsGraph(userId);
-    void prefetchPinnedExamsGraph(userId);
+    const snapshot = readPersistedWarmup(userId);
+    setCacheWarmupProgress(snapshot.progress);
+    setIsCacheWarmupDone(snapshot.done);
   }, [userId]);
 
   useEffect(() => {
     if (Number.isNaN(userId) || userId <= 0) {
+      setCacheWarmupProgress(0);
+      setIsCacheWarmupDone(false);
       return;
     }
 
-    prefetchNotificationsForUser()
-      .then(setNotifications)
-      .catch(() => undefined);
-  }, [userId]);
+    if (!isOnline) {
+      return;
+    }
+
+    let cancelled = false;
+    let completedTasks = 0;
+    const totalTasks = 3;
+    const trackProgress = !readPersistedWarmup(userId).done;
+    if (trackProgress) {
+      setCacheWarmupProgress((prev) => {
+        const next = prev > 0 ? prev : 6;
+        persistWarmup(userId, {
+          progress: next,
+          done: false,
+          updatedAt: Date.now()
+        });
+        return next;
+      });
+    }
+
+    const markTaskDone = () => {
+      completedTasks += 1;
+      const progress = Math.round((completedTasks / totalTasks) * 100);
+      if (trackProgress) {
+        setCacheWarmupProgress(progress);
+        const done = completedTasks === totalTasks;
+        persistWarmup(userId, {
+          progress,
+          done,
+          updatedAt: Date.now()
+        });
+
+        if (done) {
+          setIsCacheWarmupDone(true);
+        }
+      }
+    };
+
+    const tasks: Array<Promise<unknown>> = [
+      prefetchCreatedExamsGraph(userId),
+      prefetchPinnedExamsGraph(userId),
+      prefetchNotificationsForUser().then((items) => {
+        if (!cancelled) {
+          setNotifications(items);
+        }
+      })
+    ];
+
+    tasks.forEach((task) => {
+      void task
+        .catch(() => undefined)
+        .finally(() => {
+          if (cancelled) {
+            return;
+          }
+          markTaskDone();
+        });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOnline, userId]);
 
   useEffect(() => {
     const checkExpiredNotifications = () => {
@@ -138,6 +246,9 @@ export function MainScreen() {
     }
     navigate('/exam-list');
   };
+  const cacheIndicatorStyle = {
+    '--cache-progress': `${cacheWarmupProgress}%`
+  } as CSSProperties;
 
   return (
     <>
@@ -146,6 +257,19 @@ export function MainScreen() {
           <img className={styles.avatar} width={43} height={43} alt=''
                src="avatar.png"/>
           <div className={styles.name}>{username}</div>
+          <div
+            className={styles.cacheStatus}
+            title={isCacheWarmupDone ? 'Офлайн-кэш готов' : `Офлайн-кэш: ${cacheWarmupProgress}%`}
+          >
+            <div
+              className={`${styles.cacheCircle} ${isCacheWarmupDone ? styles.cacheCircleDone : ''}`}
+              style={cacheIndicatorStyle}
+            >
+              {isCacheWarmupDone
+                ? <span className={styles.cacheDoneCheck} />
+                : <span className={styles.cacheProgressLabel}>{Math.max(0, cacheWarmupProgress)}%</span>}
+            </div>
+          </div>
           <PushNotificationButton/>
         </div>
         <div className={styles.buttonsHeader}>

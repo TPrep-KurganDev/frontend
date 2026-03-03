@@ -1,8 +1,9 @@
 import {api} from './api';
-import {getCardsList} from './cards';
+import {getCachedCardsList} from './cards';
 import {buildCacheKey} from '../offline/cacheKey';
 import {readThroughCache} from '../offline/readThroughCache';
 import {getCacheEntry, setCacheEntry} from '../offline/cacheDb';
+import {getWarmCardsForExam} from '../offline/warmCardsCache';
 
 export interface ExamSessionStartRequest {
   exam_id: number | undefined
@@ -107,7 +108,10 @@ async function createOfflineSession(data: ExamSessionStartRequest): Promise<Exam
     throw new Error('exam_id is required');
   }
 
-  const cards = await getCardsList(data.exam_id);
+  const warmCards = getWarmCardsForExam(data.exam_id);
+  const cards = warmCards.length > 0
+    ? warmCards
+    : await getCachedCardsList(data.exam_id);
   const cardsIds = cards.map((card) => card.card_id);
 
   if (cardsIds.length === 0) {

@@ -1,11 +1,14 @@
 import styles from './StartButtons.module.scss';
-import {createSession} from '../../api/session.ts';
 import {useNavigate} from 'react-router-dom';
 import {ExamOut} from '../../api/exam.ts';
 import {useState} from 'react';
 import {RandomQuestionsModal} from '../RandomQuestionsModal/RandomQuestionsModal';
 import {AppRoute} from '../../const.ts';
 import {toast} from 'react-hot-toast';
+import {createSessionOffline} from '../../api/session.ts';
+import {beginPendingSessionStart} from '../../session/pendingSessionStart';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {probeBackendReachability} from '../../api/api.ts';
 
 type StartButtonsProps = {
   exam?: ExamOut | null;
@@ -15,6 +18,7 @@ type StartButtonsProps = {
 export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isOnline = useNetworkStatus();
   const isStartDisabled = !exam?.id || cardsCount <= 0;
 
   const ensureCanStart = (): boolean => {
@@ -26,29 +30,51 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
     return true;
   };
 
-  const startNewSession = (exam_id: number | undefined, strategy: string, n: number | null = null) => {
+  const startNewSession = async (exam_id: number | undefined, strategy: string, n: number | null = null) => {
     if (!ensureCanStart() || !exam_id) {
       return;
     }
 
-    createSession({exam_id: exam_id, strategy: strategy, n: n})
-      .then((response) => {
+    const persistedReachability = typeof window !== 'undefined'
+      ? window.localStorage.getItem('app:backend-reachable')
+      : '1';
+    let shouldStartOffline = !isOnline || persistedReachability === '0';
+
+    if (!shouldStartOffline && typeof navigator !== 'undefined' && navigator.onLine) {
+      const reachableNow = await probeBackendReachability(450);
+      shouldStartOffline = !reachableNow;
+    }
+
+    if (shouldStartOffline) {
+      createSessionOffline({
+        exam_id: exam_id,
+        strategy: strategy,
+        n: n
+      }).then((response) => {
         navigate(`/session?sessionId=${response.id}`);
-      })
-      .catch((error: unknown) => {
+      }).catch((error: unknown) => {
         const maybeError = error as { code?: string };
         if (maybeError.code === 'OFFLINE_SESSION_DATA_UNAVAILABLE') {
           toast.error('Для офлайна сначала откройте вопросы этого экзамена онлайн');
           return;
         }
-
         toast.error('Не удалось начать прохождение');
       });
-  }
+      return;
+    }
+
+    const pendingStartId = beginPendingSessionStart({
+      exam_id: exam_id,
+      strategy: strategy,
+      n: n
+    });
+
+    navigate(`/session?pendingStart=${pendingStartId}`);
+  };
 
   const handleRandomQuestions = (count: number) => {
-    startNewSession(exam?.id, 'random', count);
-  }
+    void startNewSession(exam?.id, 'random', count);
+  };
 
   const handleViewQuestions = () => {
     navigate(`${AppRoute.Exam}?examId=${exam?.id}`);
@@ -59,13 +85,13 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
       <div className={styles.firstRow}>
         <div className={`${styles.button} ${styles.yellowButton} ${isStartDisabled ? 'disabledAction' : ''}`}
              onClick={() => {
-               startNewSession(exam?.id, 'full')
+               void startNewSession(exam?.id, 'full');
              }}>
           Пройти весь тест
         </div>
         <div className={`${styles.button} ${styles.hardButton} ${isStartDisabled ? 'disabledAction' : ''}`}
              onClick={() => {
-               startNewSession(exam?.id, 'smart')
+               void startNewSession(exam?.id, 'smart');
              }}>
           Умный подбор вопросов
         </div>
