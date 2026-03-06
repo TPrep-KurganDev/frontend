@@ -27,3 +27,8 @@ body {
 .screenContentCentered {
   align-items: center;
 }
+
+.disabledAction {
+  opacity: 0.55;
+  cursor: not-allowed !important;
+}

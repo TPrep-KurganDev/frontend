@@ -18,8 +18,11 @@ type HeaderProps = {
 export default function Header({title, imgSrc, widthImg, heightImg, onRightImageClick, inputDisabled,
                                  inputRef, onInputBlur, onTitleChange, backButtonPage=null}: HeaderProps) {
   const navigate = useNavigate();
+  const isInputDisabled = inputDisabled ?? true;
+  const handleTitleChange = onTitleChange;
+
   const handleBack = () => {
-    if (backButtonPage == null){
+    if (backButtonPage === null){
       window.history.back();
     }
     else {
@@ -31,23 +34,15 @@ export default function Header({title, imgSrc, widthImg, heightImg, onRightImage
   // const [inputText, setInputText] = useState('');
   // const [inputDisabled, setInputDisabled] = useState(true);
 
-  const handleKeyDown = (e: { key: string; }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       onInputBlur();
     }
   };
 
-  if (inputDisabled == null){
-    inputDisabled = true;
-  }
-
-  if (onTitleChange == null){
-    onTitleChange = () => {};
-  }
-
   useEffect(() => {
-    onTitleChange(title!);
-  }, [title]);
+    handleTitleChange(title ?? '');
+  }, [handleTitleChange, title]);
 
 
   return (
@@ -58,8 +53,8 @@ export default function Header({title, imgSrc, widthImg, heightImg, onRightImage
         ref={inputRef}
         className={styles.title}
         value={title}
-        onChange={(e) => onTitleChange(e.target.value)}
-        disabled={inputDisabled}
+        onChange={(e) => handleTitleChange(e.target.value)}
+        disabled={isInputDisabled}
         onBlur={onInputBlur}
         onKeyDown={handleKeyDown}
       />

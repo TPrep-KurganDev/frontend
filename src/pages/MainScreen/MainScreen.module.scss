@@ -18,6 +18,7 @@
   .user {
     display: flex;
     align-items: center;
+    gap: 8px;
   }
 
   .textButtonHeader {
@@ -30,6 +31,46 @@
     font-weight: 500;
     color: linear-gradient(343.42deg, rgba(53, 53, 53, 0.37) -6.09%, #353535 58.36%);
     flex: 1;
+  }
+
+  .cacheStatus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+  }
+
+  .cacheCircle {
+    --cache-progress: 0%;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: conic-gradient(#f2c200 var(--cache-progress), #f4e08e var(--cache-progress));
+    box-shadow: 0 0 14px #fedd2c66;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.25s ease-out, box-shadow 0.25s ease-out;
+  }
+
+  .cacheProgressLabel {
+    font-size: 9px;
+    font-weight: 700;
+    color: #4d4100;
+  }
+
+  .cacheCircleDone {
+    background: #25b354;
+    box-shadow: 0 0 14px #25b35466;
+  }
+
+  .cacheDoneCheck {
+    width: 12px;
+    height: 7px;
+    border-left: 3px solid #fff;
+    border-bottom: 3px solid #fff;
+    transform: rotate(-45deg);
+    margin-top: -2px;
   }
 
   .buttonsBody {

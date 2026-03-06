@@ -1,12 +1,14 @@
 import Header from '../../components/Header/Header.tsx';
 import styles from './EditCardScreen.module.scss';
 
-import {useEffect, useState} from 'react';
-import {getCard, updateCard, deleteCard} from '../../api/cards.ts';
+import {useCallback, useEffect, useState} from 'react';
+import {getCard, getCardsList, updateCard, deleteCard} from '../../api/cards.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TextAreaAuto} from '../../components/TextAreaAuto/TextAreaAuto';
-import {getExam} from "../../api/exam.ts";
-import {AppRoute} from "../../const.ts";
+import {getExam} from '../../api/exam.ts';
+import {AppRoute} from '../../const.ts';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 
 
 export function EditCardScreen() {
@@ -17,34 +19,62 @@ export function EditCardScreen() {
   const [cardId, setCardId] = useState(0);
   const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
 
   useEffect(() => {
     const cardIdParam = searchParams.get('cardId');
     if (!cardIdParam) return;
-    setCardId(Number(cardIdParam));
-    getCard(Number(cardIdParam)).then((card) => {
-      setAnswer(card.answer);
-      setQuestion(card.question);
-    });
+    const parsedCardId = Number(cardIdParam);
+    setCardId(parsedCardId);
 
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
-    setExamId(Number(examIdParam));
-    getExam(Number(examIdParam)).then((ex) => {
+    const parsedExamId = Number(examIdParam);
+    setExamId(parsedExamId);
+
+    getCard(parsedCardId)
+      .then((card) => {
+        setAnswer(card.answer);
+        setQuestion(card.question);
+      })
+      .catch(() => {
+        getCardsList(parsedExamId)
+          .then((cards) => {
+            const card = cards.find((item) => item.card_id === parsedCardId);
+            if (!card) {
+              return;
+            }
+
+            setAnswer(card.answer);
+            setQuestion(card.question);
+          })
+          .catch(() => undefined);
+      });
+
+    getExam(parsedExamId).then((ex) => {
       setExamId(ex.id);
-      if (ex.creator_id === Number(localStorage.getItem('userId'))){
-        setCanEdit(true);
-      }
+      setCanEdit(isOnline && ex.creator_id === Number(localStorage.getItem('userId')));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
-  }, [navigate, searchParams])
+  }, [isOnline, navigate, searchParams])
 
-  const sendUpdateCard = () => {
+  const sendUpdateCard = useCallback(() => {
+    if (!canEdit || examId <= 0 || cardId <= 0) {
+      return;
+    }
+
     updateCard(Number(examId), Number(cardId), {question, answer});
-  }
+  }, [answer, canEdit, cardId, examId, question]);
 
   const deleteCardClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     const cardIdParam = searchParams.get('cardId');
     if (!cardIdParam) return;
     const examIdParam = searchParams.get('examId');
@@ -56,18 +86,22 @@ export function EditCardScreen() {
   }
 
   const onQuestionChange = (value: string) => {
-    if (canEdit){
+    if (canEdit) {
       setQuestion(value);
     }
   }
 
   const onAnswerChange = (value: string) => {
-    if (canEdit){
+    if (canEdit) {
       setAnswer(value);
     }
   }
 
   useEffect(() => {
+    if (!canEdit) {
+      return;
+    }
+
     const handler = setTimeout(() => {
       sendUpdateCard();
     }, 500);
@@ -75,7 +109,7 @@ export function EditCardScreen() {
     return () => {
       clearTimeout(handler);
     };
-  }, [question, answer]);
+  }, [canEdit, sendUpdateCard]);
 
   return (
     <>
@@ -84,7 +118,9 @@ export function EditCardScreen() {
         widthImg: '38',
         heightImg: '30',
         onRightImageClick: deleteCardClick
-      })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}} onTitleChange={()=>{}}
+      })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {
+      }} onTitleChange={() => {
+      }}
               backButtonPage={`/exam?examId=${examId}`}/>
 
       <TextAreaAuto
@@ -100,7 +136,6 @@ export function EditCardScreen() {
         className={`${styles.answer} ${!canEdit ? styles.noEdit : ''}`}
         disabled={!canEdit}
       />
-
 
 
     </>

@@ -1,4 +1,7 @@
 import {api} from './api';
+import {buildCacheKey} from '../offline/cacheKey';
+import {readThroughCache} from '../offline/readThroughCache';
+import {deleteCacheEntry, setCacheEntry} from '../offline/cacheDb';
 
 export interface ExamCreate {
   title: string;
@@ -15,23 +18,54 @@ export interface ExamOut {
   created_at?: string;
 }
 
+function getPinnedStatusCacheKey(examId: number | undefined): string {
+  return buildCacheKey('exams:isExamPinned', [examId]);
+}
+
+function getPinnedExamsCacheKey(userId: number): string {
+  return buildCacheKey('exams:getPinnedExams', [userId]);
+}
+
+async function refreshPinCaches(examId: number | undefined, isPinned: boolean): Promise<void> {
+  if (examId === undefined) {
+    return;
+  }
+
+  const tasks: Array<Promise<unknown>> = [
+    setCacheEntry(getPinnedStatusCacheKey(examId), {is_pinned: isPinned})
+  ];
+
+  const userId = Number(localStorage.getItem('userId'));
+  if (!Number.isNaN(userId) && userId > 0) {
+    tasks.push(deleteCacheEntry(getPinnedExamsCacheKey(userId)));
+  }
+
+  await Promise.allSettled(tasks);
+}
+
 export async function getExam(examId: number) {
-  const res = await api.get<ExamOut>(`/exams/${examId}`);
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('exams:getExam', [examId]),
+    async () => (await api.get<ExamOut>(`/exams/${examId}`)).data
+  );
 }
 
 export async function getCreatedExams(creatorId: number) {
-  const res = await api.get<ExamOut[]>('/exams/created', {
-    params: { creator_id: creatorId },
-  });
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('exams:getCreatedExams', [creatorId]),
+    async () => (await api.get<ExamOut[]>('/exams/created', {
+      params: {creator_id: creatorId},
+    })).data
+  );
 }
 
 export async function getPinnedExams(pinnedId: number) {
-  const res = await api.get<ExamOut[]>('/exams/pinned', {
-    params: { pinned_id: pinnedId },
-  });
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('exams:getPinnedExams', [pinnedId]),
+    async () => (await api.get<ExamOut[]>('/exams/pinned', {
+      params: {pinned_id: pinnedId},
+    })).data
+  );
 }
 
 export async function createExam(data: string) {
@@ -50,14 +84,33 @@ export async function deleteExam(examId: number | undefined) {
 
 export async function pinExam(examId: number | undefined) {
   await api.post(`/exams/${examId}/pin`);
+  await refreshPinCaches(examId, true);
 }
 
 export async function unpinExam(examId: number | undefined) {
   await api.post(`/exams/${examId}/unpin`);
+  await refreshPinCaches(examId, false);
 }
 
 export async function isExamPinned(examId: number | undefined) {
-  return (await api.get<ExamPinStatus>(`/exams/${examId}/check_pinning`)).data;
+  if (examId === undefined) {
+    return {is_pinned: false};
+  }
+
+  const userId = Number(localStorage.getItem('userId'));
+  if (Number.isNaN(userId) || userId <= 0) {
+    return {is_pinned: false};
+  }
+
+  return readThroughCache(
+    getPinnedStatusCacheKey(examId),
+    async () => {
+      const pinnedExams = (await api.get<ExamOut[]>('/exams/pinned', {
+        params: {pinned_id: userId}
+      })).data;
+      return {is_pinned: pinnedExams.some((exam) => exam.id === examId)};
+    }
+  );
 }
 
 export async function uploadCardsFile(examId: number | undefined, file: File) {

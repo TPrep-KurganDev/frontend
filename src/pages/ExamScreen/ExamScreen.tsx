@@ -11,7 +11,9 @@ import {createCard} from '../../api/cards.ts';
 import {AppRoute} from '../../const.ts';
 import {BottomSheet} from '../../components/BottomSheet/BottomSheet.tsx';
 import {AccessToogle} from '../../components/AccessToogle/AccessToogle.tsx';
-import {EditorsMenu} from "../../components/EditorsMenu/EditorsMenu.tsx";
+import {EditorsMenu} from '../../components/EditorsMenu/EditorsMenu.tsx';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 
 
 export default function ExamScreen() {
@@ -25,36 +27,56 @@ export default function ExamScreen() {
   const [isRightScreenOpened, setRightScreenOpened] = useState(false);
   const [isEditorScreenOpened, setEditorScreenOpened] = useState(false);
   const navigate = useNavigate();
+  const isOnline = useNetworkStatus();
 
   useEffect(() => {
+    let cancelled = false;
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
     const examId = Number(examIdParam);
 
     getExam(examId).then((ex) => {
+      if (cancelled) {
+        return;
+      }
       setExam(ex);
       setExamTitle(ex.title);
-      if (ex.creator_id === Number(localStorage.getItem('userId'))){
-        setCanEdit(true);
-      }
+      setCanEdit(isOnline && ex.creator_id === Number(localStorage.getItem('userId')));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
 
     getCardsList(examId)
-      .then(setCards).catch(() => {
+      .then((cardsList) => {
+        if (cancelled) {
+          return;
+        }
+        setCards(cardsList);
+      }).catch(() => {
       navigate(AppRoute.NotFound);
     });
-  }, [navigate, searchParams]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOnline, navigate, searchParams]);
 
   const inputRef = useRef(null);
 
   const renameClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     setInputDisabled(false);
     setBottom(false);
     setTimeout(() => { // @ts-expect-error ignore
-      inputRef.current.focus();}, 50);
+      inputRef.current.focus();
+    }, 50);
   };
 
   const renameEnd = () => {
@@ -62,13 +84,20 @@ export default function ExamScreen() {
   };
 
   const createCardClick = () => {
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
     const examId = Number(examIdParam);
     createCard(examId, {question: 'Вопрос', answer: 'Ответ'}).then(
       () => {
-        getCardsList(examId)
+        getCardsList(examId, {forceRefresh: true})
           .then(setCards);
       }
     );
@@ -76,10 +105,23 @@ export default function ExamScreen() {
   }
 
   const deleteExamClick = () => {
-    deleteExam(exam?.id).then(() => {navigate('/exam-list')});
+    if (!canEdit) {
+      if (!isOnline) {
+        notifyOnlineOnly();
+      }
+      return;
+    }
+
+    deleteExam(exam?.id).then(() => {
+      navigate('/exam-list')
+    });
   }
 
   useEffect(() => {
+    if (!canEdit || !exam?.id) {
+      return;
+    }
+
     const handler = setTimeout(() => {
       updateExam(exam?.id, {title: examTitle});
     }, 500);
@@ -87,15 +129,18 @@ export default function ExamScreen() {
     return () => {
       clearTimeout(handler);
     };
-  }, [exam?.id, examTitle]);
+  }, [canEdit, exam?.id, examTitle]);
 
   return (
     <>
-      <Header inputDisabled={inputDisabled} title={examTitle} inputRef={inputRef} onInputBlur={renameEnd} onTitleChange={setExamTitle} {...(canEdit && {
+      <Header inputDisabled={inputDisabled} title={examTitle} inputRef={inputRef} onInputBlur={renameEnd}
+              onTitleChange={setExamTitle} {...(canEdit && {
         imgSrc: 'settingsCard.svg',
         widthImg: '38',
         heightImg: '36',
-        onRightImageClick: () => {setBottom(true)}
+        onRightImageClick: () => {
+          setBottom(true)
+        }
       })}
               backButtonPage={`/exam-cover?examId=${exam?.id}`}/>
       <div className={styles.list}>
@@ -105,12 +150,18 @@ export default function ExamScreen() {
             question={q.question}
             answer={q.answer}
             id={(index + 1).toString()}
-            onclick={() => {navigate(`/card-edit?cardId=${q.card_id}&examId=${searchParams.get('examId')}`);}}
+            onclick={() => {
+              navigate(`/card-edit?cardId=${q.card_id}&examId=${searchParams.get('examId')}`);
+            }}
           />
         ))}
-        {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {createCardClick()}}/>}
+        {canEdit && <CardListEntry question={''} answer={''} id={'+'} onclick={() => {
+          createCardClick()
+        }}/>}
         {canEdit &&
-          <div key={1000} className={styles.uploadItem} onClick={() => {navigate(`/file-upload?examId=${exam?.id}`)}}>
+          <div key={1000} className={styles.uploadItem} onClick={() => {
+            navigate(`/file-upload?examId=${exam?.id}`)
+          }}>
             <div className={styles.uploadIcon}>
               <img src='upload button.svg' alt='' width={16}/>
             </div>

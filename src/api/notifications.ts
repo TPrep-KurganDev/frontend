@@ -1,4 +1,6 @@
 import {api} from './api';
+import {buildCacheKey} from '../offline/cacheKey';
+import {readThroughCache} from '../offline/readThroughCache';
 
 export interface NotificationOut {
   id: number;
@@ -7,8 +9,10 @@ export interface NotificationOut {
 }
 
 export async function getNotifications() {
-  const res = await api.get<NotificationOut[]>('/notifications');
-  return res.data;
+  return readThroughCache(
+    buildCacheKey('notifications:getNotifications'),
+    async () => (await api.get<NotificationOut[]>('/notifications')).data
+  );
 }
 
 export async function deleteNotification(notificationId: number) {

@@ -1,4 +1,5 @@
-import { api } from './api.ts'
+import {api} from './api.ts'
+import {clearCacheEntries} from '../offline/cacheDb';
 
 
 export async function register(data: { email: string; password: string; user_name: string }) {
@@ -20,13 +21,25 @@ export async function login(data: { email: string; password: string }) {
 }
 
 export async function getProfile() {
-  return api.get('/users/me');
+  const userId = Number(localStorage.getItem('userId'));
+  if (Number.isNaN(userId) || userId <= 0) {
+    throw new Error('No user id in local storage');
+  }
+
+  return api.get(`/users/${userId}`);
 }
 
-export function logout() {
+export async function logout() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('tokenType');
   localStorage.removeItem('userId');
+
+  try {
+    await clearCacheEntries();
+  } catch (error) {
+    console.error('Failed to clear offline cache on logout', error);
+  }
+
   window.location.href = '/login';
 }

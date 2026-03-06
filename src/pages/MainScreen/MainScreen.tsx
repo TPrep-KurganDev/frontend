@@ -2,33 +2,178 @@ import styles from './MainScreen.module.scss'
 import {Notification} from '../../components/Notification/Notification.tsx';
 import {createExam} from '../../api/exam'
 import {getUserById} from '../../api/users'
-import {getNotifications, NotificationOut, deleteNotification} from '../../api/notifications'
+import {NotificationOut, deleteNotification} from '../../api/notifications'
 import {formatNotificationTime} from '../../utils/formatNotificationTime'
 import {PushNotificationButton} from '../../components/PushNotificationButton/PushNotificationButton'
 import {usePushNotifications} from '../../hooks/usePushNotifications'
+import {
+  prefetchCreatedExamsGraph,
+  prefetchNotificationsForUser,
+  prefetchPinnedExamsGraph
+} from '../../offline/prefetch';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import {useState, useEffect, type CSSProperties} from 'react';
+
+const CACHE_WARMUP_STORAGE_PREFIX = 'app:cache-warmup:';
+
+type CacheWarmupSnapshot = {
+  progress: number;
+  done: boolean;
+  updatedAt: number;
+};
+
+function getWarmupStorageKey(userId: number): string {
+  return `${CACHE_WARMUP_STORAGE_PREFIX}${userId}`;
+}
+
+function readPersistedWarmup(userId: number): CacheWarmupSnapshot {
+  if (Number.isNaN(userId) || userId <= 0) {
+    return {progress: 0, done: false, updatedAt: 0};
+  }
+
+  const raw = window.localStorage.getItem(getWarmupStorageKey(userId));
+  if (!raw) {
+    return {progress: 0, done: false, updatedAt: 0};
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<CacheWarmupSnapshot>;
+    return {
+      progress: Math.max(0, Math.min(100, Number(parsed.progress ?? 0))),
+      done: Boolean(parsed.done),
+      updatedAt: Number(parsed.updatedAt ?? 0)
+    };
+  } catch {
+    return {progress: 0, done: false, updatedAt: 0};
+  }
+}
+
+function persistWarmup(userId: number, snapshot: CacheWarmupSnapshot): void {
+  if (Number.isNaN(userId) || userId <= 0) {
+    return;
+  }
+
+  window.localStorage.setItem(getWarmupStorageKey(userId), JSON.stringify(snapshot));
+}
 
 export function MainScreen() {
-  const [notifications, setNotifications] = useState<NotificationOut[]>([]);
   const [, setTick] = useState(0);
   const navigate = useNavigate();
-  const { subscription } = usePushNotifications();
+  const {subscription} = usePushNotifications();
+  const isOnline = useNetworkStatus();
+  const userId = Number(localStorage.getItem('userId'));
+  const [notifications, setNotifications] = useState<NotificationOut[]>([]);
+  const [cacheWarmupProgress, setCacheWarmupProgress] = useState(() => {
+    const initialUserId = Number(localStorage.getItem('userId'));
+    return readPersistedWarmup(initialUserId).progress;
+  });
+  const [isCacheWarmupDone, setIsCacheWarmupDone] = useState(() => {
+    const initialUserId = Number(localStorage.getItem('userId'));
+    return readPersistedWarmup(initialUserId).done;
+  });
   const createExamClick = () => {
-    createExam('Новый экзамен').then((res) => {navigate(`/exam-cover?examId=${res.id}`)});
+    if (!isOnline) {
+      notifyOnlineOnly();
+      return;
+    }
+
+    createExam('Новый экзамен').then((res) => {
+      navigate(`/exam-cover?examId=${res.id}`)
+    });
   }
 
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    getUserById(Number(localStorage.getItem('userId'))).then((res_user) => {
-      setUsername(res_user.user_name);
-    })
-  }, [])
+    if (Number.isNaN(userId) || userId <= 0) {
+      return;
+    }
+
+    getUserById(userId)
+      .then((resUser) => {
+        setUsername(resUser.user_name);
+      })
+      .catch(() => undefined);
+  }, [userId]);
 
   useEffect(() => {
-    getNotifications().then(setNotifications);
-  }, []);
+    const snapshot = readPersistedWarmup(userId);
+    setCacheWarmupProgress(snapshot.progress);
+    setIsCacheWarmupDone(snapshot.done);
+  }, [userId]);
+
+  useEffect(() => {
+    if (Number.isNaN(userId) || userId <= 0) {
+      setCacheWarmupProgress(0);
+      setIsCacheWarmupDone(false);
+      return;
+    }
+
+    if (!isOnline) {
+      return;
+    }
+
+    let cancelled = false;
+    let completedTasks = 0;
+    const totalTasks = 3;
+    const trackProgress = !readPersistedWarmup(userId).done;
+    if (trackProgress) {
+      setCacheWarmupProgress((prev) => {
+        const next = prev > 0 ? prev : 6;
+        persistWarmup(userId, {
+          progress: next,
+          done: false,
+          updatedAt: Date.now()
+        });
+        return next;
+      });
+    }
+
+    const markTaskDone = () => {
+      completedTasks += 1;
+      const progress = Math.round((completedTasks / totalTasks) * 100);
+      if (trackProgress) {
+        setCacheWarmupProgress(progress);
+        const done = completedTasks === totalTasks;
+        persistWarmup(userId, {
+          progress,
+          done,
+          updatedAt: Date.now()
+        });
+
+        if (done) {
+          setIsCacheWarmupDone(true);
+        }
+      }
+    };
+
+    const tasks: Array<Promise<unknown>> = [
+      prefetchCreatedExamsGraph(userId),
+      prefetchPinnedExamsGraph(userId),
+      prefetchNotificationsForUser().then((items) => {
+        if (!cancelled) {
+          setNotifications(items);
+        }
+      })
+    ];
+
+    tasks.forEach((task) => {
+      void task
+        .catch(() => undefined)
+        .finally(() => {
+          if (cancelled) {
+            return;
+          }
+          markTaskDone();
+        });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOnline, userId]);
 
   useEffect(() => {
     const checkExpiredNotifications = () => {
@@ -88,28 +233,58 @@ export function MainScreen() {
     setNotifications(notifications.filter(n => n.id !== notificationId));
   };
 
+  const handleOpenFavorites = () => {
+    if (!Number.isNaN(userId) && userId > 0) {
+      void prefetchPinnedExamsGraph(userId);
+    }
+    navigate('/favourite-exam-list');
+  };
+
+  const handleOpenCreated = () => {
+    if (!Number.isNaN(userId) && userId > 0) {
+      void prefetchCreatedExamsGraph(userId);
+    }
+    navigate('/exam-list');
+  };
+  const cacheIndicatorStyle = {
+    '--cache-progress': `${cacheWarmupProgress}%`
+  } as CSSProperties;
+
   return (
     <>
       <header className={styles.header}>
         <div className={styles.user}>
           <img className={styles.avatar} width={43} height={43} alt=''
-               src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-2409187029.jpg"/>
+               src="avatar.png"/>
           <div className={styles.name}>{username}</div>
+          <div
+            className={styles.cacheStatus}
+            title={isCacheWarmupDone ? 'Офлайн-кэш готов' : `Офлайн-кэш: ${cacheWarmupProgress}%`}
+          >
+            <div
+              className={`${styles.cacheCircle} ${isCacheWarmupDone ? styles.cacheCircleDone : ''}`}
+              style={cacheIndicatorStyle}
+            >
+              {isCacheWarmupDone
+                ? <span className={styles.cacheDoneCheck} />
+                : <span className={styles.cacheProgressLabel}>{Math.max(0, cacheWarmupProgress)}%</span>}
+            </div>
+          </div>
           <PushNotificationButton/>
         </div>
         <div className={styles.buttonsHeader}>
-          <div className={styles.buttonHeader} onClick={() => {navigate('/favourite-exam-list')}}>
+          <div className={styles.buttonHeader} onClick={handleOpenFavorites}>
             <img className={styles.imageButtonHeader} width={40} height={40} src='starActive.svg' alt=''/>
             <div className={styles.textButtonHeader}>Закреплённые</div>
           </div>
-          <div className={styles.buttonHeader} onClick={() => {navigate('/exam-list')}}>
+          <div className={styles.buttonHeader} onClick={handleOpenCreated}>
             <img className={styles.imageButtonHeader} src='createdTests.svg' width={38} height={38} alt=''/>
             <div className={styles.textButtonHeader}>Созданные</div>
           </div>
         </div>
       </header>
       <div className={styles.buttonsBody}>
-        <div className={`${styles.buttonBody} ${styles.yellowButton}`} onClick={createExamClick}>
+        <div className={`${styles.buttonBody} ${styles.yellowButton} ${!isOnline ? 'disabledAction' : ''}`} onClick={createExamClick}>
           <img width={25} height={25} src='createTest.svg' alt=''/>
           <div className={styles.textButtonBody}>Создать тест</div>
         </div>
