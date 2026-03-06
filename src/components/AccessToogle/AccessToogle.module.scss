@@ -1,0 +1,58 @@
+:local {
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #35353552;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .modal {
+    background: white;
+    border-radius: 35px;
+    padding: 20px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0;
+    text-align: center;
+    color: #000;
+  }
+
+  .rightsBlock {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rightString {
+    display: flex;
+    flex-direction: row;
+    font-size: 24px;
+    gap: 10px;
+    margin: 0 20px;
+    padding: 15px;
+  }
+  .rightString > p {
+    margin: 0;
+  }
+
+  .chooseMark {
+    width: 18px;
+  }
+
+  .hidden {
+    display: none;
+  }
+}

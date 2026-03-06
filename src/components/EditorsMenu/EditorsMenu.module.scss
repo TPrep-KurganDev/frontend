@@ -1,0 +1,106 @@
+:local {
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #35353552;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .modal {
+    background: white;
+    border-radius: 35px;
+    padding: 20px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: calc(min(450px, 95vw) * 0.8);
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0;
+    text-align: center;
+    color: #000;
+  }
+
+  .rightsBlock {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+
+  }
+
+  .currentEditors {
+    overflow-y: auto;
+    max-height: 280px;
+  }
+
+  .rightString {
+    display: flex;
+    flex-direction: row;
+    font-size: 24px;
+    gap: 10px;
+    margin: 0 20px;
+    padding: 8px;
+    justify-content: space-between;
+  }
+
+  .editorName {
+    margin: auto 0;
+    padding: 0;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .leftPart {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .rightPart {
+    width: 20px;
+    height: 20px;
+    margin: auto 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 6px 16px;
+    border: 2px solid #999;
+    border-radius: 15px;
+    margin: 25px 30px 10px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .search input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 24px;
+    margin: 0;
+    flex: 1;
+  }
+}

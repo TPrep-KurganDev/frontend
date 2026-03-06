@@ -10,6 +10,8 @@ import {ExamOut, getExam, deleteExam, updateExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
 import {AppRoute} from '../../const.ts';
 import {BottomSheet} from '../../components/BottomSheet/BottomSheet.tsx';
+import {AccessToogle} from '../../components/AccessToogle/AccessToogle.tsx';
+import {EditorsMenu} from "../../components/EditorsMenu/EditorsMenu.tsx";
 
 
 export default function ExamScreen() {
@@ -20,6 +22,8 @@ export default function ExamScreen() {
   const [bottomScreenOpen, setBottom] = useState(false);
   const [inputDisabled, setInputDisabled] = useState(true);
   const [canEdit, setCanEdit] = useState(false);
+  const [isRightScreenOpened, setRightScreenOpened] = useState(false);
+  const [isEditorScreenOpened, setEditorScreenOpened] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -117,12 +121,20 @@ export default function ExamScreen() {
         }
       </div>
 
+      <AccessToogle currentAccess={''} handler={() => {}} isOpened={isRightScreenOpened} onClose={() => setRightScreenOpened(false)}/>
+      <EditorsMenu editors={[{avatar:'avatar.png', name:'Беня Салин'}, {avatar:'avatar.png', name:'Беня Салин'}, {avatar:'avatar.png', name:'Беня Салин'}]}
+                   handler={() => {}}
+                   isOpened={isEditorScreenOpened}
+                   onClose={() => {setEditorScreenOpened(false)}}
+      />
+
       <BottomSheet
         open={bottomScreenOpen}
         onClose={() => setBottom(false)}
         buttons={[
           { text: 'Переименовать', onclick: renameClick, color: '#353535' },
-          // { text: 'Редактировать права доступа', onclick: () => alert('share'), color: '#353535' },
+          { text: 'Редактировать права доступа', onclick: () => {setRightScreenOpened(true); setBottom(false);}, color: '#353535' },
+          { text: 'Назначить редакторов', onclick: () => {setEditorScreenOpened(true); setBottom(false);}, color: '#353535' },
           { text: 'Удалить', onclick: deleteExamClick, color: '#F7474A' }
         ]}
       />
