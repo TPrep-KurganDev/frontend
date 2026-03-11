@@ -1,5 +1,6 @@
 export type ProgressBarType = {
+  mistakesCount: number;
   cardsCount: number;
-  currentCard: number;
-  cardsProgress: { [key: number]: boolean };
+  doneCardsCount: number;
+  cardsProgress: boolean[];
 }

@@ -13,13 +13,14 @@ import NotFoundScreen from '../../pages/NotFoundScreen/NotFoundScreen.tsx';
 import {ResultScreen} from '../../pages/ResultScreen/ResultScreen.tsx';
 import {FileUploadScreen} from '../../pages/FileUploadScreen/FileUploadScreen.tsx';
 import {Toaster, toast} from 'react-hot-toast';
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import NoAccessScreen from '../../pages/NoAccessScreen/NoAccessScreen.tsx';
 
 
 export default function App() {
   const location = useLocation();
   const token = localStorage.getItem('accessToken');
+  const lastOfflineToastTimeRef = useRef(0);
 
   const isAuthPage =
     location.pathname === AppRoute.Registration ||
