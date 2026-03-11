@@ -128,6 +128,7 @@ export function EditCardScreen() {
         onChange={onQuestionChange}
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         disabled={!canEdit}
+        ai_fill={false}
       />
 
       <TextAreaAuto
@@ -135,9 +136,8 @@ export function EditCardScreen() {
         onChange={onAnswerChange}
         className={`${styles.answer} ${!canEdit ? styles.noEdit : ''}`}
         disabled={!canEdit}
+        ai_fill={true}
       />
-
-
     </>
   )
 }

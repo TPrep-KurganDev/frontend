@@ -1,0 +1,15 @@
+:local {
+  .magicIcon {
+    position: absolute;
+    right: 32px;
+    bottom: 22px;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+  }
+
+  .aiBlock {
+    position: relative;
+  }
+}
