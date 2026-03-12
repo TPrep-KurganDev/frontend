@@ -29,12 +29,14 @@
   .name {
     font-size: 28px;
     font-weight: 500;
-    color: linear-gradient(343.42deg, rgba(53, 53, 53, 0.37) -6.09%, #353535 58.36%);
+    background: linear-gradient(343deg, rgba(53,53,53,0.37), #282828);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     flex: 1;
   }
 
   .cacheStatus {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     margin-right: 4px;

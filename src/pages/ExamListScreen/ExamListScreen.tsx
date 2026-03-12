@@ -16,7 +16,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const [authorNames, setAuthorNames] = useState<Record<number, string>>({});
   const [testsLoaded, setTestsLoaded] = useState(true);
   const navigate = useNavigate();
-
+  setTestsLoaded(true)
   useEffect(() => {
     const userId = Number(localStorage.getItem('userId'));
     if (Number.isNaN(userId) || userId <= 0) {

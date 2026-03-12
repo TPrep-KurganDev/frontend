@@ -142,6 +142,11 @@ export default function ExamScreen() {
           setBottom(true)
         }
       })}
+              {...(!isOnline && {
+                imgSrc: 'offline.svg',
+                widthImg: '38',
+                heightImg: '36'
+              })}
               backButtonPage={`/exam-cover?examId=${exam?.id}`}/>
       <div className={styles.list}>
         {cards.map((q, index) => (

@@ -270,6 +270,9 @@ export function MainScreen() {
                 : <span className={styles.cacheProgressLabel}>{Math.max(0, cacheWarmupProgress)}%</span>}
             </div>
           </div>
+          <div>
+            { !isOnline && <img src="offline.svg"/> }
+          </div>
           <PushNotificationButton/>
         </div>
         <div className={styles.buttonsHeader}>
