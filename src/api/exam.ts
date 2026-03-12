@@ -12,13 +12,13 @@ export interface ExamPinStatus {
 }
 
 export interface ExamOut {
-  id: number;
+  id: string;
   title: string;
-  creator_id: number;
+  creator_id: string | null;
   created_at?: string;
 }
 
-function getPinnedStatusCacheKey(examId: number | undefined): string {
+function getPinnedStatusCacheKey(examId: string | undefined): string {
   return buildCacheKey('exams:isExamPinned', [examId]);
 }
 
@@ -26,7 +26,7 @@ function getPinnedExamsCacheKey(userId: number): string {
   return buildCacheKey('exams:getPinnedExams', [userId]);
 }
 
-async function refreshPinCaches(examId: number | undefined, isPinned: boolean): Promise<void> {
+async function refreshPinCaches(examId: string | undefined, isPinned: boolean): Promise<void> {
   if (examId === undefined) {
     return;
   }
@@ -43,14 +43,14 @@ async function refreshPinCaches(examId: number | undefined, isPinned: boolean): 
   await Promise.allSettled(tasks);
 }
 
-export async function getExam(examId: number) {
+export async function getExam(examId: string) {
   return readThroughCache(
     buildCacheKey('exams:getExam', [examId]),
     async () => (await api.get<ExamOut>(`/exams/${examId}`)).data
   );
 }
 
-export async function getCreatedExams(creatorId: number) {
+export async function getCreatedExams(creatorId: string | null) {
   return readThroughCache(
     buildCacheKey('exams:getCreatedExams', [creatorId]),
     async () => (await api.get<ExamOut[]>('/exams/created', {
@@ -59,7 +59,7 @@ export async function getCreatedExams(creatorId: number) {
   );
 }
 
-export async function getPinnedExams(pinnedId: number) {
+export async function getPinnedExams(pinnedId: string | null) {
   return readThroughCache(
     buildCacheKey('exams:getPinnedExams', [pinnedId]),
     async () => (await api.get<ExamOut[]>('/exams/pinned', {
@@ -73,26 +73,26 @@ export async function createExam(data: string) {
   return res.data;
 }
 
-export async function updateExam(examId: number | undefined, data: ExamCreate) {
+export async function updateExam(examId: string | undefined, data: ExamCreate) {
   const res = await api.patch<ExamOut>(`/exams/${examId}`, data);
   return res.data;
 }
 
-export async function deleteExam(examId: number | undefined) {
+export async function deleteExam(examId: string | undefined) {
   await api.delete(`/exams/${examId}`);
 }
 
-export async function pinExam(examId: number | undefined) {
+export async function pinExam(examId: string | undefined) {
   await api.post(`/exams/${examId}/pin`);
   await refreshPinCaches(examId, true);
 }
 
-export async function unpinExam(examId: number | undefined) {
+export async function unpinExam(examId: string | undefined) {
   await api.post(`/exams/${examId}/unpin`);
   await refreshPinCaches(examId, false);
 }
 
-export async function isExamPinned(examId: number | undefined) {
+export async function isExamPinned(examId: string | undefined) {
   if (examId === undefined) {
     return {is_pinned: false};
   }

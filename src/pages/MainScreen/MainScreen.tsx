@@ -24,14 +24,11 @@ type CacheWarmupSnapshot = {
   updatedAt: number;
 };
 
-function getWarmupStorageKey(userId: number): string {
+function getWarmupStorageKey(userId: string | null): string {
   return `${CACHE_WARMUP_STORAGE_PREFIX}${userId}`;
 }
 
-function readPersistedWarmup(userId: number): CacheWarmupSnapshot {
-  if (Number.isNaN(userId) || userId <= 0) {
-    return {progress: 0, done: false, updatedAt: 0};
-  }
+function readPersistedWarmup(userId: string | null): CacheWarmupSnapshot {
 
   const raw = window.localStorage.getItem(getWarmupStorageKey(userId));
   if (!raw) {
@@ -50,11 +47,7 @@ function readPersistedWarmup(userId: number): CacheWarmupSnapshot {
   }
 }
 
-function persistWarmup(userId: number, snapshot: CacheWarmupSnapshot): void {
-  if (Number.isNaN(userId) || userId <= 0) {
-    return;
-  }
-
+function persistWarmup(userId: string | null, snapshot: CacheWarmupSnapshot): void {
   window.localStorage.setItem(getWarmupStorageKey(userId), JSON.stringify(snapshot));
 }
 
@@ -63,14 +56,14 @@ export function MainScreen() {
   const navigate = useNavigate();
   const {subscription} = usePushNotifications();
   const isOnline = useNetworkStatus();
-  const userId = Number(localStorage.getItem('userId'));
+  const userId = localStorage.getItem('userId');
   const [notifications, setNotifications] = useState<NotificationOut[]>([]);
   const [cacheWarmupProgress, setCacheWarmupProgress] = useState(() => {
-    const initialUserId = Number(localStorage.getItem('userId'));
+    const initialUserId = localStorage.getItem('userId');
     return readPersistedWarmup(initialUserId).progress;
   });
   const [isCacheWarmupDone, setIsCacheWarmupDone] = useState(() => {
-    const initialUserId = Number(localStorage.getItem('userId'));
+    const initialUserId = localStorage.getItem('userId');
     return readPersistedWarmup(initialUserId).done;
   });
   const createExamClick = () => {
@@ -87,10 +80,6 @@ export function MainScreen() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
-    if (Number.isNaN(userId) || userId <= 0) {
-      return;
-    }
-
     getUserById(userId)
       .then((resUser) => {
         setUsername(resUser.user_name);
@@ -105,12 +94,6 @@ export function MainScreen() {
   }, [userId]);
 
   useEffect(() => {
-    if (Number.isNaN(userId) || userId <= 0) {
-      setCacheWarmupProgress(0);
-      setIsCacheWarmupDone(false);
-      return;
-    }
-
     if (!isOnline) {
       return;
     }
@@ -234,16 +217,12 @@ export function MainScreen() {
   };
 
   const handleOpenFavorites = () => {
-    if (!Number.isNaN(userId) && userId > 0) {
-      void prefetchPinnedExamsGraph(userId);
-    }
+    void prefetchPinnedExamsGraph(userId);
     navigate('/favourite-exam-list');
   };
 
   const handleOpenCreated = () => {
-    if (!Number.isNaN(userId) && userId > 0) {
-      void prefetchCreatedExamsGraph(userId);
-    }
+    void prefetchCreatedExamsGraph(userId);
     navigate('/exam-list');
   };
   const cacheIndicatorStyle = {

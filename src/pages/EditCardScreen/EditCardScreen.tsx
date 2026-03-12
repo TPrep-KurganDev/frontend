@@ -15,7 +15,7 @@ export function EditCardScreen() {
   const [searchParams] = useSearchParams();
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const [examId, setExamId] = useState(0);
+  const [examId, setExamId] = useState('');
   const [cardId, setCardId] = useState(0);
   const [canEdit, setCanEdit] = useState(false);
   const navigate = useNavigate();
@@ -29,8 +29,7 @@ export function EditCardScreen() {
 
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
-    const parsedExamId = Number(examIdParam);
-    setExamId(parsedExamId);
+    setExamId(examIdParam);
 
     getCard(parsedCardId)
       .then((card) => {
@@ -38,7 +37,7 @@ export function EditCardScreen() {
         setQuestion(card.question);
       })
       .catch(() => {
-        getCardsList(parsedExamId)
+        getCardsList(examId)
           .then((cards) => {
             const card = cards.find((item) => item.card_id === parsedCardId);
             if (!card) {
@@ -51,20 +50,20 @@ export function EditCardScreen() {
           .catch(() => undefined);
       });
 
-    getExam(parsedExamId).then((ex) => {
+    getExam(examIdParam).then((ex) => {
       setExamId(ex.id);
-      setCanEdit(isOnline && ex.creator_id === Number(localStorage.getItem('userId')));
+      setCanEdit(isOnline && ex.creator_id === localStorage.getItem('userId'));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
-  }, [isOnline, navigate, searchParams])
+  }, [examId, isOnline, navigate, searchParams])
 
   const sendUpdateCard = useCallback(() => {
-    if (!canEdit || examId <= 0 || cardId <= 0) {
+    if (!canEdit || cardId <= 0) {
       return;
     }
 
-    updateCard(Number(examId), Number(cardId), {question, answer});
+    updateCard(examId, Number(cardId), {question, answer});
   }, [answer, canEdit, cardId, examId, question]);
 
   const deleteCardClick = () => {
@@ -80,7 +79,7 @@ export function EditCardScreen() {
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
-    deleteCard(Number(examIdParam), Number(cardIdParam)).then(() => {
+    deleteCard(examIdParam, Number(cardIdParam)).then(() => {
       navigate(`/exam?examId=${examIdParam}`);
     })
   }

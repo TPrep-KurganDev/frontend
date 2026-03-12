@@ -34,20 +34,18 @@ export default function ExamScreen() {
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
-    const examId = Number(examIdParam);
-
-    getExam(examId).then((ex) => {
+    getExam(examIdParam).then((ex) => {
       if (cancelled) {
         return;
       }
       setExam(ex);
       setExamTitle(ex.title);
-      setCanEdit(isOnline && ex.creator_id === Number(localStorage.getItem('userId')));
+      setCanEdit(isOnline && ex.creator_id === localStorage.getItem('userId'));
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
 
-    getCardsList(examId)
+    getCardsList(examIdParam)
       .then((cardsList) => {
         if (cancelled) {
           return;
@@ -94,10 +92,9 @@ export default function ExamScreen() {
     const examIdParam = searchParams.get('examId');
     if (!examIdParam) return;
 
-    const examId = Number(examIdParam);
-    createCard(examId, {question: 'Вопрос', answer: 'Ответ'}).then(
+    createCard(examIdParam, {question: 'Вопрос', answer: 'Ответ'}).then(
       () => {
-        getCardsList(examId, {forceRefresh: true})
+        getCardsList(examIdParam, {forceRefresh: true})
           .then(setCards);
       }
     );

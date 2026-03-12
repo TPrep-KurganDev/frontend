@@ -13,16 +13,11 @@ type ExamListScreenProps = {
 
 export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const [exams, setExams] = useState<ExamOut[]>([]);
-  const [authorNames, setAuthorNames] = useState<Record<number, string>>({});
+  const [authorNames, setAuthorNames] = useState<Record<string, string>>({});
   const [testsLoaded, setTestsLoaded] = useState(true);
   const navigate = useNavigate();
-  setTestsLoaded(true)
   useEffect(() => {
-    const userId = Number(localStorage.getItem('userId'));
-    if (Number.isNaN(userId) || userId <= 0) {
-      setExams([]);
-      return;
-    }
+    const userId = localStorage.getItem('userId');
 
     const loadExams = async () => {
       try {
@@ -49,7 +44,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   useEffect(() => {
     const fetchAuthorNames = async () => {
       const creatorIds = [...new Set(exams.map((exam) => exam.creator_id))];
-      const fetchedNames: Record<number, string> = {};
+      const fetchedNames: Record<string, string> = {};
       const results = await Promise.allSettled(creatorIds.map((creatorId) => getUserById(creatorId)));
 
       results.forEach((result, index) => {
@@ -58,7 +53,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
         }
 
         const creatorId = creatorIds[index];
-        fetchedNames[creatorId] = result.value.user_name;
+        fetchedNames[creatorId!] = result.value.user_name;
       });
 
       setAuthorNames(fetchedNames);
@@ -95,7 +90,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
             key={exam.id}
             className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`}
             onClick={() => {
-            const creatorName = authorNames[exam.creator_id] ?? '';
+            const creatorName = authorNames[exam.creator_id!] ?? '';
             navigate(`/exam-cover?examId=${exam.id}`, {
               state: {
                 examTitle: exam.title,
@@ -106,7 +101,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
             }}
           >
             <div className={styles.name}>{exam.title}</div>
-            {isFavorites && <div className={styles.author}>автор: {authorNames[exam.creator_id] || 'Загрузка...'}</div>}
+            {isFavorites && <div className={styles.author}>автор: {authorNames[exam.creator_id!] || 'Загрузка...'}</div>}
           </div>
         ))}
       </div>

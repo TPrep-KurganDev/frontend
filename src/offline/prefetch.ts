@@ -6,7 +6,7 @@ import {buildCacheKey} from './cacheKey';
 import {setCacheEntry} from './cacheDb';
 
 const cardsPrefetchInFlight = new Map<number, Promise<void>>();
-const userPrefetchInFlight = new Map<number, Promise<void>>();
+const userPrefetchInFlight = new Map<string | null, Promise<void>>();
 
 async function prefetchCardsForExam(examId: number): Promise<void> {
   const existing = cardsPrefetchInFlight.get(examId);
@@ -30,7 +30,7 @@ async function prefetchCardsForExam(examId: number): Promise<void> {
   return task;
 }
 
-async function prefetchUserName(userId: number): Promise<void> {
+async function prefetchUserName(userId: string | null): Promise<void> {
   const existing = userPrefetchInFlight.get(userId);
   if (existing) {
     return existing;
@@ -57,13 +57,13 @@ export async function prefetchExamGraph(exams: ExamOut[]): Promise<void> {
   }));
 }
 
-export async function prefetchCreatedExamsGraph(userId: number): Promise<ExamOut[]> {
+export async function prefetchCreatedExamsGraph(userId: string | null): Promise<ExamOut[]> {
   const exams = await getCreatedExams(userId);
   await prefetchExamGraph(exams);
   return exams;
 }
 
-export async function prefetchPinnedExamsGraph(userId: number): Promise<ExamOut[]> {
+export async function prefetchPinnedExamsGraph(userId: string | null): Promise<ExamOut[]> {
   const exams = await getPinnedExams(userId);
   await prefetchExamGraph(exams);
   return exams;

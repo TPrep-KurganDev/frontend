@@ -8,7 +8,7 @@ export interface UserOut {
   id: number
 }
 
-export async function getUserById(userId: number) {
+export async function getUserById(userId: string | null) {
   return readThroughCache(
     buildCacheKey('users:getById', [userId]),
     async () => (await api.get<UserOut>(`/users/${userId}`)).data

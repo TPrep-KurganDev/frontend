@@ -1,8 +1,8 @@
 import type {CardOut} from '../api/cards';
 
-const warmCardsByExam = new Map<number, CardOut[]>();
+const warmCardsByExam = new Map<string, CardOut[]>();
 
-export function setWarmCardsForExam(examId: number, cards: CardOut[]): void {
+export function setWarmCardsForExam(examId: string, cards: CardOut[]): void {
   if (cards.length === 0) {
     return;
   }
@@ -10,6 +10,6 @@ export function setWarmCardsForExam(examId: number, cards: CardOut[]): void {
   warmCardsByExam.set(examId, cards);
 }
 
-export function getWarmCardsForExam(examId: number): CardOut[] {
+export function getWarmCardsForExam(examId: string): CardOut[] {
   return warmCardsByExam.get(examId) ?? [];
 }

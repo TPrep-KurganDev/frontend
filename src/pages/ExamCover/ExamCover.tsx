@@ -16,7 +16,7 @@ import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 type ExamCoverState = {
   examTitle?: string;
   creatorName?: string;
-  creatorId?: number;
+  creatorId?: string;
 };
 
 export default function ExamCover() {
@@ -40,14 +40,13 @@ export default function ExamCover() {
     }
 
     let cancelled = false;
-    const examId = Number(examIdParam);
     const routeState = (location.state as ExamCoverState | null) ?? null;
 
     if (routeState?.examTitle) {
       const preloadedExam: ExamOut = {
-        id: examId,
+        id: examIdParam,
         title: routeState.examTitle,
-        creator_id: routeState.creatorId ?? 0
+        creator_id: routeState.creatorId ?? ''
       };
       setExam(preloadedExam);
     }
@@ -56,7 +55,7 @@ export default function ExamCover() {
       setCreator(routeState.creatorName);
     }
 
-    const resolveCreatorName = async (creatorId: number) => {
+    const resolveCreatorName = async (creatorId: string) => {
       try {
         const user = await getUserById(creatorId);
         if (cancelled) {
@@ -68,13 +67,13 @@ export default function ExamCover() {
       }
     };
 
-    getExam(examId)
+    getExam(examIdParam)
       .then((res) => {
         if (cancelled) {
           return;
         }
         setExam(res);
-        void resolveCreatorName(res.creator_id);
+        void resolveCreatorName(res.creator_id!);
       })
       .catch(() => {
         if (!routeState?.examTitle) {
@@ -82,7 +81,7 @@ export default function ExamCover() {
         }
       });
 
-    getCardsList(examId)
+    getCardsList(examIdParam)
       .then((cards) => {
         if (cancelled) {
           return;
@@ -109,11 +108,7 @@ export default function ExamCover() {
       return;
     }
 
-    const userId = Number(localStorage.getItem('userId'));
-    if (Number.isNaN(userId) || userId <= 0) {
-      setStarImage('star.svg');
-      return;
-    }
+    const userId = localStorage.getItem('userId');
 
     getPinnedExams(userId)
       .then((pinnedExams) => {

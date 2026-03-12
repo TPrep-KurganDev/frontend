@@ -19,7 +19,7 @@ interface CardsListOptions {
   forceRefresh?: boolean;
 }
 
-function getCardsListCacheKey(examId: number): string {
+function getCardsListCacheKey(examId: string): string {
   return buildCacheKey('cards:getCardsList', [examId]);
 }
 
@@ -27,7 +27,7 @@ function getCardCacheKey(cardId: number): string {
   return buildCacheKey('cards:getCard', [cardId]);
 }
 
-export async function createCard(examId: number, data: CardBase) {
+export async function createCard(examId: string, data: CardBase) {
   const res = await api.post<CardOut>(`/exams/${examId}/cards`, data);
   let createdCard: CardOut = res.data;
 
@@ -71,7 +71,7 @@ export async function getCard(cardId: number): Promise<CardOut> {
   );
 }
 
-export async function updateCard(examId: number, cardId: number, data: CardBase) {
+export async function updateCard(examId: string, cardId: number, data: CardBase) {
   const res = await api.patch(`/exams/${examId}/cards/${cardId}`, data);
 
   await Promise.allSettled([
@@ -82,7 +82,7 @@ export async function updateCard(examId: number, cardId: number, data: CardBase)
   return res.data;
 }
 
-export async function deleteCard(examId: number, cardId: number) {
+export async function deleteCard(examId: string, cardId: number) {
   await api.delete(`/exams/${examId}/cards/${cardId}`);
 
   await Promise.allSettled([
@@ -91,7 +91,7 @@ export async function deleteCard(examId: number, cardId: number) {
   ]);
 }
 
-export async function getCardsList(examId: number, options?: CardsListOptions): Promise<CardOut[]> {
+export async function getCardsList(examId: string, options?: CardsListOptions): Promise<CardOut[]> {
   const cards = await readThroughCache(
     getCardsListCacheKey(examId),
     async () => (await api.get<CardOut[]>(`/exams/${examId}/cards`)).data,
@@ -107,7 +107,7 @@ export async function getCardsList(examId: number, options?: CardsListOptions): 
   return cards;
 }
 
-export async function getCachedCardsList(examId: number): Promise<CardOut[]> {
+export async function getCachedCardsList(examId: string): Promise<CardOut[]> {
   const cached = await getCacheEntry<CardOut[]>(getCardsListCacheKey(examId));
   return cached?.value ?? [];
 }
