@@ -17,6 +17,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const [testsLoaded, setTestsLoaded] = useState(true);
   const navigate = useNavigate();
   useEffect(() => {
+    setTestsLoaded(true)
     const userId = localStorage.getItem('userId');
 
     const loadExams = async () => {

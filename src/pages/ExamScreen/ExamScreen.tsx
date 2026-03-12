@@ -175,7 +175,7 @@ export default function ExamScreen() {
       </div>
 
       <AccessToogle currentAccess={''} handler={() => {}} isOpened={isRightScreenOpened} onClose={() => setRightScreenOpened(false)}/>
-      <EditorsMenu editors={[{avatar:'avatar.png', name:'Беня Салин'}, {avatar:'avatar.png', name:'Беня Салин'}, {avatar:'avatar.png', name:'Беня Салин'}]}
+      <EditorsMenu examId={searchParams.get('examId')}
                    handler={() => {}}
                    isOpened={isEditorScreenOpened}
                    onClose={() => {setEditorScreenOpened(false)}}
