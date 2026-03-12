@@ -14,6 +14,7 @@ type ExamListScreenProps = {
 export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const [exams, setExams] = useState<ExamOut[]>([]);
   const [authorNames, setAuthorNames] = useState<Record<number, string>>({});
+  const [testsLoaded, setTestsLoaded] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +79,17 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
       }}
               backButtonPage={'/'}/>
       <div className={styles.examList}>
+        <div className={styles.loadingText}>
+          <p className={styles.syncText}>{ testsLoaded ? 'Тесты скачаны' : 'Идёт синхронизация тестов...'}</p>
+          { !testsLoaded && (
+            <div className={styles.loader}>
+              <img className={styles.spinner} src='loader.svg'/>
+            </div>
+          ) }
+          { testsLoaded && (
+            <img className={styles.spinner} src='ready.svg'/>
+          ) }
+        </div>
         {exams.map((exam) => (
           <div
             key={exam.id}
