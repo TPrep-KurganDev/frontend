@@ -5,7 +5,7 @@ import {readThroughCache} from '../offline/readThroughCache';
 export interface UserOut {
   email: string,
   user_name: string,
-  id: number
+  id: string
 }
 
 export async function getUserById(userId: string | null) {
@@ -18,6 +18,6 @@ export async function getUserById(userId: string | null) {
 export async function getUserByEmail(userEmail: string) {
   return readThroughCache(
     buildCacheKey('users:getByEmail', [userEmail]),
-    async () => (await api.get<UserOut>(`/users/${userEmail}`)).data
+    async () => (await api.get<UserOut>(`/users/email/${userEmail}`)).data
   );
 }

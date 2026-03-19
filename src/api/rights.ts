@@ -7,7 +7,7 @@ export interface ExamRightsResponse {
 }
 
 export async function grantEditorRights(
-  examId: string,
+  examId: string | null,
   targetUserId: string
 ): Promise<void> {
   await api.post(`/exams/${examId}/rights`, null, {
@@ -31,7 +31,7 @@ export async function changeUserRights(
 }
 
 export async function revokeUserRights(
-  examId: string,
+  examId: string | null,
   targetUserId: string
 ): Promise<void> {
   await api.delete(`/exams/${examId}/rights`, {
@@ -42,8 +42,5 @@ export async function revokeUserRights(
 export async function getExamEditors(
   examId: string | null
 ): Promise<ExamRightsResponse> {
-  return readThroughCache(
-    buildCacheKey('exams:rights', [examId]),
-    async () => (await api.get<ExamRightsResponse>(`/exams/${examId}/rights`)).data
-  );
+  return (await api.get<ExamRightsResponse>(`/exams/${examId}/rights`)).data;
 }

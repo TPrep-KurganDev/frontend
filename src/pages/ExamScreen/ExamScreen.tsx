@@ -14,6 +14,7 @@ import {AccessToogle} from '../../components/AccessToogle/AccessToogle.tsx';
 import {EditorsMenu} from '../../components/EditorsMenu/EditorsMenu.tsx';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import {getExamEditors} from "../../api/rights.ts";
 
 
 export default function ExamScreen() {
@@ -40,7 +41,9 @@ export default function ExamScreen() {
       }
       setExam(ex);
       setExamTitle(ex.title);
-      setCanEdit(isOnline && ex.creator_id === localStorage.getItem('userId'));
+      getExamEditors(examIdParam).then((editors) => {
+        setCanEdit(isOnline && (ex.creator_id === localStorage.getItem('userId') || editors.user_id.some(editor_id => editor_id === localStorage.getItem('userId'))));
+      })
     }).catch(() => {
       navigate(AppRoute.NotFound);
     });
