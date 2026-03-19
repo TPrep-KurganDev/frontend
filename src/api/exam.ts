@@ -18,12 +18,44 @@ export interface ExamOut {
   created_at?: string;
 }
 
+interface ExamReadOptions {
+  forceRefresh?: boolean;
+}
+
 function getPinnedStatusCacheKey(examId: number | undefined): string {
   return buildCacheKey('exams:isExamPinned', [examId]);
 }
 
+function getExamCacheKey(examId: number): string {
+  return buildCacheKey('exams:getExam', [examId]);
+}
+
+function getCreatedExamsCacheKey(userId: number): string {
+  return buildCacheKey('exams:getCreatedExams', [userId]);
+}
+
 function getPinnedExamsCacheKey(userId: number): string {
   return buildCacheKey('exams:getPinnedExams', [userId]);
+}
+
+function shouldForceRefresh(options?: ExamReadOptions): boolean {
+  if (typeof options?.forceRefresh === 'boolean') {
+    return options.forceRefresh;
+  }
+
+  return typeof navigator === 'undefined' || navigator.onLine;
+}
+
+async function invalidateExamListsForCurrentUser(): Promise<void> {
+  const userId = Number(localStorage.getItem('userId'));
+  if (Number.isNaN(userId) || userId <= 0) {
+    return;
+  }
+
+  await Promise.allSettled([
+    deleteCacheEntry(getCreatedExamsCacheKey(userId)),
+    deleteCacheEntry(getPinnedExamsCacheKey(userId))
+  ]);
 }
 
 async function refreshPinCaches(examId: number | undefined, isPinned: boolean): Promise<void> {
@@ -45,41 +77,61 @@ async function refreshPinCaches(examId: number | undefined, isPinned: boolean): 
 
 export async function getExam(examId: number) {
   return readThroughCache(
-    buildCacheKey('exams:getExam', [examId]),
-    async () => (await api.get<ExamOut>(`/exams/${examId}`)).data
+    getExamCacheKey(examId),
+    async () => (await api.get<ExamOut>(`/exams/${examId}`)).data,
+    {preferCache: !shouldForceRefresh()}
   );
 }
 
-export async function getCreatedExams(creatorId: number) {
+export async function getCreatedExams(creatorId: number, options?: ExamReadOptions) {
   return readThroughCache(
-    buildCacheKey('exams:getCreatedExams', [creatorId]),
+    getCreatedExamsCacheKey(creatorId),
     async () => (await api.get<ExamOut[]>('/exams/created', {
       params: {creator_id: creatorId},
-    })).data
+    })).data,
+    {preferCache: !shouldForceRefresh(options)}
   );
 }
 
-export async function getPinnedExams(pinnedId: number) {
+export async function getPinnedExams(pinnedId: number, options?: ExamReadOptions) {
   return readThroughCache(
-    buildCacheKey('exams:getPinnedExams', [pinnedId]),
+    getPinnedExamsCacheKey(pinnedId),
     async () => (await api.get<ExamOut[]>('/exams/pinned', {
       params: {pinned_id: pinnedId},
-    })).data
+    })).data,
+    {preferCache: !shouldForceRefresh(options)}
   );
 }
 
 export async function createExam(data: string) {
   const res = await api.post<ExamOut>('/exams', {'title': data});
+  await Promise.allSettled([
+    setCacheEntry(getExamCacheKey(res.data.id), res.data),
+    invalidateExamListsForCurrentUser()
+  ]);
   return res.data;
 }
 
 export async function updateExam(examId: number | undefined, data: ExamCreate) {
   const res = await api.patch<ExamOut>(`/exams/${examId}`, data);
+  await Promise.allSettled([
+    setCacheEntry(getExamCacheKey(res.data.id), res.data),
+    invalidateExamListsForCurrentUser()
+  ]);
   return res.data;
 }
 
 export async function deleteExam(examId: number | undefined) {
   await api.delete(`/exams/${examId}`);
+
+  if (examId === undefined) {
+    return;
+  }
+
+  await Promise.allSettled([
+    deleteCacheEntry(getExamCacheKey(examId)),
+    invalidateExamListsForCurrentUser()
+  ]);
 }
 
 export async function pinExam(examId: number | undefined) {
