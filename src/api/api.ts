@@ -1,6 +1,15 @@
 import axios from 'axios';
 
-export const API_URL = 'http://127.0.0.1:8000/api';
+function resolveApiUrl(): string {
+  const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+  if (configuredApiUrl) {
+    return configuredApiUrl.replace(/\/+$/, '');
+  }
+
+  return '/api';
+}
+
+export const API_URL = resolveApiUrl();
 
 function hasSuppressOfflineToastHeader(headers: unknown): boolean {
   if (!headers) {
