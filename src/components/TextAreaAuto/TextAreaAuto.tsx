@@ -4,6 +4,7 @@ import style from './TextAreaAuto.module.scss'
 interface TextAreaAutoProps {
   value: string;
   onChange: (val: string) => void;
+  handler: () => void;
   className?: string;
   disabled: boolean
   ai_fill: boolean
@@ -12,6 +13,7 @@ interface TextAreaAutoProps {
 export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
                                                             value,
                                                             onChange,
+                                                            handler,
                                                             className,
                                                             disabled,
                                                             ai_fill
@@ -46,7 +48,13 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
         }}
         style={{ resize: 'none', overflow: 'hidden' }}
       />
-      {ai_fill && <img src="ai gen.svg" alt="example" className={style.magicIcon} />}
+      {ai_fill &&
+        <img
+          src="ai gen.svg"
+          alt="example"
+          className={style.magicIcon}
+          onClick={() => {handler()}}
+        />}
     </div>
   );
 };

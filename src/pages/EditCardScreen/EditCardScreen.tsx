@@ -2,13 +2,14 @@ import Header from '../../components/Header/Header.tsx';
 import styles from './EditCardScreen.module.scss';
 
 import {useCallback, useEffect, useState} from 'react';
-import {getCard, getCardsList, updateCard, deleteCard} from '../../api/cards.ts';
+import {getCard, getCardsList, updateCard, deleteCard, aiGenerateAnswer} from '../../api/cards.ts';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TextAreaAuto} from '../../components/TextAreaAuto/TextAreaAuto';
 import {getExam} from '../../api/exam.ts';
 import {AppRoute} from '../../const.ts';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import clsx from 'clsx';
 
 
 export function EditCardScreen() {
@@ -110,6 +111,15 @@ export function EditCardScreen() {
     };
   }, [canEdit, sendUpdateCard]);
 
+  const aiHandler = () => {
+    setCanEdit(false)
+    aiGenerateAnswer(examId, cardId).then((res) => {
+      console.log(res);
+      setCanEdit(true)
+      setAnswer(res.cards[0].answer)
+    });
+  }
+
   return (
     <>
       <Header title='' {...(canEdit && {
@@ -124,6 +134,7 @@ export function EditCardScreen() {
 
       <TextAreaAuto
         value={question}
+        handler={()=>{}}
         onChange={onQuestionChange}
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         disabled={!canEdit}
@@ -133,7 +144,8 @@ export function EditCardScreen() {
       <TextAreaAuto
         value={answer}
         onChange={onAnswerChange}
-        className={`${styles.answer} ${!canEdit ? styles.noEdit : ''}`}
+        handler={aiHandler}
+        className={clsx(styles.question, { [styles.noEdit]: !canEdit })}
         disabled={!canEdit}
         ai_fill={true}
       />

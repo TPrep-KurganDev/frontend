@@ -28,15 +28,15 @@ function getPinnedStatusCacheKey(examId: string | undefined): string {
   return buildCacheKey('exams:isExamPinned', [examId]);
 }
 
-function getExamCacheKey(examId: number): string {
+function getExamCacheKey(examId: string): string {
   return buildCacheKey('exams:getExam', [examId]);
 }
 
-function getCreatedExamsCacheKey(userId: number): string {
+function getCreatedExamsCacheKey(userId: string | null): string {
   return buildCacheKey('exams:getCreatedExams', [userId]);
 }
 
-function getPinnedExamsCacheKey(userId: number): string {
+function getPinnedExamsCacheKey(userId: string | null): string {
   return buildCacheKey('exams:getPinnedExams', [userId]);
 }
 
@@ -49,11 +49,7 @@ function shouldForceRefresh(options?: ExamReadOptions): boolean {
 }
 
 async function invalidateExamListsForCurrentUser(): Promise<void> {
-  const userId = Number(localStorage.getItem('userId'));
-  if (Number.isNaN(userId) || userId <= 0) {
-    return;
-  }
-
+  const userId = localStorage.getItem('userId');
   await Promise.allSettled([
     deleteCacheEntry(getCreatedExamsCacheKey(userId)),
     deleteCacheEntry(getPinnedExamsCacheKey(userId))
@@ -70,10 +66,8 @@ async function refreshPinCaches(examId: string | undefined, isPinned: boolean): 
     setCacheEntry(getPinnedStatusCacheKey(examId), {is_pinned: isPinned})
   ];
 
-  const userId = Number(localStorage.getItem('userId'));
-  if (!Number.isNaN(userId) && userId > 0) {
-    tasks.push(deleteCacheEntry(getPinnedExamsCacheKey(userId)));
-  }
+  const userId = localStorage.getItem('userId');
+  tasks.push(deleteCacheEntry(getPinnedExamsCacheKey(userId)));
 
   await Promise.allSettled(tasks);
 }
@@ -96,7 +90,7 @@ export async function getCreatedExams(creatorId: string | null, options?: ExamRe
   );
 }
 
-export async function getPinnedExams(pinnedId: number, string | null?: ExamReadOptions) {
+export async function getPinnedExams(pinnedId: string | null, options?: ExamReadOptions) {
   return readThroughCache(
     getPinnedExamsCacheKey(pinnedId),
     async () => (await api.get<ExamOut[]>('/exams/pinned', {

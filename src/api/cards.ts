@@ -19,6 +19,22 @@ interface CardsListOptions {
   forceRefresh?: boolean;
 }
 
+export interface CardGenerationResult {
+  card_id: number;
+  number: number;
+  question: string;
+  answer: string;
+  success: boolean;
+  error: string | null;
+}
+
+export interface GenerateAnswersResponse {
+  total: number;
+  successful: number;
+  failed: number;
+  cards: CardGenerationResult[];
+}
+
 function getCardsListCacheKey(examId: string): string {
   return buildCacheKey('cards:getCardsList', [examId]);
 }
@@ -110,4 +126,8 @@ export async function getCardsList(examId: string, options?: CardsListOptions): 
 export async function getCachedCardsList(examId: string): Promise<CardOut[]> {
   const cached = await getCacheEntry<CardOut[]>(getCardsListCacheKey(examId));
   return cached?.value ?? [];
+}
+
+export async function aiGenerateAnswer(examId: string, cardId: number) : Promise<GenerateAnswersResponse> {
+  return (await api.post<GenerateAnswersResponse>(`/exams/${examId}/cards/generate-answers`, {card_ids: [cardId]})).data;
 }
