@@ -3,7 +3,7 @@ import clsx from 'clsx';
 
 type AccessToggleProps = {
   currentAccess: string;
-  handler: () => void;
+  handler: (access: string) => void;
   isOpened: boolean;
   onClose: () => void;
 };
@@ -14,16 +14,25 @@ export const AccessToogle: React.FC<AccessToggleProps> = ({currentAccess, handle
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.title}>Права доступа</div>
         <div className={styles.rightsBlock}>
-          <div className={styles.rightString}>
-            <img className={styles.chooseMark} src='choose mark.svg'/>
+          <div className={styles.rightString} onClick={() => {handler('personal')}}>
+            <img
+              className={clsx(styles.chooseMark, { [styles.invisible]: currentAccess != 'personal' })}
+              src='choose mark.svg'
+            />
             <p>Только для меня</p>
           </div>
-          <div className={styles.rightString}>
-            <img className={styles.chooseMark} src='choose mark.svg'/>
+          <div className={styles.rightString} onClick={() => {handler('link')}}>
+            <img
+              className={clsx(styles.chooseMark, { [styles.invisible]: currentAccess != 'link' })}
+              src='choose mark.svg'
+            />
             <p>По ссылке</p>
           </div>
-          <div className={styles.rightString}>
-            <img className={styles.chooseMark} src='choose mark.svg'/>
+          <div className={styles.rightString} onClick={() => {handler('default')}}>
+            <img
+              className={clsx(styles.chooseMark, { [styles.invisible]: currentAccess != 'default' })}
+              src='choose mark.svg'
+            />
             <p>Публичный доступ</p>
           </div>
         </div>

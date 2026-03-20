@@ -4,7 +4,8 @@ import {readThroughCache} from '../offline/readThroughCache';
 import {deleteCacheEntry, setCacheEntry} from '../offline/cacheDb';
 
 export interface ExamCreate {
-  title: string;
+  title: string | undefined;
+  scope: string
 }
 
 export interface ExamPinStatus {
@@ -14,6 +15,7 @@ export interface ExamPinStatus {
 export interface ExamOut {
   id: string;
   title: string;
+  scope: string
   creator_id: string | null;
   created_at?: string;
 }
@@ -69,7 +71,7 @@ export async function getPinnedExams(pinnedId: string | null) {
 }
 
 export async function createExam(data: string) {
-  const res = await api.post<ExamOut>('/exams', {'title': data});
+  const res = await api.post<ExamOut>('/exams', {'title': data, 'scope': 'default'});
   return res.data;
 }
 

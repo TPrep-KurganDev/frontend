@@ -1,8 +1,8 @@
 import styles from './EditorsMenu.module.scss';
 import clsx from 'clsx';
-import {useCallback, useEffect, useState} from 'react';
+import { useEffect, useState} from 'react';
 import {getExamEditors, grantEditorRights, revokeUserRights} from '../../api/rights.ts';
-import {getUserByEmail, getUserById} from "../../api/users.ts";
+import {getUserByEmail, getUserById} from '../../api/users.ts';
 
 export type Editor = {
   avatar: string

@@ -104,6 +104,11 @@ export default function ExamScreen() {
 
   }
 
+  const changeScope = (access: string) => {
+    updateExam(exam?.id, { title: exam?.title, scope: access });
+    setRightScreenOpened(false);
+  }
+
   const deleteExamClick = () => {
     if (!canEdit) {
       if (!isOnline) {
@@ -123,7 +128,7 @@ export default function ExamScreen() {
     }
 
     const handler = setTimeout(() => {
-      updateExam(exam?.id, {title: examTitle});
+      updateExam(exam?.id, {title: examTitle, scope: exam.scope});
     }, 500);
 
     return () => {
@@ -177,7 +182,7 @@ export default function ExamScreen() {
         }
       </div>
 
-      <AccessToogle currentAccess={''} handler={() => {}} isOpened={isRightScreenOpened} onClose={() => setRightScreenOpened(false)}/>
+      <AccessToogle currentAccess={exam?.scope} handler={changeScope} isOpened={isRightScreenOpened} onClose={() => setRightScreenOpened(false)}/>
       <EditorsMenu examId={searchParams.get('examId')}
                    handler={() => {}}
                    isOpened={isEditorScreenOpened}

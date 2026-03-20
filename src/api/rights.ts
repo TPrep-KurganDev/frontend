@@ -1,6 +1,6 @@
 import { api } from './api';
-import { buildCacheKey } from '../offline/cacheKey';
-import { readThroughCache } from '../offline/readThroughCache';
+// import { buildCacheKey } from '../offline/cacheKey';
+// import { readThroughCache } from '../offline/readThroughCache';
 
 export interface ExamRightsResponse {
   user_id: string[];
