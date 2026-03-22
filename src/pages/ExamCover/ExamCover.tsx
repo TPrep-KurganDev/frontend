@@ -11,6 +11,7 @@ import {StartButtons} from '../../components/StartButtons/StartButtons';
 import {toast} from 'react-hot-toast';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import {pluralizeRu} from '../../utils/pluralizeRu';
 // import {api} from '../../api/api';
 
 type ExamCoverState = {
@@ -171,7 +172,7 @@ export default function ExamCover() {
              onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
           <p className={styles.title}>{exam?.title}</p>
           <p className={styles.questionCount}>
-            {cardsCount} вопросов
+            {cardsCount} {pluralizeRu(cardsCount, ['вопрос', 'вопроса', 'вопросов'])}
           </p>
           <p className={styles.author}>автор: {creator}</p>
           <div className={styles.shareButton} onClick={handleShareClick}>
