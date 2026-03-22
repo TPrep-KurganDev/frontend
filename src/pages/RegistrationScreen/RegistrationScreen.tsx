@@ -34,7 +34,17 @@ export function RegistrationScreen() {
         <form onSubmit={handleSubmit}>
           <div className={login_styles.formGroup}>
             <label htmlFor="email">Почта</label>
-            <input type="text" id="email" name="email" placeholder="example@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="example@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
           <div className={login_styles.formGroup}>

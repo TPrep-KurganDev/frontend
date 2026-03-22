@@ -24,8 +24,17 @@ export function LoginScreen() {
 
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label htmlFor="username">Псевдоним или почта</label>
-            <input type="text" id="username" name="username" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+            <label htmlFor="email">Почта</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              inputMode="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
           <div className={styles.formGroup}>
