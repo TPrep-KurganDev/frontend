@@ -12,7 +12,7 @@ export function ResultErrors({mistakesId}: ResultErrorsProps) {
     ? `Ошибок: ${mistakesId.length}`
     : 'Тест пройден без ошибок!';
 
-  const [mistakes, setMistakes] = useState<string[]>(['Было']);
+  const [mistakes, setMistakes] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadMistakes() {
@@ -20,8 +20,8 @@ export function ResultErrors({mistakesId}: ResultErrorsProps) {
         mistakesId.map(id => getCard(id))
       );
 
-      const mistakes = cards.map((card, index) =>
-        `${mistakesId[index]}. ${card.question}`
+      const mistakes = cards.map((card) =>
+        card.question
       );
 
       setMistakes(mistakes);
