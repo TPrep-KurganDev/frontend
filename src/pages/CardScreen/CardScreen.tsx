@@ -24,7 +24,7 @@ export type CardState = {
 
 export function CardScreen() {
   const [card, setCard] = useState<CardState>({isFlipped: false, question: '', answer:''});
-  const [exam, setExam] = useState<ExamOut>({created_at: '', creator_id: 0, id: 0, title: ''});
+  const [exam, setExam] = useState<ExamOut>({scope: '', created_at: '', creator_id: '', id: '', title: ''});
   const [currentCards, setCurrentCards] = useState<number[]>([]);
   const [pendingError, setPendingError] = useState('');
   const offlineCardsByIdRef = useRef<Record<number, { question: string; answer: string }>>({});
