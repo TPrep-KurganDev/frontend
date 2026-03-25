@@ -14,3 +14,5 @@ export enum AppRoute {
   Main = '/',
   NotFound = '*'
 }
+
+export const CARD_TEXT_MAX_LENGTH = 500;

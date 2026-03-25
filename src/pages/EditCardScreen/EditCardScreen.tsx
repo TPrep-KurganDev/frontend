@@ -6,7 +6,7 @@ import {getCard, getCardsList, updateCard, deleteCard, aiGenerateAnswer} from '.
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {TextAreaAuto} from '../../components/TextAreaAuto/TextAreaAuto';
 import {getExam} from '../../api/exam.ts';
-import {AppRoute} from '../../const.ts';
+import {AppRoute, CARD_TEXT_MAX_LENGTH} from '../../const.ts';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import clsx from 'clsx';
@@ -139,7 +139,11 @@ export function EditCardScreen() {
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         disabled={!canEdit}
         ai_fill={false}
+        maxLength={CARD_TEXT_MAX_LENGTH}
       />
+      <div className={`${styles.counter} ${question.length >= CARD_TEXT_MAX_LENGTH ? styles.counterLimit : ''}`}>
+        {question.length}/{CARD_TEXT_MAX_LENGTH}
+      </div>
 
       <TextAreaAuto
         value={answer}
@@ -148,7 +152,13 @@ export function EditCardScreen() {
         className={clsx(styles.question, { [styles.noEdit]: !canEdit })}
         disabled={!canEdit}
         ai_fill={true}
+        maxLength={CARD_TEXT_MAX_LENGTH}
       />
+      <div className={`${styles.counter} ${answer.length >= CARD_TEXT_MAX_LENGTH ? styles.counterLimit : ''}`}>
+        {answer.length}/{CARD_TEXT_MAX_LENGTH}
+      </div>
+
+
     </>
   )
 }

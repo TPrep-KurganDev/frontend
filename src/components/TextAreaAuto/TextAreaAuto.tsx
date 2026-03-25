@@ -6,8 +6,9 @@ interface TextAreaAutoProps {
   onChange: (val: string) => void;
   handler: () => void;
   className?: string;
-  disabled: boolean
-  ai_fill: boolean
+  disabled: boolean;
+  ai_fill: boolean;
+  maxLength?: number;
 }
 
 export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
@@ -16,7 +17,8 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
                                                             handler,
                                                             className,
                                                             disabled,
-                                                            ai_fill
+                                                            ai_fill,
+                                                            maxLength
                                                           }) => {
   const ref = useRef<HTMLTextAreaElement | null>(null);
 
@@ -38,8 +40,12 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
         ref={ref}
         className={className}
         value={value}
+        maxLength={maxLength}
         onChange={(e) => {
-          onChange(e.target.value);
+          onChange(typeof maxLength === 'number'
+            ? e.target.value.slice(0, maxLength)
+            : e.target.value
+          );
 
           if (ref.current) {
             ref.current.style.height = 'auto';
