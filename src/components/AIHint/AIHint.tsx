@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './AIHint.module.scss';
-import clsx from "clsx";
+import clsx from 'clsx';
 
 const HINT_SHOWN_COUNT_KEY = 'ai_hint_shown_count'
 

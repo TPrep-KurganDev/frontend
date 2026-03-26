@@ -50,4 +50,46 @@
   .counterHidden {
     display: none;
   }
+
+  .loadingText {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 5px 0 20px;
+  }
+
+  .syncText {
+    margin: 0;
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .loader {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    transform-origin: center center;
+    width: 22px;
+    height: 22px;
+  }
+
+  .spinner {
+    width: 22px;
+    height: 22px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .saveHint {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .opacity {
+    opacity: 0;
+    transition: 1.5s;
+  }
 }

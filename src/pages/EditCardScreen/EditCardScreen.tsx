@@ -20,6 +20,8 @@ export function EditCardScreen() {
   const [examId, setExamId] = useState('');
   const [cardId, setCardId] = useState(0);
   const [canEdit, setCanEdit] = useState(false);
+  const [showSaveHint, setShowSaveHint] = useState(false);
+  const [saveHintSaving, setSaveHintSaving] = useState(true);
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
 
@@ -65,7 +67,14 @@ export function EditCardScreen() {
       return;
     }
 
-    updateCard(examId, Number(cardId), {question, answer});
+    updateCard(examId, Number(cardId), {question, answer}).then(() =>
+      {
+        setTimeout(() => {
+          setShowSaveHint(false)
+        }, 500)
+        setSaveHintSaving(false)
+      }
+    );
   }, [answer, canEdit, cardId, examId, question]);
 
   const deleteCardClick = () => {
@@ -102,10 +111,11 @@ export function EditCardScreen() {
     if (!canEdit) {
       return;
     }
-
+    setSaveHintSaving(true)
+    setShowSaveHint(true)
     const handler = setTimeout(() => {
       sendUpdateCard();
-    }, 500);
+    }, 800);
 
     return () => {
       clearTimeout(handler);
@@ -123,7 +133,7 @@ export function EditCardScreen() {
 
   return (
     <>
-      <Header title='' {...(canEdit && {
+      <Header title='Изменение карточки' {...(canEdit && {
         imgSrc: 'deleteCard.svg',
         widthImg: '38',
         heightImg: '30',
@@ -163,6 +173,20 @@ export function EditCardScreen() {
         [styles.counterHidden]: answer.length < CARD_TEXT_MAX_LENGTH - 100
       })}>
         {answer.length}/{CARD_TEXT_MAX_LENGTH}
+      </div>
+
+      <div className={clsx(styles.saveHint, {
+        [styles.opacity]: !showSaveHint
+      })}>
+        <p className={styles.syncText}>{ saveHintSaving ? 'Сохранение...' : 'Сохранено'}</p>
+        { saveHintSaving && (
+          <div className={styles.loader}>
+            <img className={styles.spinner} src='loader.svg'/>
+          </div>
+        ) }
+        { !saveHintSaving && (
+          <img className={styles.spinner} src='ready.svg'/>
+        ) }
       </div>
 
       <AIHint/>

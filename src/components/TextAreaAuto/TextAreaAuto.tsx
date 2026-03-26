@@ -56,6 +56,7 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
       />
       {ai_fill &&
         <img
+          title="Заполнить с помощью ИИ"
           src="ai gen.svg"
           alt="example"
           className={style.magicIcon}
