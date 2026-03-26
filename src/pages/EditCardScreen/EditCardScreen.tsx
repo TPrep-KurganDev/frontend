@@ -22,6 +22,7 @@ export function EditCardScreen() {
   const [canEdit, setCanEdit] = useState(false);
   const [showSaveHint, setShowSaveHint] = useState(false);
   const [saveHintSaving, setSaveHintSaving] = useState(true);
+  const [aiFilling, setAiFilling] = useState(false);
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
 
@@ -124,9 +125,11 @@ export function EditCardScreen() {
 
   const aiHandler = () => {
     setCanEdit(false)
+    setAiFilling(true)
     aiGenerateAnswer(examId, cardId).then((res) => {
       console.log(res);
       setCanEdit(true)
+      setAiFilling(false)
       setAnswer(res.cards[0].answer)
     });
   }
@@ -149,6 +152,7 @@ export function EditCardScreen() {
         onChange={onQuestionChange}
         className={`${styles.question} ${!canEdit ? styles.noEdit : ''}`}
         disabled={!canEdit}
+        ai_filling={aiFilling}
         ai_fill={false}
         maxLength={CARD_TEXT_MAX_LENGTH}
       />
@@ -165,6 +169,7 @@ export function EditCardScreen() {
         handler={aiHandler}
         className={clsx(styles.question, { [styles.noEdit]: !canEdit })}
         disabled={!canEdit}
+        ai_filling={aiFilling}
         ai_fill={true}
         maxLength={CARD_TEXT_MAX_LENGTH}
       />
@@ -189,7 +194,7 @@ export function EditCardScreen() {
         ) }
       </div>
 
-      <AIHint/>
+      { canEdit && <AIHint/>}
 
 
     </>

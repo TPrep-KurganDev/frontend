@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import style from './TextAreaAuto.module.scss'
+import clsx from "clsx";
 
 interface TextAreaAutoProps {
   value: string;
@@ -7,6 +8,7 @@ interface TextAreaAutoProps {
   handler: () => void;
   className?: string;
   disabled: boolean;
+  ai_filling: boolean;
   ai_fill: boolean;
   maxLength?: number;
 }
@@ -17,6 +19,7 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
                                                             handler,
                                                             className,
                                                             disabled,
+                                                            ai_filling,
                                                             ai_fill,
                                                             maxLength
                                                           }) => {
@@ -34,11 +37,14 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
   }, [value]);
 
   return (
-    <div className={style.aiBlock}>
+    <div className={clsx(style.aiBlock, style.shimmerCard)}>
+      <div className={clsx({
+         [style.shimmer]: ai_filling
+      })}></div>
       <textarea
-        disabled={disabled}
+        disabled={disabled || ai_filling}
         ref={ref}
-        className={className}
+        className={`${className} ${ai_filling ? style.aiFilling : ''}`}
         value={value}
         maxLength={maxLength}
         onChange={(e) => {
@@ -54,7 +60,7 @@ export const TextAreaAuto: React.FC<TextAreaAutoProps> = ({
         }}
         style={{ resize: 'none', overflow: 'hidden' }}
       />
-      {ai_fill &&
+      {ai_fill && !disabled &&
         <img
           title="Заполнить с помощью ИИ"
           src="ai gen.svg"
