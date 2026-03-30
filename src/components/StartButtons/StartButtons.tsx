@@ -21,7 +21,8 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isOnline = useNetworkStatus();
   const isStartDisabled = !exam?.id || cardsCount <= 0;
-  const isSmartDisabled = isStartDisabled || !isOnline;
+  const isBrowserOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const isSmartDisabled = isStartDisabled || isBrowserOffline;
 
   const ensureCanStart = (): boolean => {
     if (isStartDisabled) {
@@ -37,12 +38,26 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
       return;
     }
 
+    const normalizedStrategy = strategy.trim().toLowerCase();
+    if (normalizedStrategy === 'smart' && isBrowserOffline) {
+      notifyOnlineOnly();
+      return;
+    }
+
     const persistedReachability = typeof window !== 'undefined'
       ? window.localStorage.getItem('app:backend-reachable')
       : '1';
     let shouldStartOffline = !isOnline || persistedReachability === '0';
 
-    if (!shouldStartOffline && typeof navigator !== 'undefined' && navigator.onLine) {
+    if (normalizedStrategy === 'smart' && typeof navigator !== 'undefined' && navigator.onLine) {
+      const reachableNow = await probeBackendReachability(450);
+      if (!reachableNow) {
+        notifyOnlineOnly();
+        return;
+      }
+
+      shouldStartOffline = false;
+    } else if (!shouldStartOffline && typeof navigator !== 'undefined' && navigator.onLine) {
       const reachableNow = await probeBackendReachability(450);
       shouldStartOffline = !reachableNow;
     }
@@ -105,7 +120,7 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
                if (!ensureCanStart()) {
                  return;
                }
-               if (!isOnline) {
+               if (isBrowserOffline) {
                  notifyOnlineOnly();
                  return;
                }
