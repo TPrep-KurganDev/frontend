@@ -73,6 +73,10 @@ export function CardScreen() {
 
         clearPendingSessionStart(pendingStartId);
         const maybeError = error as { code?: string };
+        if (maybeError.code === 'OFFLINE_SMART_STRATEGY_UNAVAILABLE') {
+          setPendingError('Умный подбор вопросов доступен только онлайн');
+          return;
+        }
         if (maybeError.code === 'OFFLINE_SESSION_DATA_UNAVAILABLE') {
           setPendingError('Для офлайна сначала откройте вопросы этого экзамена онлайн');
           return;
