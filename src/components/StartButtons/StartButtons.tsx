@@ -73,6 +73,11 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
   };
 
   const handleRandomQuestions = (count: number) => {
+    if (!Number.isFinite(count) || count < 1) {
+      toast.error('Введите число от 1');
+      return;
+    }
+
     void startNewSession(exam?.id, 'random', count);
   };
 
