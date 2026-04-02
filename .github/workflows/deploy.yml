@@ -1,0 +1,44 @@
+name: Deploy Frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag to deploy (e.g. sha-abc1234 or latest)"
+        required: true
+        default: "latest"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          echo -e "Host server\n  HostName ${{ secrets.SSH_HOST }}\n  User ${{ secrets.SSH_USER }}\n  IdentityFile ~/.ssh/deploy_key\n  StrictHostKeyChecking no" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Generate .env on server
+        run: |
+          ssh server bash -c 'cat > ~/deploy/.env << EOF
+          FRONTEND_VERSION=${{ inputs.tag }}
+          EOF'
+
+      - name: Deploy and health check
+        run: |
+          ssh server '
+            cd deploy
+            docker compose pull frontend
+            docker compose up -d frontend
+            for i in $(seq 1 10); do
+              status=$(docker inspect --format="{{.State.Health.Status}}" tprep_frontend_prod 2>/dev/null)
+              [ "$status" = "healthy" ] && exit 0
+              sleep 3
+            done
+            echo "Health check failed!"
+            exit 1
+          '
