@@ -24,6 +24,7 @@ export interface ExamSessionResponse {
 }
 
 const OFFLINE_SESSION_ID_PREFIX = 'offline-session-';
+const OFFLINE_SMART_STRATEGY_ERROR_CODE = 'OFFLINE_SMART_STRATEGY_UNAVAILABLE';
 
 function getSessionCacheKey(sessionId: string | null): string {
   return buildCacheKey('sessions:getSession', [sessionId ?? 'null']);
@@ -95,17 +96,18 @@ function selectQuestionsForOfflineSession(
     return shuffleIds(cardsIds).slice(0, desiredCount);
   }
 
-  if (normalizedStrategy === 'smart') {
-    // Smart strategy requires backend history, so offline fallback is shuffled full exam.
-    return shuffleIds(cardsIds);
-  }
-
   return cardsIds;
 }
 
 async function createOfflineSession(data: ExamSessionStartRequest): Promise<ExamSessionResponse> {
   if (!data.exam_id) {
     throw new Error('exam_id is required');
+  }
+
+  if (data.strategy.trim().toLowerCase() === 'smart') {
+    const offlineStrategyError = new Error('Smart strategy is available only online');
+    (offlineStrategyError as Error & { code?: string }).code = OFFLINE_SMART_STRATEGY_ERROR_CODE;
+    throw offlineStrategyError;
   }
 
   const warmCards = getWarmCardsForExam(data.exam_id);

@@ -1,5 +1,5 @@
 import styles from './RandomQuestionsModal.module.scss';
-import { useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 type RandomQuestionsModalProps = {
   isOpen: boolean;
@@ -15,6 +15,16 @@ export function RandomQuestionsModal({
   maxQuestions
 }: RandomQuestionsModalProps) {
   const [questionCount, setQuestionCount] = useState('');
+  const [validationMessage, setValidationMessage] = useState('');
+
+  const maxAllowed = useMemo(() => Math.min(maxQuestions, 9999), [maxQuestions]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setQuestionCount('');
+      setValidationMessage('');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -24,8 +34,18 @@ export function RandomQuestionsModal({
       setQuestionCount('');
       return;
     }
+
     const inputValue = questionCount.trim();
-    const count = Math.max(1, Math.min(parseInt(inputValue), Math.min(maxQuestions, 9999)));
+    const parsedCount = Number.parseInt(inputValue, 10);
+
+    if (!Number.isFinite(parsedCount) || parsedCount < 1) {
+      setValidationMessage(`Введите число от 1 до ${maxAllowed}`);
+      return;
+    }
+
+    const count = Math.min(parsedCount, maxAllowed);
+
+    setValidationMessage('');
     onConfirm(count);
     onClose();
     setQuestionCount('');
@@ -35,11 +55,12 @@ export function RandomQuestionsModal({
     let value = e.target.value.replace(/[^0-9]/g, '');
     if (value) {
       const numValue = parseInt(value);
-      const maxAllowed = Math.min(maxQuestions, 9999);
       if (numValue > maxAllowed) {
         value = maxAllowed.toString();
       }
     }
+
+    setValidationMessage('');
     setQuestionCount(value);
   };
 
@@ -56,6 +77,7 @@ export function RandomQuestionsModal({
           placeholder="0"
           maxLength={4}
         />
+        {validationMessage && <div className={styles.validationMessage}>{validationMessage}</div>}
         <div className={styles.button} onClick={handleConfirm}>
           Продолжить
         </div>

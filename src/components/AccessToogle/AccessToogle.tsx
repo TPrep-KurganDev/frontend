@@ -8,7 +8,7 @@ type AccessToggleProps = {
   onClose: () => void;
 };
 
-export const AccessToogle: React.FC<AccessToggleProps> = ({currentAccess, handler, isOpened, onClose}) => {
+export const AccessToogle: React.FC<AccessToggleProps> = ({currentAccess: _currentAccess, handler: _handler, isOpened, onClose}) => {
   return (
     <div className={clsx(styles.overlay, { [styles.hidden]: !isOpened })} onClick={() => onClose()}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>

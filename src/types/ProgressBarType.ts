@@ -3,4 +3,5 @@ export type ProgressBarType = {
   cardsCount: number;
   doneCardsCount: number;
   cardsProgress: boolean[];
+  currentCard?: number;
 }

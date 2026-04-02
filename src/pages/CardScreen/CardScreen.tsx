@@ -73,6 +73,10 @@ export function CardScreen() {
 
         clearPendingSessionStart(pendingStartId);
         const maybeError = error as { code?: string };
+        if (maybeError.code === 'OFFLINE_SMART_STRATEGY_UNAVAILABLE') {
+          setPendingError('Умный подбор вопросов доступен только онлайн');
+          return;
+        }
         if (maybeError.code === 'OFFLINE_SESSION_DATA_UNAVAILABLE') {
           setPendingError('Для офлайна сначала откройте вопросы этого экзамена онлайн');
           return;
@@ -131,6 +135,15 @@ export function CardScreen() {
       const doneCardsCount = answersValues.length;
       const mistakesCount = answersValues.filter((value) => !value).length;
 
+      if (session.questions.length === 0) {
+        toast.error('Не удалось начать тест: нет вопросов для прохождения');
+        navigate(
+          session.exam_id > 0 ? `/exam-cover?examId=${session.exam_id}` : '/',
+          {replace: true}
+        );
+        return;
+      }
+
       setProgressBar({
         cardsCount: session.questions.length,
         cardsProgress: answersValues,
@@ -159,7 +172,7 @@ export function CardScreen() {
         applySession(session, takePreparedSessionCards(sessionIdParam));
       })
       .catch(() => undefined);
-  }, [sessionIdParam, setNewCard]);
+  }, [navigate, sessionIdParam, setNewCard]);
 
   if (!sessionIdParam) {
     return (
@@ -176,6 +189,11 @@ export function CardScreen() {
   }
 
   const handleAnswer = (answerCorrectness: boolean) => {
+    const answeredCardId = currentCards[progressBar.doneCardsCount];
+    if (typeof answeredCardId !== 'number') {
+      return;
+    }
+
     const updatedProgressBar = {...progressBar};
     updatedProgressBar.cardsProgress.push(answerCorrectness);
     if (answerCorrectness){
@@ -188,16 +206,11 @@ export function CardScreen() {
     setProgressBar(updatedProgressBar);
     setCard((prevCard) => ({...prevCard, isFlipped: !prevCard.isFlipped}));
 
-    const answeredCardId = currentCards[updatedProgressBar.doneCardsCount - 1];
     const nextCardId = currentCards[updatedProgressBar.doneCardsCount];
     const isLastCard = currentCards.length === updatedProgressBar.doneCardsCount;
 
     if (!isLastCard && typeof nextCardId === 'number') {
       setNewCard(nextCardId);
-    }
-
-    if (typeof answeredCardId !== 'number') {
-      return;
     }
 
     answerQuestion(sessionIdParam, answeredCardId, answerCorrectness).then(() => {

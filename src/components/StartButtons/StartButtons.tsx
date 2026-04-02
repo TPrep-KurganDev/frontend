@@ -9,6 +9,7 @@ import {createSessionOffline} from '../../api/session.ts';
 import {beginPendingSessionStart} from '../../session/pendingSessionStart';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {probeBackendReachability} from '../../api/api.ts';
+import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 
 type StartButtonsProps = {
   exam?: ExamOut | null;
@@ -20,6 +21,8 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isOnline = useNetworkStatus();
   const isStartDisabled = !exam?.id || cardsCount <= 0;
+  const isBrowserOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const isSmartDisabled = isStartDisabled || isBrowserOffline;
 
   const ensureCanStart = (): boolean => {
     if (isStartDisabled) {
@@ -35,12 +38,26 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
       return;
     }
 
+    const normalizedStrategy = strategy.trim().toLowerCase();
+    if (normalizedStrategy === 'smart' && isBrowserOffline) {
+      notifyOnlineOnly();
+      return;
+    }
+
     const persistedReachability = typeof window !== 'undefined'
       ? window.localStorage.getItem('app:backend-reachable')
       : '1';
     let shouldStartOffline = !isOnline || persistedReachability === '0';
 
-    if (!shouldStartOffline && typeof navigator !== 'undefined' && navigator.onLine) {
+    if (normalizedStrategy === 'smart' && typeof navigator !== 'undefined' && navigator.onLine) {
+      const reachableNow = await probeBackendReachability(450);
+      if (!reachableNow) {
+        notifyOnlineOnly();
+        return;
+      }
+
+      shouldStartOffline = false;
+    } else if (!shouldStartOffline && typeof navigator !== 'undefined' && navigator.onLine) {
       const reachableNow = await probeBackendReachability(450);
       shouldStartOffline = !reachableNow;
     }
@@ -54,6 +71,10 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
         navigate(`/session?sessionId=${response.id}`);
       }).catch((error: unknown) => {
         const maybeError = error as { code?: string };
+        if (maybeError.code === 'OFFLINE_SMART_STRATEGY_UNAVAILABLE') {
+          notifyOnlineOnly();
+          return;
+        }
         if (maybeError.code === 'OFFLINE_SESSION_DATA_UNAVAILABLE') {
           toast.error('Для офлайна сначала откройте вопросы этого экзамена онлайн');
           return;
@@ -73,6 +94,11 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
   };
 
   const handleRandomQuestions = (count: number) => {
+    if (!Number.isFinite(count) || count < 1) {
+      toast.error('Введите число от 1');
+      return;
+    }
+
     void startNewSession(exam?.id, 'random', count);
   };
 
@@ -89,8 +115,15 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
              }}>
           Пройти весь тест
         </div>
-        <div className={`${styles.button} ${styles.hardButton} ${isStartDisabled ? 'disabledAction' : ''}`}
+        <div className={`${styles.button} ${styles.hardButton} ${isSmartDisabled ? 'disabledAction' : ''}`}
              onClick={() => {
+               if (!ensureCanStart()) {
+                 return;
+               }
+               if (isBrowserOffline) {
+                 notifyOnlineOnly();
+                 return;
+               }
                void startNewSession(exam?.id, 'smart');
              }}>
           Умный подбор вопросов
