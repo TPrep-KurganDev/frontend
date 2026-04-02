@@ -17,7 +17,6 @@ type EditorsMenuProps = {
   onClose: () => void;
 };
 
-<<<<<<< HEAD
 async function getEditors(examId: string | null) {
   const res = await getExamEditors(examId)
   console.log(res)
@@ -27,7 +26,7 @@ async function getEditors(examId: string | null) {
   // return [, {avatar: 'avatar.png', name: 'Беня Салин'}]
 }
 
-export const EditorsMenu: React.FC<EditorsMenuProps> = ({examId, handler, isOpened, onClose}) => {
+export const EditorsMenu: React.FC<EditorsMenuProps> = ({examId, handler: _handlerv, isOpened, onClose}) => {
   const [editors, setEditors] = useState<Editor[]>([])
   useEffect(() => {
     getEditors(examId).then((res) => {
@@ -86,9 +85,6 @@ export const EditorsMenu: React.FC<EditorsMenuProps> = ({examId, handler, isOpen
     setEditors(await getEditors(examId));
   }
 
-=======
-export const EditorsMenu: React.FC<EditorsMenuProps> = ({editors, handler: _handler, isOpened, onClose}) => {
->>>>>>> 2794328f77a0c8d7a25e6645189c12bdf6d99a39
   return (
     <div className={clsx(styles.overlay, {[styles.hidden]: !isOpened})} onClick={() => onClose()}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
