@@ -14,7 +14,7 @@ import {AccessToogle} from '../../components/AccessToogle/AccessToogle.tsx';
 import {EditorsMenu} from '../../components/EditorsMenu/EditorsMenu.tsx';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
-import {getExamEditors} from "../../api/rights.ts";
+import {getExamEditors} from '../../api/rights.ts';
 
 
 export default function ExamScreen() {

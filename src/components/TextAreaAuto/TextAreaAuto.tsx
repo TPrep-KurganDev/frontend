@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import style from './TextAreaAuto.module.scss'
-import clsx from "clsx";
+import clsx from 'clsx';
 
 interface TextAreaAutoProps {
   value: string;
