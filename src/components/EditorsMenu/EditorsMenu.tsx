@@ -13,7 +13,7 @@ type EditorsMenuProps = {
   onClose: () => void;
 };
 
-export const EditorsMenu: React.FC<EditorsMenuProps> = ({editors, handler, isOpened, onClose}) => {
+export const EditorsMenu: React.FC<EditorsMenuProps> = ({editors, handler: _handler, isOpened, onClose}) => {
   return (
     <div className={clsx(styles.overlay, { [styles.hidden]: !isOpened })} onClick={() => onClose()}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
