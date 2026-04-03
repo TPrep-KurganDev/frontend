@@ -33,7 +33,7 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
     return true;
   };
 
-  const startNewSession = async (exam_id: number | undefined, strategy: string, n: number | null = null) => {
+  const startNewSession = async (exam_id: string | undefined, strategy: string, n: number | null = null) => {
     if (!ensureCanStart() || !exam_id) {
       return;
     }

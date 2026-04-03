@@ -20,11 +20,11 @@ export function ResultScreen(){
     cardsProgress: []
   });
   const [sessionResponse, setSessionResponse] = useState<ExamSessionResponse>({
-    exam_id: 0,
+    exam_id: '',
     id: '',
     questions: [],
     answers: {}});
-  const [exam, setExam] = useState<ExamOut>({created_at: '', creator_id: 0, id: 0, title: ''});
+  const [exam, setExam] = useState<ExamOut>({created_at: '', creator_id: '', id: '', title: '', scope: ''});
   const mistakesIds = Object.entries(sessionResponse.answers ?? {})
     .filter(([, value]) => !value)
     .map(([key]) => Number(key));

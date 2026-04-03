@@ -126,7 +126,7 @@ export function CardScreen() {
       session: {
         answers?: Record<number, boolean>;
         questions: number[];
-        exam_id: number;
+        exam_id: string;
         offline_cards?: Record<number, { question: string; answer: string }>;
       },
       seededCards: Record<number, { question: string; answer: string }>
@@ -138,7 +138,7 @@ export function CardScreen() {
       if (session.questions.length === 0) {
         toast.error('Не удалось начать тест: нет вопросов для прохождения');
         navigate(
-          session.exam_id > 0 ? `/exam-cover?examId=${session.exam_id}` : '/',
+          session.exam_id != '' ? `/exam-cover?examId=${session.exam_id}` : '/',
           {replace: true}
         );
         return;

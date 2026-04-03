@@ -6,7 +6,7 @@ import {getCacheEntry, setCacheEntry} from '../offline/cacheDb';
 import {getWarmCardsForExam} from '../offline/warmCardsCache';
 
 export interface ExamSessionStartRequest {
-  exam_id: number | undefined
+  exam_id: string | undefined
   strategy: string
   n: number | null
 }
@@ -19,7 +19,7 @@ export interface ExamSessionResponse {
   id: string
   questions: number[]
   answers: Answers
-  exam_id: number
+  exam_id: string
   offline_cards?: Record<number, { question: string; answer: string }>
 }
 
@@ -238,7 +238,7 @@ export async function answerQuestion(session_id: string, question_id: number, va
 
   const fallbackSession: ExamSessionResponse = {
     id: session_id,
-    exam_id: 0,
+    exam_id: '',
     questions: [],
     answers: {
       [question_id]: value

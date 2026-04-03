@@ -5,10 +5,10 @@ import {getUserById} from '../api/users';
 import {buildCacheKey} from './cacheKey';
 import {setCacheEntry} from './cacheDb';
 
-const cardsPrefetchInFlight = new Map<number, Promise<void>>();
+const cardsPrefetchInFlight = new Map<string, Promise<void>>();
 const userPrefetchInFlight = new Map<string | null, Promise<void>>();
 
-async function prefetchCardsForExam(examId: number): Promise<void> {
+async function prefetchCardsForExam(examId: string): Promise<void> {
   const existing = cardsPrefetchInFlight.get(examId);
   if (existing) {
     return existing;

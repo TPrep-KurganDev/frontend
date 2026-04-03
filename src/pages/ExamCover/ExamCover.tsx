@@ -47,6 +47,7 @@ export default function ExamCover() {
       const preloadedExam: ExamOut = {
         id: examIdParam,
         title: routeState.examTitle,
+        scope: 'default',
         creator_id: routeState.creatorId ?? ''
       };
       setExam(preloadedExam);
