@@ -2,7 +2,7 @@ import styles from './AccessToogle.module.scss';
 import clsx from 'clsx';
 
 type AccessToggleProps = {
-  currentAccess: string;
+  currentAccess: string | undefined;
   handler: (access: string) => void;
   isOpened: boolean;
   onClose: () => void;
@@ -14,23 +14,23 @@ export const AccessToogle: React.FC<AccessToggleProps> = ({currentAccess: _curre
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.title}>Права доступа</div>
         <div className={styles.rightsBlock}>
-          <div className={styles.rightString} onClick={() => {handler('personal')}}>
+          <div className={styles.rightString} onClick={() => {_handler('personal')}}>
             <img
-              className={clsx(styles.chooseMark, { [styles.invisible]: currentAccess != 'personal' })}
+              className={clsx(styles.chooseMark, { [styles.invisible]: _currentAccess != 'personal' })}
               src='choose mark.svg'
             />
             <p>Только для меня</p>
           </div>
-          <div className={styles.rightString} onClick={() => {handler('link')}}>
+          <div className={styles.rightString} onClick={() => {_handler('link')}}>
             <img
-              className={clsx(styles.chooseMark, { [styles.invisible]: currentAccess != 'link' })}
+              className={clsx(styles.chooseMark, { [styles.invisible]: _currentAccess != 'link' })}
               src='choose mark.svg'
             />
             <p>По ссылке</p>
           </div>
-          <div className={styles.rightString} onClick={() => {handler('default')}}>
+          <div className={styles.rightString} onClick={() => {_handler('default')}}>
             <img
-              className={clsx(styles.chooseMark, { [styles.invisible]: currentAccess != 'default' })}
+              className={clsx(styles.chooseMark, { [styles.invisible]: _currentAccess != 'default' })}
               src='choose mark.svg'
             />
             <p>Публичный доступ</p>
