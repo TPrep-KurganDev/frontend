@@ -11,6 +11,39 @@ function resolveApiUrl(): string {
 
 export const API_URL = resolveApiUrl();
 
+const AUTH_ENDPOINTS = new Set([
+  '/auth/login',
+  '/auth/refresh',
+  '/auth/token',
+]);
+
+type StoredAuthSession = {
+  access_token: string;
+  refresh_token?: string;
+  token_type: string;
+  user_id: number;
+};
+5
+type RefreshResponse = {
+  accessToken?: string;
+  access_token?: string;
+  refreshToken?: string;
+  refresh_token?: string;
+  expiresIn?: number;
+  expires_in?: number;
+  token_type?: string;
+};
+
+let refreshRequestPromise: Promise<string> | null = null;
+
+function isAuthEndpoint(url: string | undefined): boolean {
+  if (!url) {
+    return false;
+  }
+
+  return Array.from(AUTH_ENDPOINTS).some((endpoint) => url.includes(endpoint));
+}
+
 function hasSuppressOfflineToastHeader(headers: unknown): boolean {
   if (!headers) {
     return false;
@@ -39,11 +72,24 @@ function emitBackendReachability(isReachable: boolean) {
   );
 }
 
-function clearAuthStorage() {
+export function clearAuthStorage() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('tokenType');
   localStorage.removeItem('userId');
+}
+
+export function storeAuthSession(session: StoredAuthSession) {
+  localStorage.setItem('accessToken', session.access_token);
+  localStorage.setItem('tokenType', session.token_type);
+  localStorage.setItem('userId', String(session.user_id));
+
+  if (session.refresh_token) {
+    localStorage.setItem('refreshToken', session.refresh_token);
+    return;
+  }
+
+  localStorage.removeItem('refreshToken');
 }
 
 export const api = axios.create({
@@ -52,6 +98,43 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+async function refreshAccessToken(): Promise<string> {
+  if (refreshRequestPromise) {
+    return refreshRequestPromise;
+  }
+
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) {
+    throw new Error('No refresh token');
+  }
+
+  refreshRequestPromise = axios.post<RefreshResponse>(`${API_URL}/auth/refresh`, {
+    refresh_token: refreshToken,
+    refreshToken,
+  }).then((response) => {
+    const nextAccessToken = response.data.access_token ?? response.data.accessToken;
+    const nextRefreshToken = response.data.refresh_token ?? response.data.refreshToken;
+
+    if (!nextAccessToken) {
+      throw new Error('No access token in refresh response');
+    }
+
+    localStorage.setItem('accessToken', nextAccessToken);
+    if (nextRefreshToken) {
+      localStorage.setItem('refreshToken', nextRefreshToken);
+    }
+    if (response.data.token_type) {
+      localStorage.setItem('tokenType', response.data.token_type);
+    }
+
+    return nextAccessToken;
+  }).finally(() => {
+    refreshRequestPromise = null;
+  });
+
+  return refreshRequestPromise;
+}
 
 export async function probeBackendReachability(timeoutMs = 3500): Promise<boolean> {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -99,7 +182,7 @@ api.interceptors.request.use((config) => {
   }
 
   const token = localStorage.getItem('accessToken');
-  if (token) {
+  if (token && !isAuthEndpoint(config.url)) {
     config.headers = config.headers ?? {};
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -137,33 +220,18 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      if (config._retry) {
+      if (config._retry || isAuthEndpoint(config.url)) {
         return Promise.reject(error);
       }
 
       config._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) throw new Error('No refresh token');
-
-        const res = await axios.post(`${API_URL}/auth/refresh`, {
-          refresh_token: refreshToken,
-        });
-
-        const newAccessToken = res.data.access_token;
-        const newRefreshToken = res.data.refresh_token;
-
-        if (newAccessToken) {
-          localStorage.setItem('accessToken', newAccessToken);
-        }
-        if (newRefreshToken) {
-          localStorage.setItem('refreshToken', newRefreshToken);
-        }
+        const newAccessToken = await refreshAccessToken();
 
         config.headers = config.headers ?? {};
         config.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axios(config);
+        return api(config);
       } catch (refreshError) {
         const typedRefreshError = refreshError as {
           response?: { status?: number };
@@ -171,6 +239,8 @@ api.interceptors.response.use(
           code?: string;
         };
         const status = typedRefreshError.response?.status;
+        const missingRefreshToken =
+          refreshError instanceof Error && refreshError.message === 'No refresh token';
         const networkFailure =
           typedRefreshError.code === 'ERR_NETWORK' || (typeof navigator !== 'undefined' && !navigator.onLine) ||
           (!typedRefreshError.response && !!typedRefreshError.request);
@@ -180,8 +250,7 @@ api.interceptors.response.use(
           return Promise.reject(typedRefreshError);
         }
 
-        if (status === 401 || status === 403) {
-          console.log('Refresh failed — redirect to login');
+        if (missingRefreshToken || status === 401 || status === 403) {
           clearAuthStorage();
           window.location.href = '/login';
         }

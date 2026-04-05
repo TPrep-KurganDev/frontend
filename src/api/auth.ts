@@ -1,21 +1,21 @@
-import {api} from './api.ts'
+import {api, clearAuthStorage, storeAuthSession} from './api.ts'
 import {clearCacheEntries} from '../offline/cacheDb';
 
+type LoginResponse = {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  user_id: number;
+};
 
 export async function register(data: { email: string; password: string; user_name: string }) {
   return api.post('/auth/register', data);
 }
 
 export async function login(data: { email: string; password: string }) {
-  const res = await api.post('/auth/login', data);
+  const res = await api.post<LoginResponse>('/auth/login', data);
 
-  console.log(res);
-  localStorage.setItem('accessToken', res.data.access_token);
-  if (res.data.refresh_token) {
-    localStorage.setItem('refreshToken', res.data.refresh_token);
-  }
-  localStorage.setItem('tokenType', res.data.token_type);
-  localStorage.setItem('userId', res.data.user_id);
+  storeAuthSession(res.data);
 
   return res.data;
 }
@@ -30,10 +30,7 @@ export async function getProfile() {
 }
 
 export async function logout() {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('tokenType');
-  localStorage.removeItem('userId');
+  clearAuthStorage();
 
   try {
     await clearCacheEntries();
