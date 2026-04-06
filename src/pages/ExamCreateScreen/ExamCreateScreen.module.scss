@@ -1,0 +1,99 @@
+:local {
+  .content {
+    display: flex;
+    flex-direction: column;
+    padding: 22px 25px 0;
+  }
+
+  .nameText,
+  .rightsText {
+    width: min(349px, 100%);
+    margin: 0 auto 3px;
+    padding-left: 14px;
+    font-size: 14px;
+    line-height: 17px;
+    color: #353535;
+    box-sizing: border-box;
+  }
+
+  .name,
+  .rights {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(349px, 100%);
+    min-height: 48px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #939393;
+    box-shadow: inset 0 0 4px rgba(0, 3, 59, 0.3);
+    border-radius: 18px;
+    font-size: 24px;
+    line-height: 30px;
+    text-align: center;
+    color: #353535;
+  }
+
+  .name {
+    margin-bottom: 19px;
+  }
+
+  .rights {
+    margin-bottom: 42px;
+  }
+
+  .rights::after {
+    content: '';
+    position: absolute;
+    right: 23px;
+    top: 16px;
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid #353535;
+    border-bottom: 2px solid #353535;
+    transform: rotate(45deg);
+    box-sizing: border-box;
+  }
+
+  .loadButton,
+  .scanButton {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(349px, 100%);
+    min-height: 48px;
+    margin: 0 auto 19px;
+    padding: 0 24px;
+    border-radius: 18px;
+    box-sizing: border-box;
+  }
+
+  .loadButton {
+    background: #ddecff;
+    box-shadow: 0 0 28.6px rgba(0, 3, 59, 0.14);
+  }
+
+  .scanButton {
+    margin-bottom: 0;
+    background: linear-gradient(85.22deg, #e0f2ff 2.78%, #ece8f9 50.25%, #fcf4e9 97.73%);
+  }
+
+  .loadText,
+  .scanText {
+    font-size: 24px;
+    line-height: 30px;
+    text-align: center;
+    color: #353535;
+  }
+
+  .loadIcon,
+  .scanIcon {
+    position: absolute;
+    right: 35px;
+    width: 24px;
+    height: 24px;
+  }
+}

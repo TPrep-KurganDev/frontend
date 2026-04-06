@@ -15,6 +15,7 @@ import {FileUploadScreen} from '../../pages/FileUploadScreen/FileUploadScreen.ts
 import {Toaster, toast} from 'react-hot-toast';
 import {useEffect, useRef} from 'react';
 import NoAccessScreen from '../../pages/NoAccessScreen/NoAccessScreen.tsx';
+import {ExamCreateScreen} from '../../pages/ExamCreateScreen/ExamCreateScreen';
 
 
 export default function App() {
@@ -104,6 +105,10 @@ export default function App() {
           <Route
             path={AppRoute.NoAccess}
             element={<NoAccessScreen/>}
+          />
+          <Route
+            path={'test'}
+            element={<ExamCreateScreen/>}
           />
         </Routes>
       <Toaster position="top-center"/>
