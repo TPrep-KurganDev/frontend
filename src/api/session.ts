@@ -66,7 +66,7 @@ function isSessionResponse(data: unknown): data is ExamSessionResponse {
 
   return (
     typeof session.id === 'string' &&
-    typeof session.exam_id === 'number' &&
+    typeof session.exam_id === 'string' &&
     Array.isArray(session.questions) &&
     !!answers &&
     typeof answers === 'object' &&
