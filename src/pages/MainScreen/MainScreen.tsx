@@ -15,6 +15,7 @@ import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
 import {useState, useEffect, type CSSProperties} from 'react';
+import {AppRoute} from '../../const';
 
 const CACHE_WARMUP_STORAGE_PREFIX = 'app:cache-warmup:';
 
@@ -73,7 +74,7 @@ export function MainScreen() {
     }
 
     createExam('Новый экзамен').then((res) => {
-      navigate(`/exam-cover?examId=${res.id}`)
+      navigate(`${AppRoute.ExamCreate}?examId=${res.id}`);
     });
   }
 

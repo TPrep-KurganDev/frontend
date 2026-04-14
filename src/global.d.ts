@@ -5,3 +5,11 @@ declare module '*.module.scss' {
 
   export default classes;
 }
+
+interface FileSystemDirectoryHandle {
+  entries(): AsyncIterableIterator<[string, FileSystemHandle]>;
+}
+
+interface Window {
+  showDirectoryPicker?: (options?: {mode?: 'read' | 'readwrite'}) => Promise<FileSystemDirectoryHandle>;
+}

@@ -69,6 +69,9 @@
     padding: 0 24px;
     border-radius: 18px;
     box-sizing: border-box;
+    border: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
   }
 
   .loadButton {
@@ -89,11 +92,55 @@
     color: #353535;
   }
 
+  .loadButton:disabled,
+  .scanButton:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
   .loadIcon,
   .scanIcon {
     position: absolute;
     right: 35px;
     width: 24px;
     height: 24px;
+  }
+
+  .loadingNote,
+  .cancelButton,
+  .status {
+    width: min(349px, 100%);
+    margin: 0 auto;
+  }
+
+  .loadingNote {
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #5d5d5d;
+    text-align: center;
+  }
+
+  .cancelButton {
+    display: block;
+    margin-top: 8px;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 16px;
+    color: #cf4d45;
+    text-align: center;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .status {
+    margin-top: 6px;
+    padding-bottom: 12px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #3d5afe;
+    text-align: center;
   }
 }

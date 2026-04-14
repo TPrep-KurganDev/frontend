@@ -107,7 +107,7 @@ export default function App() {
             element={<NoAccessScreen/>}
           />
           <Route
-            path={'test'}
+            path={AppRoute.ExamCreate}
             element={<ExamCreateScreen/>}
           />
         </Routes>

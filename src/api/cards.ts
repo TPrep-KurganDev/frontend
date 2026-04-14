@@ -131,3 +131,22 @@ export async function getCachedCardsList(examId: string): Promise<CardOut[]> {
 export async function aiGenerateAnswer(examId: string, cardId: number) : Promise<GenerateAnswersResponse> {
   return (await api.post<GenerateAnswersResponse>(`/exams/${examId}/cards/generate-answers`, {card_ids: [cardId]})).data;
 }
+
+export async function createCardsFromOcr(
+  examId: string,
+  imageName: string,
+  signal?: AbortSignal
+): Promise<CardOut[]> {
+  const res = await api.post<CardOut[]>(`/exams/${examId}/ocr`, {
+    image_name: imageName
+  }, {
+    signal
+  });
+
+  await Promise.allSettled([
+    deleteCacheEntry(getCardsListCacheKey(examId)),
+    ...res.data.map((card) => setCacheEntry(getCardCacheKey(card.card_id), card))
+  ]);
+
+  return res.data;
+}

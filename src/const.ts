@@ -7,6 +7,7 @@ export enum AppRoute {
   ExamList = '/exam-list',
   FavouriteExamList = '/favourite-exam-list',
   ExamCover = '/exam-cover',
+  ExamCreate = '/exam-create',
   Test = '/test',
   Result = '/result',
   FileUpload = '/file-upload',
