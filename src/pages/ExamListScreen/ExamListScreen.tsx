@@ -6,6 +6,7 @@ import {getCreatedExams, getPinnedExams, ExamOut} from '../../api/exam';
 import {useNavigate} from 'react-router-dom';
 import {getUserById} from '../../api/users';
 import {prefetchExamGraph} from '../../offline/prefetch';
+import {ExamListItem} from '../../components/ExamListItem/ExamListItem.tsx';
 
 type ExamListScreenProps = {
   isFavorites: boolean;
@@ -87,23 +88,13 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
           ) }
         </div>
         {exams.map((exam) => (
-          <div
+          <ExamListItem
             key={exam.id}
-            className={`${styles.listItem} ${isFavorites ? styles.favorites : ''}`}
-            onClick={() => {
-            const creatorName = authorNames[exam.creator_id!] ?? '';
-            navigate(`/exam-cover?examId=${exam.id}`, {
-              state: {
-                examTitle: exam.title,
-                creatorName,
-                creatorId: exam.creator_id
-              }
-            });
-            }}
-          >
-            <div className={styles.name}>{exam.title}</div>
-            {isFavorites && <div className={styles.author}>автор: {authorNames[exam.creator_id!] || 'Загрузка...'}</div>}
-          </div>
+            exam={exam}
+            authorNames={authorNames}
+            isFavorites={isFavorites}
+            navigate={navigate}
+          />
         ))}
       </div>
     </>

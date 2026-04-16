@@ -13,6 +13,7 @@ export enum AppRoute {
   FileUpload = '/file-upload',
   NoAccess = '/no-access',
   Main = '/',
+  SearchExam = '/search',
   NotFound = '*'
 }
 

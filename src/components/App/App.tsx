@@ -16,6 +16,7 @@ import {Toaster, toast} from 'react-hot-toast';
 import {useEffect, useRef} from 'react';
 import NoAccessScreen from '../../pages/NoAccessScreen/NoAccessScreen.tsx';
 import {ExamCreateScreen} from '../../pages/ExamCreateScreen/ExamCreateScreen';
+import {SearchExamPage} from '../../pages/SearchExamPage/SearchExamPage.tsx';
 
 
 export default function App() {
@@ -109,6 +110,10 @@ export default function App() {
           <Route
             path={AppRoute.ExamCreate}
             element={<ExamCreateScreen/>}
+          />
+          <Route
+            path={AppRoute.SearchExam}
+            element={<SearchExamPage/>}
           />
         </Routes>
       <Toaster position="top-center"/>
