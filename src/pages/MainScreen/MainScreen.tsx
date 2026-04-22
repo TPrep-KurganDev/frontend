@@ -16,6 +16,7 @@ import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
 import {useState, useEffect, type CSSProperties} from 'react';
 import {AppRoute} from '../../const';
+import clsx from "clsx";
 
 const CACHE_WARMUP_STORAGE_PREFIX = 'app:cache-warmup:';
 
@@ -267,14 +268,21 @@ export function MainScreen() {
         </div>
       </header>
       <div className={styles.buttonsBody}>
-        <div className={`${styles.buttonBody} ${styles.yellowButton} ${!isOnline ? 'disabledAction' : ''}`} onClick={createExamClick}>
+        <div className={clsx(
+            styles.buttonBody,
+            styles.yellowButton,
+            { 'disabledAction': !isOnline }
+          )} onClick={createExamClick}>
           <img width={25} height={25} src='createTest.svg' alt=''/>
           <div className={styles.textButtonBody}>Создать тест</div>
         </div>
-        {/*<div className={styles.buttonBody}>*/}
-        {/*  <img width={30} height={30} src='findTest.svg'/>*/}
-        {/*  <div className={styles.textButtonBody}>Найти тест</div>*/}
-        {/*</div>*/}
+        <div className={clsx(
+          styles.buttonBody,
+          { 'disabledAction': !isOnline }
+        )} onClick={() => {navigate('/search')}}>
+          <img width={30} height={30} src='findTest.svg'/>
+          <div className={styles.textButtonBody}>Найти тест</div>
+        </div>
       </div>
       {notifications.map((notification) => (
         <Notification
