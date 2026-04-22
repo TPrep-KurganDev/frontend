@@ -175,3 +175,10 @@ export async function uploadCardsFile(examId: number | undefined, file: File) {
     }
   );
 }
+
+export async function searchExams(searchString: string) {
+  const res = await api.get<ExamOut[]>('/exams/search', {
+    params: { 'searched': searchString },
+  });
+  return res.data;
+}
