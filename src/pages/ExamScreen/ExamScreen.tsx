@@ -4,7 +4,7 @@ import Header from '../../components/Header/Header';
 import {CardListEntry} from '../../components/CardListEntry/CardListEntry.tsx';
 
 import {useEffect, useRef, useState} from 'react';
-import {useSearchParams, useNavigate} from 'react-router-dom';
+import {useSearchParams, useNavigate, useLocation} from 'react-router-dom';
 import {CardOut, getCardsList} from '../../api/cards.ts';
 import {ExamOut, getExam, deleteExam, updateExam} from '../../api/exam.ts';
 import {createCard} from '../../api/cards.ts';
@@ -15,6 +15,13 @@ import {EditorsMenu} from '../../components/EditorsMenu/EditorsMenu.tsx';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {getExamEditors} from '../../api/rights.ts';
+import {
+  buildCardEditPath,
+  buildExamCoverPath,
+  buildFileUploadPath,
+  getBackPage,
+  getCurrentLocationPath
+} from '../../utils/backNavigation';
 
 
 export default function ExamScreen() {
@@ -27,8 +34,11 @@ export default function ExamScreen() {
   const [canEdit, setCanEdit] = useState(false);
   const [isRightScreenOpened, setRightScreenOpened] = useState(false);
   const [isEditorScreenOpened, setEditorScreenOpened] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
+  const currentExamPath = getCurrentLocationPath(location);
+  const backButtonPage = getBackPage(searchParams, exam?.id ? buildExamCoverPath(exam.id) : AppRoute.Main);
 
   useEffect(() => {
     let cancelled = false;
@@ -152,7 +162,7 @@ export default function ExamScreen() {
                 widthImg: '38',
                 heightImg: '36'
               })}
-              backButtonPage={`/exam-cover?examId=${exam?.id}`}/>
+              backButtonPage={backButtonPage}/>
       <div className={styles.list}>
         {cards.map((q, index) => (
           <CardListEntry
@@ -161,7 +171,7 @@ export default function ExamScreen() {
             answer={q.answer}
             id={(index + 1).toString()}
             onclick={() => {
-              navigate(`/card-edit?cardId=${q.card_id}&examId=${searchParams.get('examId')}`);
+              navigate(buildCardEditPath(q.card_id, searchParams.get('examId'), currentExamPath));
             }}
           />
         ))}
@@ -170,7 +180,7 @@ export default function ExamScreen() {
         }}/>}
         {canEdit &&
           <div key={1000} className={styles.uploadItem} onClick={() => {
-            navigate(`/file-upload?examId=${exam?.id}`)
+            navigate(buildFileUploadPath(exam?.id, currentExamPath))
           }}>
             <div className={styles.uploadIcon}>
               <img src='upload button.svg' alt='' width={16}/>

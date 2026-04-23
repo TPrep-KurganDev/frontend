@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '../../pages/ExamListScreen/ExamListScreen.module.scss';
+import {buildExamCoverPath} from '../../utils/backNavigation';
 
 interface ExamListItemProps {
   exam: {
@@ -9,6 +10,7 @@ interface ExamListItemProps {
   };
   authorNames: Record<string | number, string>;
   isFavorites: boolean;
+  backPage: string;
   navigate: (path: string, options?: { state: Record<string, unknown> }) => void;
 }
 
@@ -16,11 +18,12 @@ export const ExamListItem: React.FC<ExamListItemProps> = ({
                                                             exam,
                                                             authorNames,
                                                             isFavorites,
+                                                            backPage,
                                                             navigate,
                                                           }) => {
   const handleClick = () => {
     const creatorName = authorNames[exam.creator_id!] ?? '';
-    navigate(`/exam-cover?examId=${exam.id}`, {
+    navigate(buildExamCoverPath(exam.id, backPage), {
       state: {
         examTitle: exam.title,
         creatorName,

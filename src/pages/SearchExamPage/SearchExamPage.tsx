@@ -4,7 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import {ExamOut, searchExams} from '../../api/exam.ts';
 import { ExamListItem } from '../../components/ExamListItem/ExamListItem.tsx';
 import { useNavigate } from 'react-router-dom';
-import {getUserById} from "../../api/users.ts";
+import {getUserById} from '../../api/users.ts';
+import {AppRoute} from '../../const.ts';
+
 
 export const SearchExamPage: React.FC = () => {
   const [searchText, setSearchText] = useState('');
@@ -94,6 +96,7 @@ export const SearchExamPage: React.FC = () => {
             exam={exam}
             authorNames={authorNames}
             isFavorites={true}
+            backPage={AppRoute.SearchExam}
             navigate={navigate}
           />
         ))}

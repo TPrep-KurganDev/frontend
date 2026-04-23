@@ -7,6 +7,7 @@ import {useNavigate} from 'react-router-dom';
 import {getUserById} from '../../api/users';
 import {prefetchExamGraph} from '../../offline/prefetch';
 import {ExamListItem} from '../../components/ExamListItem/ExamListItem.tsx';
+import {AppRoute} from '../../const.ts';
 
 type ExamListScreenProps = {
   isFavorites: boolean;
@@ -17,6 +18,8 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
   const [authorNames, setAuthorNames] = useState<Record<string, string>>({});
   const [testsLoaded, setTestsLoaded] = useState(true);
   const navigate = useNavigate();
+  const listBackPage = isFavorites ? AppRoute.FavouriteExamList : AppRoute.ExamList;
+
   useEffect(() => {
     setTestsLoaded(true)
     const userId = localStorage.getItem('userId');
@@ -93,6 +96,7 @@ export function ExamListScreen({isFavorites}: ExamListScreenProps) {
             exam={exam}
             authorNames={authorNames}
             isFavorites={isFavorites}
+            backPage={listBackPage}
             navigate={navigate}
           />
         ))}

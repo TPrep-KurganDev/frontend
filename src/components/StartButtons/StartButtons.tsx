@@ -3,20 +3,21 @@ import {useNavigate} from 'react-router-dom';
 import {ExamOut} from '../../api/exam.ts';
 import {useState} from 'react';
 import {RandomQuestionsModal} from '../RandomQuestionsModal/RandomQuestionsModal';
-import {AppRoute} from '../../const.ts';
 import {toast} from 'react-hot-toast';
 import {createSessionOffline} from '../../api/session.ts';
 import {beginPendingSessionStart} from '../../session/pendingSessionStart';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {probeBackendReachability} from '../../api/api.ts';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import {buildExamPath} from '../../utils/backNavigation';
 
 type StartButtonsProps = {
   exam?: ExamOut | null;
   cardsCount?: number;
+  viewQuestionsBackPage?: string;
 }
 
-export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
+export function StartButtons({exam, cardsCount = 0, viewQuestionsBackPage}: StartButtonsProps) {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isOnline = useNetworkStatus();
@@ -103,7 +104,11 @@ export function StartButtons({exam, cardsCount = 0}: StartButtonsProps) {
   };
 
   const handleViewQuestions = () => {
-    navigate(`${AppRoute.Exam}?examId=${exam?.id}`);
+    if (!exam?.id) {
+      return;
+    }
+
+    navigate(buildExamPath(exam?.id, viewQuestionsBackPage));
   }
 
   return (

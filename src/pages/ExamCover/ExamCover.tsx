@@ -12,6 +12,7 @@ import {toast} from 'react-hot-toast';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {pluralizeRu} from '../../utils/pluralizeRu';
+import {buildExamCoverPath, buildExamPath, getBackPage, getCurrentLocationPath} from '../../utils/backNavigation';
 // import {api} from '../../api/api';
 
 type ExamCoverState = {
@@ -28,6 +29,8 @@ export default function ExamCover() {
   const [starImage, setStarImage] = useState('star.svg');
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
+  const backButtonPage = getBackPage(searchParams);
+  const currentCoverPath = getCurrentLocationPath(location);
 
   const [exam, setExam] = useState<ExamOut | null>(null);
   // const [loading, setLoading] = useState(true);
@@ -142,7 +145,9 @@ export default function ExamCover() {
   ) => {
     e.stopPropagation();
 
-    const url = window.location.href;
+    const url = exam?.id
+      ? `${window.location.origin}${buildExamCoverPath(exam.id)}`
+      : window.location.href;
 
     try {
       await navigator.clipboard.writeText(url);
@@ -160,12 +165,17 @@ export default function ExamCover() {
               inputDisabled={true} inputRef={undefined} onInputBlur={() => {
       }} onTitleChange={() => {
       }}
-              backButtonPage={'/'} onRightImageClick={isOnline ? (() => {
+              backButtonPage={backButtonPage} onRightImageClick={isOnline ? (() => {
         changePinState();
       }) : undefined}/>
       <div className="screenСontent screenContentCentered">
         <div className={`${styles.titleBlock} ${styles.roundedBox}`}
-             onClick={() => navigate(`/exam?examId=${exam?.id}`)}>
+             onClick={() => {
+               if (!exam?.id) {
+                 return;
+               }
+               navigate(buildExamPath(exam.id, currentCoverPath));
+             }}>
           <p className={styles.title}>{exam?.title}</p>
           <p className={styles.questionCount}>
             {cardsCount} {pluralizeRu(cardsCount, ['вопрос', 'вопроса', 'вопросов'])}
@@ -179,7 +189,7 @@ export default function ExamCover() {
           </div>
           {/*<p className={styles.linkAccess}>Доступ по ссылке</p>*/}
         </div>
-        <StartButtons exam={exam} cardsCount={cardsCount}/>
+        <StartButtons exam={exam} cardsCount={cardsCount} viewQuestionsBackPage={currentCoverPath}/>
       </div>
       <div className={styles.bottomGap}></div>
     </>

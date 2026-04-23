@@ -11,6 +11,7 @@ import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {AIHint} from '../../components/AIHint/AIHint.tsx';
 import clsx from 'clsx';
+import {buildExamPath, getBackPage} from '../../utils/backNavigation';
 
 
 export function EditCardScreen() {
@@ -25,6 +26,8 @@ export function EditCardScreen() {
   const [aiFilling, setAiFilling] = useState(false);
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
+  const examIdParam = searchParams.get('examId');
+  const backButtonPage = getBackPage(searchParams, buildExamPath(examIdParam));
 
   useEffect(() => {
     const cardIdParam = searchParams.get('cardId');
@@ -92,7 +95,7 @@ export function EditCardScreen() {
     if (!examIdParam) return;
 
     deleteCard(examIdParam, Number(cardIdParam)).then(() => {
-      navigate(`/exam?examId=${examIdParam}`);
+      navigate(backButtonPage);
     })
   }
 
@@ -144,7 +147,7 @@ export function EditCardScreen() {
       })} inputDisabled={true} inputRef={undefined} onInputBlur={() => {
       }} onTitleChange={() => {
       }}
-              backButtonPage={`/exam?examId=${examId}`}/>
+              backButtonPage={backButtonPage}/>
 
       <TextAreaAuto
         value={question}

@@ -10,10 +10,11 @@
     width: min(349px, 100%);
     margin: 0 auto 3px;
     padding-left: 14px;
-    font-size: 14px;
-    line-height: 17px;
+    text-align: left;
     color: #353535;
     box-sizing: border-box;
+    font-size: 14px;
+    line-height: 17px;
   }
 
   .name,
@@ -58,7 +59,8 @@
   }
 
   .loadButton,
-  .scanButton {
+  .scanButton,
+  .createButton {
     position: relative;
     display: flex;
     align-items: center;
@@ -84,8 +86,16 @@
     background: linear-gradient(85.22deg, #e0f2ff 2.78%, #ece8f9 50.25%, #fcf4e9 97.73%);
   }
 
+  .createButton {
+    margin-top: 19px;
+    margin-bottom: 0;
+    background: #fff4cb;
+    box-shadow: 0 0 28.6px rgba(0, 3, 59, 0.14);
+  }
+
   .loadText,
-  .scanText {
+  .scanText,
+  .createText {
     font-size: 24px;
     line-height: 30px;
     text-align: center;
@@ -93,13 +103,15 @@
   }
 
   .loadButton:disabled,
-  .scanButton:disabled {
+  .scanButton:disabled,
+  .createButton:disabled {
     cursor: default;
     opacity: 0.6;
   }
 
   .loadIcon,
-  .scanIcon {
+  .scanIcon,
+  .createIcon {
     position: absolute;
     right: 35px;
     width: 24px;

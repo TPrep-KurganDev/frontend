@@ -4,13 +4,15 @@ import {uploadCardsFile} from '../../api/exam.ts';
 import {useNavigate} from 'react-router-dom';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
+import {buildExamPath} from '../../utils/backNavigation';
 
 interface FileUploadProps {
   exam_id: string;
+  backPage?: string | null;
 }
 
 
-export const FileUpload: React.FC<FileUploadProps> = ({ exam_id: examId }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ exam_id: examId, backPage }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ exam_id: examId }) => {
     setLoading(true);
     try {
       await uploadCardsFile(Number(examId), file);
-      navigate(`/exam?examId=${examId}`)
+      navigate(backPage ?? buildExamPath(examId))
     } catch (err) {
       console.error(err);
     } finally {

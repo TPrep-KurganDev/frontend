@@ -1,6 +1,5 @@
 import styles from './MainScreen.module.scss'
 import {Notification} from '../../components/Notification/Notification.tsx';
-import {createExam} from '../../api/exam'
 import {getUserById} from '../../api/users'
 import {NotificationOut, deleteNotification} from '../../api/notifications'
 import {formatNotificationTime} from '../../utils/formatNotificationTime'
@@ -11,7 +10,6 @@ import {
   prefetchNotificationsForUser,
   prefetchPinnedExamsGraph
 } from '../../offline/prefetch';
-import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
 import {useState, useEffect, type CSSProperties} from 'react';
@@ -69,14 +67,7 @@ export function MainScreen() {
     return readPersistedWarmup(initialUserId).done;
   });
   const createExamClick = () => {
-    if (!isOnline) {
-      notifyOnlineOnly();
-      return;
-    }
-
-    createExam('Новый экзамен').then((res) => {
-      navigate(`${AppRoute.ExamCreate}?examId=${res.id}`);
-    });
+    navigate(AppRoute.ExamCreate);
   }
 
   const [username, setUsername] = useState('');

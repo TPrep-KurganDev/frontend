@@ -1,24 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import styles from './FileUploadScreen.module.scss';
 import Header from '../../components/Header/Header.tsx';
 import {FileUpload} from '../../components/FileUpload/FileUpload.tsx';
 import {useSearchParams} from 'react-router-dom';
+import {buildExamPath, getBackPage} from '../../utils/backNavigation';
 
 export const FileUploadScreen: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const [examId, setExamId] = useState('');
-
-  useEffect(() => {
-    const examIdParam = searchParams.get('examId');
-    if (!examIdParam) return;
-
-    setExamId(examIdParam);
-  }, [searchParams])
+  const examId = searchParams.get('examId') ?? '';
+  const backButtonPage = getBackPage(searchParams, buildExamPath(examId));
 
   return (
     <>
       <Header title={'Загрузка файла'} inputDisabled={true} inputRef={undefined} onInputBlur={() => {}}
-              onTitleChange={() => {}} backButtonPage={`/exam?examId=${examId}`}/>
+              onTitleChange={() => {}} backButtonPage={backButtonPage}/>
       <h1 className={styles.title}>Формат</h1>
 
       <div className={styles.card}>
@@ -72,7 +67,7 @@ export const FileUploadScreen: React.FC = () => {
       </div>
 
       {/*<button className={styles.yellowButton}>Выбрать файл</button>*/}
-      <FileUpload exam_id={examId}/>
+      <FileUpload exam_id={examId} backPage={backButtonPage}/>
     </>
   )
 }

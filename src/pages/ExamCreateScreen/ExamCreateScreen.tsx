@@ -5,7 +5,7 @@ import {toast} from 'react-hot-toast';
 import styles from './ExamCreateScreen.module.scss';
 import Header from '../../components/Header/Header';
 import {AppRoute} from '../../const';
-import {ExamOut, getExam} from '../../api/exam';
+import {createExam, ExamOut, getExam} from '../../api/exam';
 import {createCardsFromOcr} from '../../api/cards';
 import {
   collectOcrFilesFromDirectory,
@@ -18,6 +18,7 @@ import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {notifyOnlineOnly} from '../../utils/notifyOnlineOnly';
 import {pluralizeRu} from '../../utils/pluralizeRu';
 import {extractApiErrorMessage} from '../../utils/extractApiErrorMessage';
+import {buildExamCoverPath, buildExamPath, buildFileUploadPath} from '../../utils/backNavigation';
 
 const EMPTY_FOLDER_ERROR = 'В выбранной папке нет файлов. Выберите папку, где лежат изображения для OCR.';
 const FOLDER_OCR_UNAVAILABLE_ERROR = 'Загрузка папки с изображениями недоступна в текущей сборке приложения.';
@@ -25,6 +26,7 @@ const READ_FOLDER_STATUS = 'Читаю файлы из папки...';
 const UPLOAD_FOLDER_STATUS = 'Загружаю папку с изображениями...';
 const STOPPING_STATUS = 'Сканирование останавливается...';
 const STOPPED_STATUS = 'Сканирование остановлено';
+const CREATE_EXAM_ERROR = 'Не удалось создать тест';
 
 type FolderFiles = FileList | File[] | OcrUploadFile[];
 
@@ -74,25 +76,30 @@ function getOcrSuccessMessage(createdCards: number, failedImages: number): strin
 export function ExamCreateScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const examId = searchParams.get('examId');
+  const searchExamId = searchParams.get('examId') ?? '';
+  const [examId, setExamId] = useState(searchExamId);
+  const [exam, setExam] = useState<ExamOut | null>(null);
   const isOnline = useNetworkStatus();
   const folderInputRef = useRef<HTMLInputElement | null>(null);
   const scanAbortControllerRef = useRef<AbortController | null>(null);
+  const createExamRequestRef = useRef<Promise<string | null> | null>(null);
 
-  const [exam, setExam] = useState<ExamOut | null>(null);
   const [ocrStatusText, setOcrStatusText] = useState('');
   const [isOcrRunning, setIsOcrRunning] = useState(false);
   const [isFolderOcrAvailable, setIsFolderOcrAvailable] = useState(false);
+  const [isExamCreating, setIsExamCreating] = useState(false);
 
   useEffect(() => {
-    if (!examId) {
-      navigate(AppRoute.NotFound);
+    setExamId(searchExamId);
+
+    if (!searchExamId) {
+      setExam(null);
       return;
     }
 
     let cancelled = false;
 
-    getExam(examId)
+    getExam(searchExamId)
       .then((nextExam) => {
         if (cancelled) {
           return;
@@ -101,13 +108,17 @@ export function ExamCreateScreen() {
         setExam(nextExam);
       })
       .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
         navigate(AppRoute.NotFound);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [examId, navigate]);
+  }, [navigate, searchExamId]);
 
   useEffect(() => {
     const input = folderInputRef.current;
@@ -145,6 +156,49 @@ export function ExamCreateScreen() {
     };
   }, []);
 
+  const ensureExamId = async (): Promise<string | null> => {
+    if (examId) {
+      if (exam?.id === examId) {
+        return examId;
+      }
+
+      try {
+        const nextExam = await getExam(examId);
+        setExam(nextExam);
+        return nextExam.id;
+      } catch {
+        navigate(AppRoute.NotFound);
+        return null;
+      }
+    }
+
+    if (createExamRequestRef.current) {
+      return createExamRequestRef.current;
+    }
+
+    const request = (async () => {
+      setIsExamCreating(true);
+
+      try {
+        const nextExam = await createExam('Новый экзамен');
+        setExamId(nextExam.id);
+        setExam(nextExam);
+        navigate(`${AppRoute.ExamCreate}?examId=${nextExam.id}`, {replace: true});
+
+        return nextExam.id;
+      } catch (error) {
+        toast.error(extractApiErrorMessage(error, CREATE_EXAM_ERROR));
+        return null;
+      } finally {
+        setIsExamCreating(false);
+        createExamRequestRef.current = null;
+      }
+    })();
+
+    createExamRequestRef.current = request;
+    return request;
+  };
+
   const finishOcrRun = (controller?: AbortController | null, nextStatusText = '') => {
     if (!controller || scanAbortControllerRef.current === controller) {
       scanAbortControllerRef.current = null;
@@ -154,18 +208,18 @@ export function ExamCreateScreen() {
     setOcrStatusText(nextStatusText);
   };
 
-  const handleFileUploadClick = () => {
-    if (!examId) {
-      navigate(AppRoute.NotFound);
-      return;
-    }
-
+  const handleFileUploadClick = async () => {
     if (!isOnline) {
       notifyOnlineOnly();
       return;
     }
 
-    navigate(`${AppRoute.FileUpload}?examId=${examId}`);
+    const nextExamId = await ensureExamId();
+    if (!nextExamId) {
+      return;
+    }
+
+    navigate(buildFileUploadPath(nextExamId, buildExamPath(nextExamId)));
   };
 
   const handleFolderPickClick = () => {
@@ -222,14 +276,6 @@ export function ExamCreateScreen() {
     files: FolderFiles,
     controller: AbortController = new AbortController()
   ) => {
-    if (!examId) {
-      finishOcrRun(controller);
-      navigate(AppRoute.NotFound);
-      return;
-    }
-
-    scanAbortControllerRef.current = controller;
-
     if (countFolderFiles(files) === 0) {
       toast.error(EMPTY_FOLDER_ERROR);
       finishOcrRun(controller);
@@ -248,6 +294,13 @@ export function ExamCreateScreen() {
       return;
     }
 
+    const nextExamId = await ensureExamId();
+    if (!nextExamId) {
+      finishOcrRun(controller);
+      return;
+    }
+
+    scanAbortControllerRef.current = controller;
     setIsOcrRunning(true);
     setOcrStatusText(UPLOAD_FOLDER_STATUS);
 
@@ -268,7 +321,7 @@ export function ExamCreateScreen() {
         setOcrStatusText(`Распознаю изображения: ${processedImages} из ${uploadResult.imageNames.length}`);
 
         try {
-          const cards = await createCardsFromOcr(examId, imageName, controller.signal);
+          const cards = await createCardsFromOcr(nextExamId, imageName, controller.signal);
           createdCards += cards.length;
         } catch (error) {
           if (isAbortError(error)) {
@@ -290,7 +343,7 @@ export function ExamCreateScreen() {
 
       toast.success(getOcrSuccessMessage(createdCards, failedImages));
       finishOcrRun(controller);
-      navigate(`${AppRoute.Exam}?examId=${examId}`);
+      navigate(buildExamPath(nextExamId));
     } catch (error) {
       if (isAbortError(error)) {
         finishOcrRun(controller, STOPPED_STATUS);
@@ -324,6 +377,23 @@ export function ExamCreateScreen() {
     setOcrStatusText(STOPPING_STATUS);
   };
 
+  const handleCreateEmptyExamClick = async () => {
+    if (!isOnline) {
+      notifyOnlineOnly();
+      return;
+    }
+
+    const nextExamId = await ensureExamId();
+    if (!nextExamId) {
+      return;
+    }
+
+    navigate(buildExamPath(nextExamId));
+  };
+
+  const isActionDisabled = isOcrRunning || isExamCreating || !isOnline;
+  const backButtonPage = examId ? buildExamCoverPath(examId) : AppRoute.Main;
+
   return (
     <>
       <Header
@@ -332,18 +402,18 @@ export function ExamCreateScreen() {
         inputRef={undefined}
         onInputBlur={() => {}}
         onTitleChange={() => {}}
-        backButtonPage={examId ? `${AppRoute.ExamCover}?examId=${examId}` : AppRoute.Main}
+        backButtonPage={backButtonPage}
       />
       <div className={styles.content}>
         <div className={styles.nameText}>Название</div>
-        <div className={styles.name}>{exam?.title ?? 'Загрузка...'}</div>
+        <div className={styles.name}>{exam?.title ?? 'Новый экзамен'}</div>
         <div className={styles.rightsText}>Права доступа</div>
         <div className={styles.rights}>{getScopeLabel(exam?.scope)}</div>
         <button
           type="button"
           className={styles.loadButton}
-          onClick={handleFileUploadClick}
-          disabled={isOcrRunning || !isOnline}
+          onClick={() => { void handleFileUploadClick(); }}
+          disabled={isActionDisabled}
         >
           <span className={styles.loadText}>Загрузить из файла</span>
           <img className={styles.loadIcon} src="load.svg" alt=""/>
@@ -352,14 +422,26 @@ export function ExamCreateScreen() {
           type="button"
           className={styles.scanButton}
           onClick={handleFolderPickClick}
-          disabled={isOcrRunning || !isOnline}
+          disabled={isActionDisabled}
         >
           <span className={styles.scanText}>
             {isOcrRunning ? 'Обрабатываю папку...' : 'Загрузить папку фото'}
           </span>
           <img className={styles.scanIcon} src="scan.svg" alt=""/>
         </button>
+        <button
+          type="button"
+          className={styles.createButton}
+          onClick={() => { void handleCreateEmptyExamClick(); }}
+          disabled={isActionDisabled}
+        >
+          <span className={styles.createText}>
+            {isExamCreating ? 'Создаю тест...' : 'Создать тест'}
+          </span>
+          <img className={styles.createIcon} src="createTest.svg" alt=""/>
+        </button>
 
+        {isExamCreating && <div className={styles.loadingNote}>Подготавливаю новый тест...</div>}
         {isOcrRunning && <div className={styles.loadingNote}>Карточки загружаются...</div>}
         {isOcrRunning && (
           <button
