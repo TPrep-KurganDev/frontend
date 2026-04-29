@@ -26,6 +26,8 @@ jobs:
         run: |
           ssh server bash -c 'cat > ~/deploy/.env << EOF
           FRONTEND_VERSION=${{ inputs.tag }}
+          DOMAIN=${{ secrets.DOMAIN }}
+          ACME_EMAIL=${{ secrets.ACME_EMAIL }}
           EOF'
 
       - name: Deploy and health check
