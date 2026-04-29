@@ -34,7 +34,7 @@ jobs:
             cd deploy
             git pull
             docker compose pull frontend
-            docker compose up -d frontend
+            docker compose up -d traefik nginx frontend
             for i in $(seq 1 10); do
               status=$(docker inspect --format="{{.State.Health.Status}}" tprep_frontend_prod 2>/dev/null)
               [ "$status" = "healthy" ] && exit 0
