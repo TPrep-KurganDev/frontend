@@ -41,6 +41,15 @@
   .name {
     padding: 0 24px;
     margin-bottom: 19px;
+    outline: none;
+  }
+
+  .name:disabled {
+    opacity: 0.6;
+  }
+
+  .name:focus {
+    border-color: #5a7dff;
   }
 
   .rights {

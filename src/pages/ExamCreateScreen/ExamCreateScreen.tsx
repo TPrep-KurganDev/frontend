@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'react-hot-toast';
 
@@ -28,6 +28,7 @@ const UPLOAD_FOLDER_STATUS = 'Загружаю папку с изображен�
 const STOPPING_STATUS = 'Сканирование останавливается...';
 const STOPPED_STATUS = 'Сканирование остановлено';
 const CREATE_EXAM_ERROR = 'Не удалось создать тест';
+const DEFAULT_TITLE = 'Новый экзамен';
 const DEFAULT_SCOPE = 'default';
 
 type FolderFiles = FileList | File[] | OcrUploadFile[];
@@ -90,8 +91,10 @@ export function ExamCreateScreen() {
   const [isOcrRunning, setIsOcrRunning] = useState(false);
   const [isFolderOcrAvailable, setIsFolderOcrAvailable] = useState(false);
   const [isExamCreating, setIsExamCreating] = useState(false);
+  const [examTitle, setExamTitle] = useState(DEFAULT_TITLE);
   const [selectedScope, setSelectedScope] = useState(DEFAULT_SCOPE);
   const [isRightScreenOpened, setRightScreenOpened] = useState(false);
+  const [isTitleSaving, setIsTitleSaving] = useState(false);
   const [isScopeSaving, setIsScopeSaving] = useState(false);
 
   useEffect(() => {
@@ -99,6 +102,7 @@ export function ExamCreateScreen() {
 
     if (!searchExamId) {
       setExam(null);
+      setExamTitle(DEFAULT_TITLE);
       setSelectedScope(DEFAULT_SCOPE);
       return;
     }
@@ -112,6 +116,7 @@ export function ExamCreateScreen() {
         }
 
         setExam(nextExam);
+        setExamTitle(nextExam.title);
         setSelectedScope(nextExam.scope);
       })
       .catch(() => {
@@ -126,6 +131,10 @@ export function ExamCreateScreen() {
       cancelled = true;
     };
   }, [navigate, searchExamId]);
+
+  const getNormalizedExamTitle = () => {
+    return examTitle.trim() || DEFAULT_TITLE;
+  };
 
   useEffect(() => {
     const input = folderInputRef.current;
@@ -172,6 +181,8 @@ export function ExamCreateScreen() {
       try {
         const nextExam = await getExam(examId);
         setExam(nextExam);
+        setExamTitle(nextExam.title);
+        setSelectedScope(nextExam.scope);
         return nextExam.id;
       } catch {
         navigate(AppRoute.NotFound);
@@ -187,9 +198,10 @@ export function ExamCreateScreen() {
       setIsExamCreating(true);
 
       try {
-        const nextExam = await createExam('Новый экзамен', selectedScope);
+        const nextExam = await createExam(getNormalizedExamTitle(), selectedScope);
         setExamId(nextExam.id);
         setExam(nextExam);
+        setExamTitle(nextExam.title);
         setSelectedScope(nextExam.scope);
         navigate(`${AppRoute.ExamCreate}?examId=${nextExam.id}`, {replace: true});
 
@@ -224,6 +236,11 @@ export function ExamCreateScreen() {
 
     const nextExamId = await ensureExamId();
     if (!nextExamId) {
+      return;
+    }
+
+    const isTitleSaved = await saveExamTitleIfNeeded();
+    if (!isTitleSaved) {
       return;
     }
 
@@ -308,6 +325,12 @@ export function ExamCreateScreen() {
       return;
     }
 
+    const isTitleSaved = await saveExamTitleIfNeeded();
+    if (!isTitleSaved) {
+      finishOcrRun(controller);
+      return;
+    }
+
     scanAbortControllerRef.current = controller;
     setIsOcrRunning(true);
     setOcrStatusText(UPLOAD_FOLDER_STATUS);
@@ -388,6 +411,47 @@ export function ExamCreateScreen() {
   const isCurrentExamLoaded = !examId || exam?.id === examId;
   const isExistingExamLoading = Boolean(examId && !isCurrentExamLoaded);
 
+  const saveExamTitleIfNeeded = async (): Promise<boolean> => {
+    if (!isCurrentExamLoaded) {
+      return false;
+    }
+
+    const nextTitle = getNormalizedExamTitle();
+    if (nextTitle !== examTitle) {
+      setExamTitle(nextTitle);
+    }
+
+    if (!exam || nextTitle === exam.title) {
+      return true;
+    }
+
+    if (!isOnline) {
+      notifyOnlineOnly();
+      return false;
+    }
+
+    setIsTitleSaving(true);
+
+    try {
+      const nextExam = await updateExam(exam.id, {title: nextTitle, scope: exam.scope});
+      setExam(nextExam);
+      setExamTitle(nextExam.title);
+      setSelectedScope(nextExam.scope);
+      return true;
+    } catch (error) {
+      toast.error(extractApiErrorMessage(error, 'Не удалось изменить название теста'));
+      return false;
+    } finally {
+      setIsTitleSaving(false);
+    }
+  };
+
+  const handleTitleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.currentTarget.blur();
+    }
+  };
+
   const handleScopeChange = async (scope: string) => {
     if (!isCurrentExamLoaded) {
       setRightScreenOpened(false);
@@ -411,8 +475,9 @@ export function ExamCreateScreen() {
     setIsScopeSaving(true);
 
     try {
-      const nextExam = await updateExam(exam.id, {title: exam.title, scope});
+      const nextExam = await updateExam(exam.id, {title: getNormalizedExamTitle(), scope});
       setExam(nextExam);
+      setExamTitle(nextExam.title);
       setSelectedScope(nextExam.scope);
     } catch (error) {
       setSelectedScope(previousScope);
@@ -433,10 +498,16 @@ export function ExamCreateScreen() {
       return;
     }
 
+    const isTitleSaved = await saveExamTitleIfNeeded();
+    if (!isTitleSaved) {
+      return;
+    }
+
     navigate(buildExamPath(nextExamId));
   };
 
-  const isActionDisabled = isOcrRunning || isExamCreating || isScopeSaving || isExistingExamLoading || !isOnline;
+  const isActionDisabled =
+    isOcrRunning || isExamCreating || isTitleSaving || isScopeSaving || isExistingExamLoading || !isOnline;
   const backButtonPage = examId ? buildExamCoverPath(examId) : AppRoute.Main;
 
   return (
@@ -451,7 +522,18 @@ export function ExamCreateScreen() {
       />
       <div className={styles.content}>
         <div className={styles.nameText}>Название</div>
-        <div className={styles.name}>{exam?.title ?? 'Новый экзамен'}</div>
+        <input
+          type="text"
+          aria-label="Название"
+          className={styles.name}
+          value={examTitle}
+          onChange={(event) => setExamTitle(event.target.value)}
+          onBlur={() => {
+            void saveExamTitleIfNeeded();
+          }}
+          onKeyDown={handleTitleKeyDown}
+          disabled={isActionDisabled}
+        />
         <div className={styles.rightsText}>Права доступа</div>
         <button
           type="button"
