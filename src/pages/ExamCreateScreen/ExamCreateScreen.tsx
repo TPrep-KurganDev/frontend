@@ -4,8 +4,9 @@ import {toast} from 'react-hot-toast';
 
 import styles from './ExamCreateScreen.module.scss';
 import Header from '../../components/Header/Header';
+import {AccessToogle} from '../../components/AccessToogle/AccessToogle';
 import {AppRoute} from '../../const';
-import {createExam, ExamOut, getExam} from '../../api/exam';
+import {createExam, ExamOut, getExam, updateExam} from '../../api/exam';
 import {createCardsFromOcr} from '../../api/cards';
 import {
   collectOcrFilesFromDirectory,
@@ -27,6 +28,7 @@ const UPLOAD_FOLDER_STATUS = 'Загружаю папку с изображен�
 const STOPPING_STATUS = 'Сканирование останавливается...';
 const STOPPED_STATUS = 'Сканирование остановлено';
 const CREATE_EXAM_ERROR = 'Не удалось создать тест';
+const DEFAULT_SCOPE = 'default';
 
 type FolderFiles = FileList | File[] | OcrUploadFile[];
 
@@ -88,12 +90,16 @@ export function ExamCreateScreen() {
   const [isOcrRunning, setIsOcrRunning] = useState(false);
   const [isFolderOcrAvailable, setIsFolderOcrAvailable] = useState(false);
   const [isExamCreating, setIsExamCreating] = useState(false);
+  const [selectedScope, setSelectedScope] = useState(DEFAULT_SCOPE);
+  const [isRightScreenOpened, setRightScreenOpened] = useState(false);
+  const [isScopeSaving, setIsScopeSaving] = useState(false);
 
   useEffect(() => {
     setExamId(searchExamId);
 
     if (!searchExamId) {
       setExam(null);
+      setSelectedScope(DEFAULT_SCOPE);
       return;
     }
 
@@ -106,6 +112,7 @@ export function ExamCreateScreen() {
         }
 
         setExam(nextExam);
+        setSelectedScope(nextExam.scope);
       })
       .catch(() => {
         if (cancelled) {
@@ -180,9 +187,10 @@ export function ExamCreateScreen() {
       setIsExamCreating(true);
 
       try {
-        const nextExam = await createExam('Новый экзамен');
+        const nextExam = await createExam('Новый экзамен', selectedScope);
         setExamId(nextExam.id);
         setExam(nextExam);
+        setSelectedScope(nextExam.scope);
         navigate(`${AppRoute.ExamCreate}?examId=${nextExam.id}`, {replace: true});
 
         return nextExam.id;
@@ -377,6 +385,43 @@ export function ExamCreateScreen() {
     setOcrStatusText(STOPPING_STATUS);
   };
 
+  const isCurrentExamLoaded = !examId || exam?.id === examId;
+  const isExistingExamLoading = Boolean(examId && !isCurrentExamLoaded);
+
+  const handleScopeChange = async (scope: string) => {
+    if (!isCurrentExamLoaded) {
+      setRightScreenOpened(false);
+      return;
+    }
+
+    if (exam && !isOnline) {
+      notifyOnlineOnly();
+      setRightScreenOpened(false);
+      return;
+    }
+
+    const previousScope = selectedScope;
+    setSelectedScope(scope);
+    setRightScreenOpened(false);
+
+    if (!exam) {
+      return;
+    }
+
+    setIsScopeSaving(true);
+
+    try {
+      const nextExam = await updateExam(exam.id, {title: exam.title, scope});
+      setExam(nextExam);
+      setSelectedScope(nextExam.scope);
+    } catch (error) {
+      setSelectedScope(previousScope);
+      toast.error(extractApiErrorMessage(error, 'Не удалось изменить права доступа'));
+    } finally {
+      setIsScopeSaving(false);
+    }
+  };
+
   const handleCreateEmptyExamClick = async () => {
     if (!isOnline) {
       notifyOnlineOnly();
@@ -391,7 +436,7 @@ export function ExamCreateScreen() {
     navigate(buildExamPath(nextExamId));
   };
 
-  const isActionDisabled = isOcrRunning || isExamCreating || !isOnline;
+  const isActionDisabled = isOcrRunning || isExamCreating || isScopeSaving || isExistingExamLoading || !isOnline;
   const backButtonPage = examId ? buildExamCoverPath(examId) : AppRoute.Main;
 
   return (
@@ -408,7 +453,14 @@ export function ExamCreateScreen() {
         <div className={styles.nameText}>Название</div>
         <div className={styles.name}>{exam?.title ?? 'Новый экзамен'}</div>
         <div className={styles.rightsText}>Права доступа</div>
-        <div className={styles.rights}>{getScopeLabel(exam?.scope)}</div>
+        <button
+          type="button"
+          className={styles.rights}
+          onClick={() => setRightScreenOpened(true)}
+          disabled={isActionDisabled}
+        >
+          {getScopeLabel(selectedScope)}
+        </button>
         <button
           type="button"
           className={styles.loadButton}
@@ -463,6 +515,14 @@ export function ExamCreateScreen() {
           onChange={(event) => void handleFolderSelected(event)}
         />
       </div>
+      <AccessToogle
+        currentAccess={selectedScope}
+        handler={(scope) => {
+          void handleScopeChange(scope);
+        }}
+        isOpened={isRightScreenOpened}
+        onClose={() => setRightScreenOpened(false)}
+      />
     </>
   );
 }

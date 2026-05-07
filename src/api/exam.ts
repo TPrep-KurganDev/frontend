@@ -100,8 +100,8 @@ export async function getPinnedExams(pinnedId: string | null, options?: ExamRead
   );
 }
 
-export async function createExam(data: string) {
-  const res = await api.post<ExamOut>('/exams', {'title': data, 'scope': 'default'});
+export async function createExam(title: string, scope = 'default') {
+  const res = await api.post<ExamOut>('/exams', {title, scope});
   await Promise.allSettled([
     setCacheEntry(getExamCacheKey(res.data.id), res.data),
     invalidateExamListsForCurrentUser()
