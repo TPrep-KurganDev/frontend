@@ -38,13 +38,14 @@
     background: linear-gradient(-45deg, #fee976, #feef9e);
     width: 70%;
     border-radius: 28px;
-    padding: 5px;
+    padding: 12px 5px;
     display: flex;
     justify-content: center;
     align-content: center;
     align-items: center;
     flex-direction: column;
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.10);
+    margin-top: 5px;
   }
 
   .yellowButton:hover {
@@ -52,13 +53,16 @@
   }
 
   .yellowButtonPadding {
-    margin-bottom: 120px;
+    margin-bottom: 80px;
   }
 
-  .yellowButtonP {
+  .orP {
     color: #939393;
     padding: 0;
+    font-size: 21px;
     margin: 0;
+    margin-top: -5px;
+    line-height: 0;
   }
 
   .yellowButtonTitle {

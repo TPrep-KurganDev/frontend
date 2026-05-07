@@ -17,6 +17,7 @@ import {useEffect, useRef} from 'react';
 import NoAccessScreen from '../../pages/NoAccessScreen/NoAccessScreen.tsx';
 import {ExamCreateScreen} from '../../pages/ExamCreateScreen/ExamCreateScreen';
 import {SearchExamPage} from '../../pages/SearchExamPage/SearchExamPage.tsx';
+import {AccountScreen} from "../../pages/AccountScreen/AccountScreen.tsx";
 
 
 export default function App() {
@@ -114,6 +115,10 @@ export default function App() {
           <Route
             path={AppRoute.SearchExam}
             element={<SearchExamPage/>}
+          />
+          <Route
+            path={AppRoute.Account}
+            element={<AccountScreen/>}
           />
         </Routes>
       <Toaster position="top-center"/>
