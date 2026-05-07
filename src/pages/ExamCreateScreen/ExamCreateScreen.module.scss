@@ -80,13 +80,14 @@
   .scanButton,
   .createButton {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 24px;
+    column-gap: 12px;
     align-items: center;
-    justify-content: center;
     width: min(349px, 100%);
     min-height: 48px;
     margin: 0 auto 19px;
-    padding: 0 24px;
+    padding: 8px 22px 8px 28px;
     border-radius: 18px;
     box-sizing: border-box;
     border: 0;
@@ -114,10 +115,13 @@
   .loadText,
   .scanText,
   .createText {
+    min-width: 0;
     font-size: 24px;
-    line-height: 30px;
+    line-height: 28px;
     text-align: center;
     color: #353535;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 
   .loadButton:disabled,
@@ -130,8 +134,8 @@
   .loadIcon,
   .scanIcon,
   .createIcon {
-    position: absolute;
-    right: 35px;
+    position: static;
+    justify-self: end;
     width: 24px;
     height: 24px;
   }
