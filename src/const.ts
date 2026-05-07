@@ -14,6 +14,7 @@ export enum AppRoute {
   NoAccess = '/no-access',
   Main = '/',
   SearchExam = '/search',
+  Account = '/me',
   NotFound = '*'
 }
 
