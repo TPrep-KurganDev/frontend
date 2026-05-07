@@ -22,6 +22,15 @@
     cursor: pointer;
   }
 
+  .uploadItemDisabled {
+    opacity: 0.6;
+  }
+
+  .uploadItemDisabled:hover {
+    background-color: transparent;
+    cursor: default;
+  }
+
   .uploadIcon {
     flex-shrink: 0;
     width: 50px;
@@ -48,9 +57,35 @@
     font-weight: 500;
     color: #111827;
     margin: 0;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: min(290px, 100%);
+  }
+
+  .cancelScanButton,
+  .ocrStatus {
+    width: min(349px, 100%);
+    margin: 0 auto;
+  }
+
+  .cancelScanButton {
+    display: block;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 16px;
+    color: #cf4d45;
+    text-align: center;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .ocrStatus {
+    font-size: 14px;
+    line-height: 18px;
+    color: #3d5afe;
+    text-align: center;
   }
 }
