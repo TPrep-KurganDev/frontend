@@ -65,9 +65,8 @@ export function RegistrationScreen() {
           <BlueButton title="Готово"/>
         </form>
       </div>
-
+      <p className={styles.orP}>или</p>
       <div className={`${styles.yellowButton} ${styles.yellowButtonPadding}`} onClick={() => {navigate('/login')}}>
-        <p className={styles.yellowButtonP}>или</p>
         <p className={styles.yellowButtonTitle}>Вход</p>
       </div>
     </div>
