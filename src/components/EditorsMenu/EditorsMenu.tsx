@@ -22,8 +22,7 @@ async function getEditors(examId: string | null) {
   console.log(res)
   const userPromises = res.user_id.map(editor_id => getUserById(editor_id));
   const users = await Promise.all(userPromises);
-  return users.map((user) => { return {avatar: 'avatar.png', name: user.user_name, id: user.id}; })
-  // return [, {avatar: 'avatar.png', name: 'Беня Салин'}]
+  return users.map((user) => { return {avatar: 'avatar3.png', name: user.user_name, id: user.id}; })
 }
 
 export const EditorsMenu: React.FC<EditorsMenuProps> = ({examId, handler: _handlerv, isOpened, onClose}) => {
@@ -37,7 +36,7 @@ export const EditorsMenu: React.FC<EditorsMenuProps> = ({examId, handler: _handl
 
   const [value, setValue] = useState('');
   const [debouncedValue, setDebouncedValue] = useState(value);
-  const [userByEmail, setUserByEmail] = useState<Editor>({name: '', avatar: 'avatar.png', id: ''});
+  const [userByEmail, setUserByEmail] = useState<Editor>({name: '', avatar: 'avatar3.png', id: ''});
   const [showUser, setShowUser] = useState(false);
 
   useEffect(() => {
@@ -124,7 +123,7 @@ export const EditorsMenu: React.FC<EditorsMenuProps> = ({examId, handler: _handl
           { showUser && (
             <div className={styles.rightString}>
               <div className={styles.leftPart}>
-                <img className={styles.avatar} src='avatar.png' alt=''/>
+                <img className={styles.avatar} src='avatar3.png' alt=''/>
                 <p className={styles.editorName}>{userByEmail.name}</p>
               </div>
               <img
