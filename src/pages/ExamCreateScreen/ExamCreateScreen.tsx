@@ -96,6 +96,13 @@ export function ExamCreateScreen() {
   const [isRightScreenOpened, setRightScreenOpened] = useState(false);
   const [isTitleSaving, setIsTitleSaving] = useState(false);
   const [isScopeSaving, setIsScopeSaving] = useState(false);
+  const selectedScopeRef = useRef(DEFAULT_SCOPE);
+  const titleSavePromiseRef = useRef<Promise<boolean> | null>(null);
+
+  const applySelectedScope = (scope: string) => {
+    selectedScopeRef.current = scope;
+    setSelectedScope(scope);
+  };
 
   useEffect(() => {
     setExamId(searchExamId);
@@ -103,7 +110,7 @@ export function ExamCreateScreen() {
     if (!searchExamId) {
       setExam(null);
       setExamTitle(DEFAULT_TITLE);
-      setSelectedScope(DEFAULT_SCOPE);
+      applySelectedScope(DEFAULT_SCOPE);
       return;
     }
 
@@ -117,7 +124,7 @@ export function ExamCreateScreen() {
 
         setExam(nextExam);
         setExamTitle(nextExam.title);
-        setSelectedScope(nextExam.scope);
+        applySelectedScope(nextExam.scope);
       })
       .catch(() => {
         if (cancelled) {
@@ -182,7 +189,7 @@ export function ExamCreateScreen() {
         const nextExam = await getExam(examId);
         setExam(nextExam);
         setExamTitle(nextExam.title);
-        setSelectedScope(nextExam.scope);
+        applySelectedScope(nextExam.scope);
         return nextExam.id;
       } catch {
         navigate(AppRoute.NotFound);
@@ -202,7 +209,7 @@ export function ExamCreateScreen() {
         setExamId(nextExam.id);
         setExam(nextExam);
         setExamTitle(nextExam.title);
-        setSelectedScope(nextExam.scope);
+        applySelectedScope(nextExam.scope);
         navigate(`${AppRoute.ExamCreate}?examId=${nextExam.id}`, {replace: true});
 
         return nextExam.id;
@@ -430,20 +437,31 @@ export function ExamCreateScreen() {
       return false;
     }
 
-    setIsTitleSaving(true);
-
-    try {
-      const nextExam = await updateExam(exam.id, {title: nextTitle, scope: exam.scope});
-      setExam(nextExam);
-      setExamTitle(nextExam.title);
-      setSelectedScope(nextExam.scope);
-      return true;
-    } catch (error) {
-      toast.error(extractApiErrorMessage(error, 'Не удалось изменить название теста'));
-      return false;
-    } finally {
-      setIsTitleSaving(false);
+    if (titleSavePromiseRef.current) {
+      return titleSavePromiseRef.current;
     }
+
+    const request = (async () => {
+      setIsTitleSaving(true);
+
+      try {
+        const nextExam = await updateExam(exam.id, {title: nextTitle, scope: selectedScopeRef.current});
+        const currentScope = selectedScopeRef.current;
+        setExam({...nextExam, scope: currentScope});
+        setExamTitle(nextExam.title);
+        applySelectedScope(currentScope);
+        return true;
+      } catch (error) {
+        toast.error(extractApiErrorMessage(error, 'Не удалось изменить название теста'));
+        return false;
+      } finally {
+        setIsTitleSaving(false);
+        titleSavePromiseRef.current = null;
+      }
+    })();
+
+    titleSavePromiseRef.current = request;
+    return request;
   };
 
   const handleTitleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -465,7 +483,7 @@ export function ExamCreateScreen() {
     }
 
     const previousScope = selectedScope;
-    setSelectedScope(scope);
+    applySelectedScope(scope);
     setRightScreenOpened(false);
 
     if (!exam) {
@@ -475,12 +493,18 @@ export function ExamCreateScreen() {
     setIsScopeSaving(true);
 
     try {
+      const pendingTitleSave = titleSavePromiseRef.current;
+      if (pendingTitleSave) {
+        await pendingTitleSave;
+      }
+
       const nextExam = await updateExam(exam.id, {title: getNormalizedExamTitle(), scope});
       setExam(nextExam);
       setExamTitle(nextExam.title);
-      setSelectedScope(nextExam.scope);
+      applySelectedScope(nextExam.scope);
     } catch (error) {
-      setSelectedScope(previousScope);
+      applySelectedScope(previousScope);
+      setExam((currentExam) => currentExam ? {...currentExam, scope: previousScope} : currentExam);
       toast.error(extractApiErrorMessage(error, 'Не удалось изменить права доступа'));
     } finally {
       setIsScopeSaving(false);
