@@ -227,7 +227,7 @@ export function MainScreen() {
       <header className={styles.header}>
         <div className={styles.user}>
           <img className={styles.avatar} width={43} height={43} alt=''
-               src="avatar.png"/>
+               src="avatar3.png"/>
           <div className={styles.name}>{username}</div>
           <div
             className={styles.cacheStatus}

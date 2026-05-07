@@ -8,7 +8,6 @@ const APP_SHELL_ASSETS = [
   '/cards.ico',
   '/icon-192.png',
   '/icon-512.png',
-  '/avatar.png',
   '/Arrow 1.svg',
   '/bell active.svg',
   '/bell inactive.svg',
