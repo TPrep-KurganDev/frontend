@@ -17,7 +17,8 @@ import {useEffect, useRef} from 'react';
 import NoAccessScreen from '../../pages/NoAccessScreen/NoAccessScreen.tsx';
 import {ExamCreateScreen} from '../../pages/ExamCreateScreen/ExamCreateScreen';
 import {SearchExamPage} from '../../pages/SearchExamPage/SearchExamPage.tsx';
-import {AccountScreen} from "../../pages/AccountScreen/AccountScreen.tsx";
+import {AccountScreen} from
+    '../../pages/AccountScreen/AccountScreen.tsx';
 
 
 export default function App() {

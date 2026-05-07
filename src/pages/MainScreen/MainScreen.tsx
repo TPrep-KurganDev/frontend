@@ -14,7 +14,7 @@ import {useNetworkStatus} from '../../hooks/useNetworkStatus';
 import {useNavigate} from 'react-router-dom';
 import {useState, useEffect, type CSSProperties} from 'react';
 import {AppRoute} from '../../const';
-import clsx from "clsx";
+import clsx from 'clsx';
 
 const CACHE_WARMUP_STORAGE_PREFIX = 'app:cache-warmup:';
 
